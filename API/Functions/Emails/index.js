@@ -12,9 +12,10 @@ module.exports.process = async (event, context, callback) => {
         //Informative log until all is working as expected.
         console.log(JSON.stringify(mailEvent))
         const { messageId, timestamp, commonHeaders } = mailEvent.mail
-        let { subject, to } = commonHeaders
+        let { subject, to, from } = commonHeaders
 
-        const source = to[0]
+
+        const source =  getEmail(to);
 
         // Removing forward subject label
         if (subject.includes('Fwd: ')) {
@@ -35,9 +36,13 @@ module.exports.process = async (event, context, callback) => {
                 Key: messageId
             }).promise();
 
+            console.log(data);
+            
             if (!([undefined, null].includes(data.Body))) {
                 const emailData = data.Body.toString('utf-8')
                 const result = await utils.readRawEmail(emailData)
+
+                console.log(result);
 
                 for (let index = 0; index < filters.length; index++) {
                     const filter = filters[index];
@@ -90,6 +95,8 @@ const getEmail = (from) => {
         source = from[0].match(/\<(.*?)\>/g)
         if (Array.isArray(source) && source.length > 0) {
             source = source[0].replace('<', '').replace('>', '')
+        }else{
+            source = from[0];
         }
     }
     return source
