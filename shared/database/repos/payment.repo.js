@@ -59,6 +59,7 @@ module.exports.updatePayment = async (Payment) => {
     }
   );
   await destroy()
+  return result; 
 };
 
 module.exports.getByCategories = async (userId, date) => {
