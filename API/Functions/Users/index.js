@@ -84,6 +84,54 @@ module.exports.addNewCategory = async (event) => {
   }
 };
 
+module.exports.addBudgetCategory = async (event) => {
+
+  const body = event.body ? event.body : {};
+  
+  if (!body.value || !body.budget || isNaN(body.budget))
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
+
+  const {
+    cognitoPoolClaims
+  } = event
+
+  const {
+    sub
+  } = cognitoPoolClaims
+
+  try {
+    const result = await UserRepo.updateCategory(
+      {
+        sub, 
+        category: {
+          value: { $eq: body.value }
+        }
+      },
+      { 'category.$.budget': body.budget }
+    );
+    return {
+      statusCode: result ? 200 : 409,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      statusCode: "500",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(error),
+    };
+  }
+};
+
 module.exports.checkSecretKey = async (event) => {
   const body = event.body ? JSON.parse(event.body) : {};
 

@@ -1,4 +1,3 @@
-const { search } = require("../../../AutomationServices/AutoMailChecker/utils");
 const userModel = require("../../models/user.model");
 const Users = require("../../models/user.model");
 const { connect, destroy, isConnected } = require("../mongo");
@@ -54,5 +53,12 @@ module.exports.createCategory = async (userCriteria, category) =>{
             categories: { ...category }
         }
     })
+    return result.nModified > 0 
+}
+
+module.exports.updateCategory = async (searchCriteria, update) =>{
+    await connect()
+    const result = await userModel.updateOne({ ...searchCriteria }, update)
+    await destroy()
     return result.nModified > 0 
 }

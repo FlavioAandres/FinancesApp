@@ -236,6 +236,26 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+  AddBudgetCategory:
+    handler: API/Functions/Users.addBudgetCategory
+    name: UserRepo-Categories-POST-${opt:stage}
+    events:
+      - http:
+          path: /user/categories/budget
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
 
   GetDataCredit:
     handler: API/Functions/DataCredit.get

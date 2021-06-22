@@ -37,6 +37,7 @@ const userSchema = mongoose.Schema(
         categories: [{
             label: String, 
             value: String, 
+            budget: Number, 
         }],
         emails: [
             {
