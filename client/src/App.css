@@ -12,6 +12,10 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
 
 }
 
+.add-new-payment, .add-new-income {
+  cursor: pointer;
+}
+
 .prepayment-item-expansion-content form{
   margin-top: 20px;
 }
