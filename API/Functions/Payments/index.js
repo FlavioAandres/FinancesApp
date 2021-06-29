@@ -68,3 +68,45 @@ module.exports.put = async (event, context, callback) => {
   }
 }
 
+module.exports.post = async (event, context, callback) => {
+  const { body: bodyString, cognitoPoolClaims } = event
+  const {
+    description,
+    category,
+    amount,
+    source
+  } = bodyString
+
+  const {
+    sub
+  } = cognitoPoolClaims
+
+  try {
+    if (!description || !category || !amount || !source) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
+    const user = await getUser({ sub })
+
+    await PaymentRepo.create({
+      user: user._id,
+      isHidden: false,
+      isAccepted: true,
+      description: description,
+      category: category,
+      amount,
+      source,
+      createdBy: 'API',
+      text: `${description} by ${amount}`,
+      type: 'EXPENSE'
+    })
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({ success: 'Payment Created' })
+    }
+  } catch (error) {
+    console.error(error)
+    return context.done(error, 'Something goes wrong')
+  }
+}

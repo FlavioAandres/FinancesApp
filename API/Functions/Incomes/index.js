@@ -95,7 +95,6 @@ module.exports.post = async (event, context, callback) => {
       source
     })
 
-    await detroyMongoConnection()
     return {
       statusCode: 200,
       headers: {

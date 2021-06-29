@@ -92,6 +92,27 @@ functions:
             claims:
               - sub
 
+  PostPrepayments:
+    handler: API/Functions/Payments.post
+    name: PrepaymentsRepo-post-${opt:stage}
+    events:
+      - http:
+          path: /payments
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
   GetStats:
     handler: API/Functions/BoxFlow.get
     name: StatsRepo-get-${opt:stage}
