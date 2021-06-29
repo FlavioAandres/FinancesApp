@@ -9,7 +9,7 @@ const NewCategoryModal = ({ save, categories: UserCategories, close, loading, sh
     const [categories, setCategories] = useState([])
 
 
-    const onCreateIncome = (evt) => {
+    const onCreatePayment = (evt) => {
         if (source.trim() === "" || amount.trim() === "" || category.trim() === "") return alert("Hey, agrega datos!");
         save({
             source,
@@ -25,14 +25,14 @@ const NewCategoryModal = ({ save, categories: UserCategories, close, loading, sh
 
     useEffect(() => {
         if (UserCategories) {
-            setCategories([...UserCategories.filter(category => category.type === 'INCOME'), 'INCOME'])
+            setCategories([...UserCategories.filter(category => category.type === 'EXPENSE')])
         }
     }, [UserCategories])
 
     return (
         <Modal onHide={close} show={show}>
             <Modal.Header closeButton={true}>
-                <Modal.Title>Nuevo Ingreso</Modal.Title>
+                <Modal.Title>Nuevo Pago</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <form action="">
@@ -43,14 +43,14 @@ const NewCategoryModal = ({ save, categories: UserCategories, close, loading, sh
                     <TextField label="Monto"
                         value={amount}
                         type='number'
+                        step="0.01"
                         onChange={(evt) => setAmount(evt.target.value)}
                     />
                     <TextField label="description"
                         value={description}
                         onChange={(evt) => setDescription(evt.target.value)}
                     />
-                    <SingleSelect onSelect={(category) => setCategory(category)} value={'INCOME'}>
-                        <option value='INCOME'>INCOME</option>
+                    <SingleSelect onSelect={(category) => setCategory(category)}>
                         {
                             categories.map(category => <option value={category.value}> {category.label}</option>)
                         }
@@ -61,7 +61,7 @@ const NewCategoryModal = ({ save, categories: UserCategories, close, loading, sh
                 <Button onClick={close} shape="flat" color="info">
                     Cancelar
                 </Button>
-                <Button loading={loading} color="info" onClick={onCreateIncome}>Crear Ingreso</Button>
+                <Button loading={loading} color="info" onClick={onCreatePayment}>Crear Ingreso</Button>
             </Modal.Footer>
         </Modal>
     );

@@ -4,6 +4,7 @@ import moment from "moment";
 import formatCash from '../utils/formatCash';
 import ModalShowCategories from './ModalShowCategories/ModalShowCategories'
 import ModalAddIncome from './ModalAddIncome/ModalAddIncome'
+import ModalAddPayment from './ModalAddPayment/ModalAddPayment'
 import SelectorTimming from './SelectorTiming'
 import { Label } from 'emerald-ui/lib'
 import { API } from 'aws-amplify'
@@ -22,6 +23,9 @@ class HomeComponent extends React.Component {
       latestIncomes: [],
       showSpinningCategoryModal: false,
       showAddIncomeModal: false,
+      showSpinningIncomeModal: false,
+      showAddPaymentModal: false,
+      showSpinningPaymentModal: false
     };
   }
   isRenderd = false;
@@ -103,13 +107,40 @@ class HomeComponent extends React.Component {
     }).catch(err => console.error(err))
   }
 
+  onSavePayment = (payment) => {
+    this.setState({
+      showSpinningPaymentModal: true
+    })
+    API.post('finances', '/payments', {
+      body: {
+        ...payment
+      }
+    }).then(result => {
+      this.setState((state, props) => {
+        return {
+          showAddPaymentModal: false,
+          showSpinningPaymentModal: false,
+          latestPayments: [{ description: payment.description, amount: payment.amount, category: payment.category }, ...state.latestPayments]
+        }
+      })
+    }).catch(err => console.error(err))
+  }
+
   onCreateIncomeClick = (evt) => {
     this.setState({
       showAddIncomeModal: true
     })
   }
 
+  onCreatePaymentClick = (evt) => {
+    this.setState({
+      showAddPaymentModal : true
+    })
+  }
+
   onCloseIncomesModal = (evt) => this.setState({ showAddIncomeModal: false })
+
+  onClosePaymentModal = (evt) => this.setState({ showAddPaymentModal: false })
 
   render() {
     const {
@@ -140,6 +171,14 @@ class HomeComponent extends React.Component {
           close={this.onCloseIncomesModal}
           categories={user.categories} />
 
+        <ModalAddPayment
+          save={this.onSavePayment}
+          loading={this.state.showSpinningPaymentModal}
+          show={this.state.showAddPaymentModal}
+          close={this.onClosePaymentModal}
+          categories={user.categories} />
+
+
         <SelectorTimming
           onChangeDate={this.onChangeDate}
           timeAgo={timeAgo}
@@ -156,12 +195,19 @@ class HomeComponent extends React.Component {
           }
         </div>
         <div className="stats-container">
-          <Table title="Last payments: " content={latestPayments} />
+          <Table title={
+            <>
+              Last payments:  {' '}
+              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="primary">
+                ➕ Add
+              </Label>
+            </>
+          } content={latestPayments} />
           <Table title="Expensive payments:" content={expensivePayments} />
           <Table title={
             <>
               Last Incomes {' '}
-              <Label onClick={this.onCreateIncomeClick} className="add-new-category" color="primary">
+              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="primary">
                 ➕ Add
               </Label>
             </>
