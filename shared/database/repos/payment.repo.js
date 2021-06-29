@@ -194,6 +194,137 @@ module.exports.usersHavePayments = async (userList = []) => {
     }
   }];
   const result = await Payments.aggregate(aggregation)
-  await destroy()
+  return result
+}
+
+module.exports.percentageByCardTypeStat = async (userId, date) => {
+  await connect();
+  
+  const aggregation = [
+    {
+      '$match': {
+        'category': {
+          '$ne': null
+        },
+        'user': userId,
+        'isAccepted': true,
+        'createdAt': { '$gte': new Date(date) },
+      }
+    }, {
+      '$group': {
+        '_id': {
+          '$cond': {
+            'if': {
+              '$eq': [
+                '$cardType', null
+              ]
+            },
+            'then': 'Manual',
+            'else': '$cardType'
+          }
+        },
+        'payments': {
+          '$push': {
+            'payment': '$$ROOT'
+          }
+        },
+        'sum': {
+          '$sum': '$amount'
+        }
+      }
+    }, {
+      '$group': {
+        '_id': null,
+        'sum': {
+          '$sum': '$sum'
+        },
+        'card': {
+          '$push': {
+            'cardType': '$_id',
+            'amount': '$sum'
+          }
+        }
+      }
+    }, {
+      '$unwind': {
+        'path': '$card'
+      }
+    }, {
+      '$project': {
+        'cardType': '$card.cardType',
+        'amount': '$card.amount',
+        'sum': '$sum',
+        'percent': {
+          '$multiply': [
+            {
+              '$divide': [
+                '$card.amount', '$sum'
+              ]
+            }, 100
+          ]
+        }
+      }
+    }
+  ]
+
+  const result = await Payments.aggregate(aggregation)
+  return result
+}
+
+module.exports.percentageByCategoryTypeStat = async (userId, date) => {
+  await connect();
+  
+  const aggregation = [
+    {
+      '$match': {
+        'category': {
+          '$ne': null
+        }, 
+        'user': userId,
+        'isAccepted': true,
+        'createdAt': { '$gte': new Date(date) },
+      }
+    }, {
+      '$group': {
+        '_id': '$category', 
+        'sum': {
+          '$sum': '$amount'
+        }
+      }
+    }, {
+      '$group': {
+        '_id': null, 
+        'sum': {
+          '$sum': '$sum'
+        }, 
+        'categories': {
+          '$push': {
+            'category': '$_id', 
+            'amount': '$sum'
+          }
+        }
+      }
+    }, {
+      '$unwind': {
+        'path': '$categories'
+      }
+    }, {
+      '$project': {
+        'cardType': '$categories.category', 
+        'amount': '$categories.amount', 
+        'sum': '$sum', 
+        'percent': {
+          '$multiply': [
+            {
+              '$divide': [
+                '$categories.amount', '$sum'
+              ]
+            }, 100
+          ]
+        }
+      }
+    }
+  ]
+  const result = await Payments.aggregate(aggregation)
   return result
 }

@@ -16,7 +16,7 @@ class GraphContainer extends Component {
   isGraphRendered = false;
   ChartsRendered = {}
 
-  renderGraph = ({ type = "bar", series, categories, xaxis = {}, dataLabels = {}, plotOptions = {}, chartOptions = {} }, id) => {
+  renderGraph = ({ type = "bar", series, categories = [], xaxis = {}, dataLabels = {}, plotOptions = {}, chartOptions = {} }, id) => {
     const basics = {
       chart: {
         type,
@@ -24,31 +24,61 @@ class GraphContainer extends Component {
       },
     };
     if (!this.ChartsRendered[id]) {
-      const chart = new ApexCharts(document.getElementById(id), {
-        ...basics,
-        series,
-        xaxis: {
-          categories,
-          axisBorder: {
-            show: false
-          },
-          ...xaxis
-        },
-        yaxis: {
-          formatter: formatCash
-        },
-        dataLabels,
-        plotOptions,
-        stroke: {
-          curve: "smooth",
-          width: 3
-        },
-      });
+      let chart;
+      switch (type) {
+        case 'donut':
+          chart = new ApexCharts(document.getElementById(id), {
+            ...basics,
+            series,
+            enabled: true,
+            formatter: function (val) {
+              return val + "%"
+            },
+            labels: dataLabels,
+            plotOptions
+          });
+          break;
+
+        default:
+          chart = new ApexCharts(document.getElementById(id), {
+            ...basics,
+            series,
+            xaxis: {
+              categories,
+              axisBorder: {
+                show: false
+              },
+              ...xaxis
+            },
+            yaxis: {
+              formatter: formatCash
+            },
+            dataLabels,
+            plotOptions,
+            stroke: {
+              curve: "smooth",
+              width: 3
+            },
+          });
+          break;
+      }
       chart.render();
       this.ChartsRendered[id] = chart;
     } else {
       this.ChartsRendered[id].updateSeries(series)
+      switch (type) {
+        case 'donut':
+          
+          this.ChartsRendered[id].updateOptions({
+            labels: dataLabels
+          })
+          console.log(dataLabels)
+          break;
+        default:
+          break;
+      }
     }
+
   };
 
   getMonthlyMetrics = () =>
@@ -253,10 +283,56 @@ class GraphContainer extends Component {
       })
       .catch((err) => console.error(err));
 
+  getStats = (date) => {
+    API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'stats', date } })
+      .then((res) => {
+        const { cardTypeStats, categoryTypeStats } = JSON.parse(res.body);
+
+        // CardTypeStats
+
+        const { cardTypesNamesSeries, cardTypeStatsSeries } = cardTypeStats.reduce((prev, item) => {
+          prev.cardTypesNamesSeries.push(item.cardType)
+          prev.cardTypeStatsSeries.push(parseFloat(item.percent.toFixed(2)))
+
+          return prev
+        }, { cardTypesNamesSeries: [], cardTypeStatsSeries: [] })
+
+
+        this.renderGraph(
+          {
+            dataLabels: cardTypesNamesSeries,
+            type: "donut",
+            series: cardTypeStatsSeries,
+            chartOptions: { width: 400 }
+          },
+          "graph-card-stats"
+        );
+
+        // CategoryTypeStats
+        const { categoriesTypeNamesSeries, categoryTypeSeries } = categoryTypeStats.reduce((prev, item) => {
+          prev.categoriesTypeNamesSeries.push(item.cardType)
+          prev.categoryTypeSeries.push(parseFloat(item.percent.toFixed(2)))
+
+          return prev
+        }, { categoriesTypeNamesSeries: [], categoryTypeSeries: [] })
+
+        this.renderGraph(
+          {
+            dataLabels: categoriesTypeNamesSeries,
+            type: "donut",
+            series: categoryTypeSeries,
+            chartOptions: { width: 500 }
+          },
+          "graph-category-stats"
+        );
+      })
+      .catch((err) => console.error(err));
+  }
 
   componentDidMount = () => {
     this.getMonthlyMetrics();
     this.getMonthlyCategories();
+    this.getStats();
   };
 
   onChangeDate = (e, period) => {
@@ -265,6 +341,7 @@ class GraphContainer extends Component {
       ? 'month'
       : 'day';
     this.getMonthlyCategories(date, grpupBy)
+    this.getStats(date);
     this.setState({
       timeAgo: period
     })
@@ -297,6 +374,17 @@ class GraphContainer extends Component {
           <div className="graph-category-monthly-container">
             <h2>Incomes Categories by month</h2>
             <div id="graph-category-monthly-incomes"></div>
+          </div>
+        </div>
+
+        <div className="container-graphs-general">
+          <div className="ggraph-monthly-container">
+            <h2>Percentage By Card Type</h2>
+            <div id="graph-card-stats"></div>
+          </div>
+          <div className="graph-category-monthly-container">
+            <h2>Percentage by Category</h2>
+            <div id="graph-category-stats"></div>
           </div>
         </div>
       </div>
