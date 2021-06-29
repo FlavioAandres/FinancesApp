@@ -121,6 +121,7 @@ module.exports = {
 
         let query = {
             user: user._id,
+            isAccepted: true,
             createdAt: {
                 $gte: new Date(date)
             }
@@ -187,6 +188,7 @@ module.exports = {
 
         let query = {
             user: user._id,
+            isAccepted: true,
             category: { $in: category },
             createdAt: {
                 $gte: new Date(date)
@@ -240,6 +242,7 @@ module.exports = {
 
         let query = {
             user: user._id,
+            isAccepted: true,
             category: { $in: fromCategory },
             createdAt: {
                 $gte: new Date(date)

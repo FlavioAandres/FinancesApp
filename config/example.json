@@ -9,6 +9,8 @@
     "EMAIL_USERNAME": "user@domain.tld",
     "EMAIL_PASSWORD": "SECRET",
     "PHONE_NUMBER": "+573000000000",
+    "TWILIO_ACCESS_TOKEN": "",
+    "TWILIO_SECTRET_KEY":"",
     "SECRET_KEY": "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3",
     "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:XXXXXXXX:userpool/us-east-1_ZZZZZZZ",
     "EMAIL_RECIPIENTS": ["finance@domain.tdl"]

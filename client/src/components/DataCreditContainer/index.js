@@ -1,6 +1,7 @@
 import React from "react";
 import Gauge from './gauge'
 import Table from './table'
+import formatCash from '../../utils/formatCash';
 import { API } from 'aws-amplify'
 class DataCreditComponent extends React.Component {
     _isMounted = false;
@@ -56,8 +57,6 @@ class DataCreditComponent extends React.Component {
         this.getDataCreditStatistics()
     }
 
-    transformNumber = (number) => Intl.NumberFormat('es-co', { style: 'currency', currency: 'COP' }).format(number)
-
     render() {
         const {
             score,
@@ -74,7 +73,7 @@ class DataCreditComponent extends React.Component {
             { title: 'Numero de productos', value: amountOfProducts },
             { title: 'Productos en mora los ultimos 30 días', value: arrears30daysLastYear ? arrears30daysLastYear : 0 },
             { title: 'Productos en mora los ultimos 60 días', value: arrears60daysLast2Year ? arrears60daysLast2Year : 0 },
-            { title: 'Monto en Mora', value: this.transformNumber(arrearsAmount) },
+            { title: 'Monto en Mora', value: formatCash(arrearsAmount) },
         ]
 
         return (

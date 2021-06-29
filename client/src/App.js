@@ -1,6 +1,4 @@
 import React from "react";
-import "./App.css";
-import "emerald-ui/lib/styles.css";
 import Navbar from "./components/navbar";
 import PrepaymentContainer from "./components/prePaymentContainer";
 import GraphContainer from "./components/GraphsContainer";
@@ -11,8 +9,8 @@ import constants from "./constants";
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
 import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
-
-
+import "emerald-ui/lib/styles.css";
+import "./App.css";
 Amplify.configure({
   ...awsconfig,
   API: {
@@ -35,6 +33,7 @@ class App extends React.Component {
       user: {},
       banks: [],
       prepayments: [],
+      incomes: [],
       navbarActive: "home",
       token: null
     };
@@ -50,13 +49,24 @@ class App extends React.Component {
     })
   };
 
+  getIncomes = () => {
+    const self = this;
+    API.get("finances", "/incomes").then(response => {
+      const data = JSON.parse(response.body)
+      self.setState({
+        incomes: data,
+      })
+    })
+  }
+
   componentDidMount = async () => {
     this.loadInitialData()
   };
 
   loadInitialData() {
     this.getPrePayments();
-    this.getUserInformation()
+    this.getUserInformation();
+    this.getIncomes();
   }
 
   onLoginClick = (secret) => {
@@ -68,6 +78,7 @@ class App extends React.Component {
   getUserInformation = () => {
     API.get("finances", "/user").then(response => {
       const data = JSON.parse(response.body)
+      if (!data) return;
       this.setState({
         user: {
           ...data,
@@ -122,10 +133,10 @@ class App extends React.Component {
             />
           )}
           {this.state.navbarActive === "graph" && <GraphContainer />}
-          {this.state.navbarActive === "home" && <HomeContainer />}
+          {this.state.navbarActive === "home" && <HomeContainer user={this.state.user} />}
           {this.state.navbarActive === "datacredit" && <DataCreditContainer />}
           {this.state.navbarActive === "profile" && (
-            <ProfileContainer user={this.state.user} banks={this.state.banks} saveCategory={this.addCategoryToState} />
+            <ProfileContainer getUserInformation={this.getUserInformation} user={this.state.user} banks={this.state.banks} saveCategory={this.addCategoryToState} />
           )}
         </div>
       </React.Fragment>

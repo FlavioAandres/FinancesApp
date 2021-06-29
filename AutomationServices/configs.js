@@ -5,8 +5,6 @@ const {
 
 module.exports  = {
     imap:{
-        user: EMAIL_USERNAME,
-        password: EMAIL_PASSWORD,
         host: 'imap.gmail.com',
         port: 993,
         tls: true, 

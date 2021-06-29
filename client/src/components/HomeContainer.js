@@ -1,6 +1,12 @@
 import React from "react";
 import Table from "./TableComponent";
 import moment from "moment";
+import formatCash from '../utils/formatCash';
+import ModalShowCategories from './ModalShowCategories/ModalShowCategories'
+import ModalAddIncome from './ModalAddIncome/ModalAddIncome'
+import ModalAddPayment from './ModalAddPayment/ModalAddPayment'
+import SelectorTimming from './SelectorTiming'
+import { Label } from 'emerald-ui/lib'
 import { API } from 'aws-amplify'
 
 class HomeComponent extends React.Component {
@@ -13,7 +19,13 @@ class HomeComponent extends React.Component {
       expensivePayments: [],
       totalByCategory: [],
       prepayments: [],
-      categories: []
+      categories: [],
+      latestIncomes: [],
+      showSpinningCategoryModal: false,
+      showAddIncomeModal: false,
+      showSpinningIncomeModal: false,
+      showAddPaymentModal: false,
+      showSpinningPaymentModal: false
     };
   }
   isRenderd = false;
@@ -23,7 +35,7 @@ class HomeComponent extends React.Component {
       .then(response => {
         const data = JSON.parse(response.body)
         const categories = [];
-        const { latestPayments, expensivePayments, prepayments, totalByCategory } = data;
+        const { latestPayments, expensivePayments, prepayments, totalByCategory, latestIncomes } = data;
         Object.keys(totalByCategory).forEach((key) => {
           const catName = key
           const total = totalByCategory[key].reduce((prev, curr) => prev + curr.amount, 0)
@@ -39,14 +51,15 @@ class HomeComponent extends React.Component {
         })
         if (this._isMounted) {
           this.setState({
+            latestIncomes,
             latestPayments,
             expensivePayments,
             prepayments,
-            categories
+            categories,
+            totalByCategory
           });
         }
       })
-
   };
 
   onChangeDate = (evt, date) => {
@@ -68,7 +81,66 @@ class HomeComponent extends React.Component {
     this._isMounted = false;
   }
 
-  transformNumber = (number) => Intl.NumberFormat('es-co', { style: 'currency', currency: 'COP' }).format(number)
+  showCategoriesContainer(evt, category) {
+    if (evt) evt.preventDefault();
+    this.setState({ showCategoriesModal: true, choosedCategoryModal: category });
+
+  }
+
+
+  onSaveIncome = (income) => {
+    this.setState({
+      showSpinningIncomeModal: true
+    })
+    API.post('finances', '/incomes', {
+      body: {
+        ...income
+      }
+    }).then(result => {
+      this.setState((state, props) => {
+        return {
+          showAddIncomeModal: false,
+          showSpinningIncomeModal: false,
+          latestIncomes: [{ description: income.description, amount: income.amount, category: income.category }, ...state.latestIncomes]
+        }
+      })
+    }).catch(err => console.error(err))
+  }
+
+  onSavePayment = (payment) => {
+    this.setState({
+      showSpinningPaymentModal: true
+    })
+    API.post('finances', '/payments', {
+      body: {
+        ...payment
+      }
+    }).then(result => {
+      this.setState((state, props) => {
+        return {
+          showAddPaymentModal: false,
+          showSpinningPaymentModal: false,
+          latestPayments: [{ description: payment.description, amount: payment.amount, category: payment.category }, ...state.latestPayments]
+        }
+      })
+    }).catch(err => console.error(err))
+  }
+
+  onCreateIncomeClick = (evt) => {
+    this.setState({
+      showAddIncomeModal: true
+    })
+  }
+
+  onCreatePaymentClick = (evt) => {
+    this.setState({
+      showAddPaymentModal : true
+    })
+  }
+
+  onCloseIncomesModal = (evt) => this.setState({ showAddIncomeModal: false })
+
+  onClosePaymentModal = (evt) => this.setState({ showAddPaymentModal: false })
 
   render() {
     const {
@@ -76,43 +148,70 @@ class HomeComponent extends React.Component {
       latestPayments,
       expensivePayments,
       categories,
+      choosedCategoryModal,
+      totalByCategory,
+      latestIncomes,
     } = this.state;
+
+    const { user } = this.props
+
     return (
       <div className="home-container">
-        <div className="container-timming-buton">
-          <button
-            onClick={(evt) => this.onChangeDate(evt, "week")}
-            className={timeAgo === "week" ? "selected" : ""}
-          >
-            Last 1 Week
-          </button>
-          <button
-            onClick={(evt) => this.onChangeDate(evt, "month")}
-            className={timeAgo === "month" ? "selected" : ""}
-          >
-            Last 1 Month
-          </button>
-          <button
-            onClick={(evt) => this.onChangeDate(evt, "year")}
-            className={timeAgo === "year" ? "selected" : ""}
-          >
-            Last 1 Year
-          </button>
-        </div>
+        <ModalShowCategories
+          show={this.state.showCategoriesModal}
+          category={this.state.choosedCategoryModal}
+          data={choosedCategoryModal ? totalByCategory[choosedCategoryModal] : []}
+          close={() => this.setState({ showCategoriesModal: null, choosedCategoryModal: null })}
+        />
+
+        <ModalAddIncome
+          save={this.onSaveIncome}
+          loading={this.state.showSpinningIncomeModal}
+          show={this.state.showAddIncomeModal}
+          close={this.onCloseIncomesModal}
+          categories={user.categories} />
+
+        <ModalAddPayment
+          save={this.onSavePayment}
+          loading={this.state.showSpinningPaymentModal}
+          show={this.state.showAddPaymentModal}
+          close={this.onClosePaymentModal}
+          categories={user.categories} />
+
+
+        <SelectorTimming
+          onChangeDate={this.onChangeDate}
+          timeAgo={timeAgo}
+        />
         <div className="categories-container">
           {
             categories.map((item, index) => (
-              <div className="category-item" key={`item-${index}`}>
+              <button onClick={(evt) => this.showCategoriesContainer(evt, item.name)} className="category-item" key={`item-${index}`}>
                 <p>
-                  {item.name}: <span>{this.transformNumber(item.total)}</span>
+                  {item.name}: <span>{formatCash(item.total)}</span>
                 </p>
-              </div>
+              </button>
             ))
           }
         </div>
         <div className="stats-container">
-          <Table title="Ultimas compras" content={latestPayments} />
-          <Table title="Compras mas hptas..." content={expensivePayments} />
+          <Table title={
+            <>
+              Last payments:  {' '}
+              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="primary">
+                ➕ Add
+              </Label>
+            </>
+          } content={latestPayments} />
+          <Table title="Expensive payments:" content={expensivePayments} />
+          <Table title={
+            <>
+              Last Incomes {' '}
+              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="primary">
+                ➕ Add
+              </Label>
+            </>
+          } content={latestIncomes} />
         </div>
       </div>
     );

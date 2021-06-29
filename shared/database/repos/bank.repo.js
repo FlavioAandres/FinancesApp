@@ -16,6 +16,5 @@ module.exports.create = async (bankBody) => {
 module.exports.getBanks = async (searchCriteria = {}) => {
     await connect();
     const banks = await bankSchema.find(searchCriteria)
-    await destroy();
     return banks;
 }

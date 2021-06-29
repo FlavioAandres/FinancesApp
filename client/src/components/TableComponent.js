@@ -1,8 +1,8 @@
 import React from "react";
+import formatCash from '../utils/formatCash'
 import { Table } from "emerald-ui/lib";
 
 export default (props) => {
-  const transformNumber = (number) => Intl.NumberFormat('es-co', {style: 'currency', currency: 'COP'}).format(number)
   const { content = [], title = 'Table title' } = props;
   return (
     <div className="table-container-emerald">
@@ -20,7 +20,7 @@ export default (props) => {
             <tr key={`content-key-${index}`}>
               <td>{description}</td>
               <td>{category}</td>
-              <td>{transformNumber(amount)}</td>
+              <td>{formatCash(amount)}</td>
             </tr>
           ))}
         </tbody>

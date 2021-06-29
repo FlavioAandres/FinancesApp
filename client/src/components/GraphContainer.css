@@ -1,0 +1,12 @@
+.graph-container h1, h2{
+    display: inline-block;
+}
+.container-graphs-general{
+    display: flex;
+    justify-content: space-between;
+}
+.graph-monthly-container,
+.graph-category-monthly-container{
+    width: 50%;
+    margin: 10px;
+}

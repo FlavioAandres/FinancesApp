@@ -1,5 +1,5 @@
 const UserRepo = require("./../../../shared/database/repos/user.repo");
-const { encrypt, decrypt } = require('../../../shared/utils/crypto')
+const { encrypt, decrypt } = require('../../../shared/utils/crypto');
 
 module.exports.getUserInformation = async (event) => {
   try {
@@ -64,7 +64,7 @@ module.exports.addNewCategory = async (event) => {
       {
         sub
       },
-      { label: body.label, value: body.value }
+      { label: body.label, value: body.value, type: body.type }
     );
     return {
       statusCode: result ? 200 : 409,
@@ -153,4 +153,55 @@ module.exports.postConfirmation = async (event, context, callback) => {
     callback(error, event)
   }
 
+}
+
+const encryptBase64 = (data) => encrypt(Buffer.from(data, 'base64').toString('utf8'))
+
+module.exports.updateEmailSourceCredentials = async (event)=>{
+  const { cognitoPoolClaims, body } = event;
+  const { sub } = cognitoPoolClaims
+
+  if(!body || !body.credentials || !body.credentials.user || !body.credentials.key) return {
+    statusCode: 400, 
+    body: JSON.stringify({error: 'Bad Request'})
+  }
+
+  const credentials = {
+    user: encryptBase64(body.credentials.user),
+    key: encryptBase64(body.credentials.key),
+  }
+  
+  const response = await UserRepo.updateUser({
+    sub: sub
+  }, {
+    $set: {
+      'settings.email.user': credentials.user, 
+      'settings.email.key': credentials.key
+    }
+  })
+
+  return {
+    statusCode: response.nModified ? 201 : 409
+  }
+
+}
+
+module.exports.addBankToUser = async (event) =>{
+  const body = event.body
+  const { bankId } = body
+  const {
+    cognitoPoolClaims
+  } = event
+
+  const {
+    sub
+  } = cognitoPoolClaims
+
+  if(!bankId) return { statusCode: 400, body: JSON.stringify({error: 'Missing bank to add'}) }
+
+  const result = await UserRepo.updateUser({ sub }, { $addToSet: { banks: bankId } } );
+  
+  return {
+    statusCode: result ? 200 : 409, 
+  }
 }

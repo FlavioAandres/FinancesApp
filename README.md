@@ -16,6 +16,23 @@
 npm i @aws-amplify/cli -g
 ```
 
+#### Go to Client folder and initialize Amplify
+
+``` bash
+cd ./client/
+amplify init 
+```
+
+Continue the wizzard 
+#### Initialize cognito
+
+``` bash
+cd ./client/
+amplify add auth
+```
+
+Continue the wizzard using username & password 
+
 #### Push Amplify stack
 
 ``` bash

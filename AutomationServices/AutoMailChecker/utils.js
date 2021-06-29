@@ -2,6 +2,7 @@ const mailparser = require('mailparser').simpleParser
 const _ = require('lodash')
 const cheerio = require('cheerio');
 const { htmlToText } = require('html-to-text');
+const { paymentsParser: paymentsDaviviendaParser } = require('./parsers/davivienda/payments.parser')
 const { paymentsParser: paymentsPSEParser } = require('./parsers/pse/payments.parser')
 const { paymentsParser: paymentsBancolombiaParser } = require('./parsers/bancolombia/payments.parser')
 const { shoppingParser } = require('./parsers/bancolombia/shopping.parser')
@@ -46,7 +47,7 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
     if ([null, undefined].includes(parser)) return undefined; //If we don't have a parser, just return null to continue with the next message
     const $ = cheerio.load(html)
     const res = $('p')
-    const value = res.text().trim().toLowerCase().replace(/=/g,'')
+    const value = res.text().trim().toLowerCase().replace(/=/g, '')
     filter = filter.toLocaleLowerCase()
     if (value.includes(filter)) {
         if (skipped_phrase === null || skipped_phrase === undefined || !value.includes(skipped_phrase.toLocaleLowerCase())) { // If the phrase do not includes the skipped phrase
@@ -104,6 +105,15 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
 
                     parserResult = paymentsPSEParser(description)
                     break;
+                }
+                case "DAVIVIENDA": {
+                    description = value.substring(first)
+                    switch (parser) {
+                        case 'payments': {
+                            parserResult = paymentsDaviviendaParser(description)
+                            break;
+                        }
+                    }
                 }
             }
 

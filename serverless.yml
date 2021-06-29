@@ -1,6 +1,7 @@
 service: personal-interface
 plugins:
   - serverless-offline
+  - serverless-iam-roles-per-function
 
 package:
   exclude:
@@ -9,6 +10,14 @@ package:
     - node_modules/chrome-aws-lambda/** # The function is provided by the layer
     - devutils/**
     - AutomationServices/AutoMailChecker/**
+
+custom: 
+  ArnSQSEmails: 
+    dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
+    test: 
+      Ref: EmailUsersQueue
+    prod:
+      Ref: EmailUsersQueue
 
 provider:
   name: aws
@@ -46,8 +55,6 @@ functions:
   TwilioIncommingMessage:
     handler: AutomationServices/WhatsAppBot/handlerIncommingMessage.handler
     name: TwilioIncommingMessage-lambda-${opt:stage}
-    environment:
-      BODY_REQUEST: ${file(./config/${opt:stage}.json):BODY_REQUEST}
     events:
       - http:
           path: "/whatsapp/webhook/"
@@ -101,6 +108,27 @@ functions:
             claims:
               - sub
 
+  PostPrepayments:
+    handler: API/Functions/Payments.post
+    name: PrepaymentsRepo-post-${opt:stage}
+    events:
+      - http:
+          path: /payments
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
   GetStats:
     handler: API/Functions/BoxFlow.get
     name: StatsRepo-get-${opt:stage}
@@ -121,6 +149,26 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+  UpdateEmailCredentials:
+    handler: API/Functions/Users.updateEmailSourceCredentials
+    name: UpdateEmailCredentials-put-${opt:stage}
+    events:
+      - http:
+          path: /user/settings/email
+          method: PUT
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
 
   GetUser:
     handler: API/Functions/Users.getUserInformation
@@ -128,6 +176,47 @@ functions:
     events:
       - http:
           path: /user
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  AddBankToUser:
+    handler: API/Functions/Users.addBankToUser
+    name: UserRepo-banks-PUT-${opt:stage}
+    events:
+      - http:
+          path: /user/banks
+          method: patch
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+  GetBanks:
+    handler: API/Functions/Banks.getBanks
+    name: BanksRepo-GET-${opt:stage}
+    events:
+      - http:
+          path: /banks
           method: GET
           integration: lambda
           cors:
@@ -211,96 +300,161 @@ functions:
     handler: API/Functions/Users.postConfirmation
     name: PostConfirmationUser-${opt:stage}
 
-  ProcessEmails:
-    handler: API/Functions/Emails.process
-    name: ProcessEmail-${opt:stage}
-    environment: 
-      BUCKETNAME: finance-emails-${opt:stage}
-
-  #  
-  # DEPRECATED
-  #
-  # EmailChecker:
-  #   handler: AutomationServices/AutoMailChecker/checker.start
-  #   name: AutomationServices-EmailChecker-${opt:stage}
-  #   events:
-  #     - schedule:
-  #         name: "cw-start-email-checker"
-  #         description: "Function to connecto to Gmail :D"
-  #         rate: rate(20 minutes)
-  #         enabled: true
-  #   environment:
-  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-  #     EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
-
-  DataCreditoScraper:
-    handler: AutomationServices/DataCreditoScraper/scraper.start
-    name: AutomationServices-DataCreditoScraper-${opt:stage}
-    memorySize: 2048 # Recomended, in MB, default is 1024
-    timeout: 60 # Recomended, in seconds, default is 6
+  #INCOMES
+  
+  GetIncomes:
+    handler: API/Functions/Incomes.get
+    name: Incomes-GET-${opt:stage}
     events:
-      - schedule:
-          name: "cw-start-datacredito-scraper"
-          description: "Function to scraper datacredito data"
-          rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
-          enabled: true
-    layers:
-      - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
+      - http:
+          path: /incomes
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  PostIncomes:
+    handler: API/Functions/Incomes.post
+    name: Incomes-POST-${opt:stage}
+    events:
+      - http:
+          path: /incomes
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  PutIncomes:
+    handler: API/Functions/Incomes.get
+    name: Incomes-PUT-${opt:stage}
+    events:
+      - http:
+          path: /incomes/{income}
+          method: PUT
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+
+
+  #AUTOMATIONS
+  EmailChecker:
+    handler: AutomationServices/AutoMailChecker/checker.start
+    name: AutomationServices-EmailChecker-${opt:stage}
+    timeout: 120
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - EmailUsersQueue
+              - Arn
+          batchSize: 1
     environment:
       EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-      SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
+      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
+
+  PaymentsAnalizer:
+    handler: AutomationServices/AnalizerTask/analizer.start
+    name: AutomationServices-AnalizerTasks-${opt:stage}
+    events:
+      - schedule:
+          description: "Runs every month"
+          rate: cron(0 0 1 * ? *) # First day of the month
+          enabled: true
+          input:
+            ExecutionType: "MONTHLY"
+      - schedule:
+          description: "Runs every sunday"
+          rate: cron(0 0 ? * SUN *)
+          enabled: true
+          input:
+            ExecutionType: "WEEKLY"
+    environment:
+      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
+      TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
+      TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
+
+  ##Deprecated function since DataCredito updates the backend
+  # DataCreditoScraper:
+  #   handler: AutomationServices/DataCreditoScraper/scraper.start
+  #   name: AutomationServices-DataCreditoScraper-${opt:stage}
+  #   memorySize: 2048 # Recomended, in MB, default is 1024
+  #   timeout: 60 # Recomended, in seconds, default is 6
+  #   events:
+  #     - schedule:
+  #         name: "cw-start-datacredito-scraper"
+  #         description: "Function to scraper datacredito data"
+  #         rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
+  #         enabled: false
+  #   environment:
+  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+  #     SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
+
+  HideNoAcceptedPayments:
+    handler: AutomationServices/AutoHidePayments/handler.start
+    description: "Function to hide payments not accepted after 30 days"
+    name: AutomationServices-HideNoAcceptedPayments-${opt:stage}
+    events:
+      - schedule:
+          name: "cw-hide-payments-not-accepted"
+          rate: rate(1 day)
+          enabled: true
+
+  ScheduleUsersToCheckEmails:
+    handler: AutomationServices/AutoMailChecker/schedule.start
+    name: AutomationServices-ScheduleUsers-${opt:stage}
+    iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
+    iamRoleStatements: 
+      - Effect: 'Allow'
+        Action: 
+          - 'sqs:SendMessage'
+          - 'sqs:SendMessageBatch'
+        Resource:
+          Fn::GetAtt:
+            - EmailUsersQueue
+            - Arn
+    events: 
+      - schedule: 
+          enabled: true
+          rate: rate(20 minutes)
+    environment:
+      USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
 resources:
   Resources:
-    GiveSESPermissionToInvokeProcessEmailLambdaFunction:
-      Type: AWS::Lambda::Permission
+    EmailUsersQueue:
+      Type: "AWS::SQS::Queue"
       Properties:
-        FunctionName: { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
-        Principal: ses.amazonaws.com
-        Action: "lambda:InvokeFunction"
-        SourceAccount: { Ref: AWS::AccountId }
-    
-    EmailsBucket:
-     Type: AWS::S3::Bucket
-     Properties:
-        BucketName: finance-emails-${opt:stage}
-    EmailsBucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket: { Ref: EmailsBucket }
-        PolicyDocument:
-          Statement:
-            -
-              Action: 
-                - s3:PutObject
-              Effect: Allow
-              Resource:
-                Fn::Join:
-                  - ""
-                  -
-                    - { "Fn::GetAtt": ["EmailsBucket", "Arn"] }
-                    - "/*"
-              Principal:
-                Service: ses.amazonaws.com
-              Condition:
-                StringEquals:
-                  aws:Referer: { Ref: AWS::AccountId }
-
-    SesLambdaRule:
-      Type: AWS::SES::ReceiptRule
-      DependsOn:
-        - GiveSESPermissionToInvokeProcessEmailLambdaFunction
-        - EmailsBucketPolicy
-      Properties:
-        Rule:
-          Enabled: true
-          ScanEnabled: true
-          Name: finance-email-rule-${opt:stage}
-          Recipients: ${file(./config/${opt:stage}.json):EMAIL_RECIPIENTS}
-          Actions:
-            - LambdaAction:
-                FunctionArn:
-                  { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
-            - S3Action:
-                BucketName: finance-emails-${opt:stage}
-        RuleSetName: default-rule-set
+        QueueName: "email-users-checker"
+        VisibilityTimeout: 300

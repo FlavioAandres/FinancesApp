@@ -32,7 +32,17 @@ const getSession = async (user, password, seccondpass) => {
             waitUntil: ["networkidle0", "load", "domcontentloaded"]
         });
 
+        await page.click('#tipoDocumento')
+
+        await page.waitForTimeout(2000);
+
+        await page.click('#mat-option-0')
+
         await page.type('#documento', user);
+
+        await page.click('button[type=submit]')
+        
+        await page.waitForTimeout(5000);
 
         await page.type('#password', password)
 
@@ -41,14 +51,15 @@ const getSession = async (user, password, seccondpass) => {
         await page.waitForTimeout(2000);
 
         try {
-            await page.waitForSelector('#answer')
+            await page.waitForSelector('#respuesta')
 
-            await page.type('#answer', seccondpass)
+            await page.type('#respuesta', seccondpass)
 
             await page.click('button[type=submit]')
 
         } catch (error) {
-
+            console.log(error)
+            reject(error)
         }
 
         await browser.close()

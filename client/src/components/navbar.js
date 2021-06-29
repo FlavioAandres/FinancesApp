@@ -3,7 +3,7 @@ import { Navbar, Nav, DropdownButton, DropdownItem } from "emerald-ui/lib";
 
 const navbar = ({ updateNav }) => {
   return (
-    <Navbar breakAt="md" theme="dark">
+    <Navbar breakAt="md" theme="dark" className="navbar-custom">
       <Navbar.Brand>
         <a>
           <img

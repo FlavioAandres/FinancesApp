@@ -1,9 +1,9 @@
 import React from "react";
 import { ExpansionTableRow } from "emerald-ui/lib/";
+import formatCash from '../utils/formatCash';
 import moment from "moment";
 
 const PrePaymentItemComponent = (props = { item: {} }) => {
-  const transformNumber = (number) => Intl.NumberFormat('es-co', {style: 'currency', currency: 'COP'}).format(number)
   const {
     item: { _id: id, amount, text, createdAt, type },
   } = props;
@@ -31,7 +31,7 @@ const PrePaymentItemComponent = (props = { item: {} }) => {
   return (
     <ExpansionTableRow onToggle={onClick} expanded={expanded}>
       <ExpansionTableRow.Summary>
-        <td>{transformNumber(amount)}</td>
+        <td>{formatCash(amount)}</td>
         <td>{text}</td>
         <td>{parsedDate}</td>
       </ExpansionTableRow.Summary>
