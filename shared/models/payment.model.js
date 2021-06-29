@@ -10,7 +10,7 @@ const PaymentSchema = mongoose.Schema(
         source: { type: String, required: false, default: null },
         account: { type: String, required: false },
         destination: { type: String, required: false },
-        cardType: { type: String, required: false },
+        cardType: { type: String, required: true, default: "Manual" },
         type: { type: String, required: true, default: "EXPENSE" },
         createdBy: { type: String, required: true },
         amount: { type: Number, required: true },
