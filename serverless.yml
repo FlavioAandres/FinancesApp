@@ -94,7 +94,7 @@ functions:
 
   PostPrepayments:
     handler: API/Functions/Payments.post
-    name: PrepaymentsRepo-put-${opt:stage}
+    name: PrepaymentsRepo-post-${opt:stage}
     events:
       - http:
           path: /payments
