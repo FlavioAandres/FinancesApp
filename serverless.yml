@@ -11,13 +11,13 @@ package:
     - devutils/**
     - AutomationServices/AutoMailChecker/**
 
-custom: 
-  ArnSQSEmails: 
-    dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
-    test: 
-      Ref: EmailUsersQueue
-    prod:
-      Ref: EmailUsersQueue
+# custom: 
+#   ArnSQSEmails: 
+#     dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
+#     test: 
+#       Ref: EmailUsersQueue
+#     prod:
+#       Ref: EmailUsersQueue
 
 provider:
   name: aws
@@ -149,6 +149,7 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+
   UpdateEmailCredentials:
     handler: API/Functions/Users.updateEmailSourceCredentials
     name: UpdateEmailCredentials-put-${opt:stage}
@@ -368,20 +369,27 @@ functions:
 
 
   #AUTOMATIONS
-  EmailChecker:
-    handler: AutomationServices/AutoMailChecker/checker.start
-    name: AutomationServices-EmailChecker-${opt:stage}
-    timeout: 120
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - EmailUsersQueue
-              - Arn
-          batchSize: 1
-    environment:
-      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
+
+  ProcessEmails:
+    handler: AutomationServices/EmailsForwardingReader.process
+    name: ProcessEmail-${opt:stage}
+    environment: 
+      BUCKETNAME: finance-emails-andresmorelos-dev${opt:stage}
+
+  # EmailChecker:
+  #   handler: AutomationServices/AutoMailChecker/checker.start
+  #   name: AutomationServices-EmailChecker-${opt:stage}
+  #   timeout: 120
+  #   events:
+  #     - sqs:
+  #         arn:
+  #           Fn::GetAtt:
+  #             - EmailUsersQueue
+  #             - Arn
+  #         batchSize: 1
+  #   environment:
+  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+  #     EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
 
   PaymentsAnalizer:
     handler: AutomationServices/AnalizerTask/analizer.start
@@ -400,8 +408,6 @@ functions:
           input:
             ExecutionType: "WEEKLY"
     environment:
-      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
       TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
       TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
 
@@ -431,30 +437,84 @@ functions:
           rate: rate(1 day)
           enabled: true
 
-  ScheduleUsersToCheckEmails:
-    handler: AutomationServices/AutoMailChecker/schedule.start
-    name: AutomationServices-ScheduleUsers-${opt:stage}
-    iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
-    iamRoleStatements: 
-      - Effect: 'Allow'
-        Action: 
-          - 'sqs:SendMessage'
-          - 'sqs:SendMessageBatch'
-        Resource:
-          Fn::GetAtt:
-            - EmailUsersQueue
-            - Arn
-    events: 
-      - schedule: 
-          enabled: true
-          rate: rate(20 minutes)
-    environment:
-      USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
+  # ScheduleUsersToCheckEmails:
+  #   handler: AutomationServices/AutoMailChecker/schedule.start
+  #   name: AutomationServices-ScheduleUsers-${opt:stage}
+  #   iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
+  #   iamRoleStatements: 
+  #     - Effect: 'Allow'
+  #       Action: 
+  #         - 'sqs:SendMessage'
+  #         - 'sqs:SendMessageBatch'
+  #       Resource:
+  #         Fn::GetAtt:
+  #           - EmailUsersQueue
+  #           - Arn
+  #   events: 
+  #     - schedule: 
+  #         enabled: true
+  #         rate: rate(20 minutes)
+  #   environment:
+  #     USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
 resources:
   Resources:
-    EmailUsersQueue:
-      Type: "AWS::SQS::Queue"
+    # EmailUsersQueue:
+    #   Type: "AWS::SQS::Queue"
+    #   Properties:
+    #     QueueName: "email-users-checker"
+    #     VisibilityTimeout: 300
+
+    GiveSESPermissionToInvokeProcessEmailLambdaFunction:
+      Type: AWS::Lambda::Permission
       Properties:
-        QueueName: "email-users-checker"
-        VisibilityTimeout: 300
+        FunctionName: { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
+        Principal: ses.amazonaws.com
+        Action: "lambda:InvokeFunction"
+        SourceAccount: { Ref: AWS::AccountId }
+    
+    EmailsBucket:
+     Type: AWS::S3::Bucket
+     Properties:
+        BucketName: finance-emails-andresmorelos-dev${opt:stage}
+
+    EmailsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: { Ref: EmailsBucket }
+        PolicyDocument:
+          Statement:
+            -
+              Action: 
+                - s3:PutObject
+              Effect: Allow
+              Resource:
+                Fn::Join:
+                  - ""
+                  -
+                    - { "Fn::GetAtt": ["EmailsBucket", "Arn"] }
+                    - "/*"
+              Principal:
+                Service: ses.amazonaws.com
+              Condition:
+                StringEquals:
+                  aws:Referer: { Ref: AWS::AccountId }
+
+    SesLambdaRule:
+      Type: AWS::SES::ReceiptRule
+      DependsOn:
+        - GiveSESPermissionToInvokeProcessEmailLambdaFunction
+        - EmailsBucketPolicy
+      Properties:
+        Rule:
+          Enabled: true
+          ScanEnabled: true
+          Name: finance-email-rule-${opt:stage}
+          Recipients: ${file(./config/${opt:stage}.json):EMAIL_RECIPIENTS}
+          Actions:
+            - LambdaAction:
+                FunctionArn:
+                  { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
+            - S3Action:
+                BucketName: finance-emails-andresmorelos-dev${opt:stage}
+        RuleSetName: default-rule-set

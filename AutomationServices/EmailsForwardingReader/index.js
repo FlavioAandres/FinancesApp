@@ -1,21 +1,18 @@
 const AWS = require('aws-sdk')
 const S3 = new AWS.S3();
 const moment = require('moment')
-const { getBanks } = require('../../../shared/database/repos/bank.repo');
-const { getUser } = require('../../../shared/database/repos/user.repo');
-const { create: createPayment } = require('../../../shared/database/repos/payment.repo')
+const { getBanks } = require('../../shared/database/repos/bank.repo');
+const { getUser } = require('../../shared/database/repos/user.repo');
+const { create: createPayment } = require('../../shared/database/repos/payment.repo')
 const utils = require('./utils')
 
 module.exports.process = async (event, context, callback) => {
     try {
         const mailEvent = event.Records[0].ses
-        //Informative log until all is working as expected.
-        console.log(JSON.stringify(mailEvent))
         const { messageId, timestamp, commonHeaders } = mailEvent.mail
         let { subject, to, from } = commonHeaders
 
-
-        const source =  getEmail(to);
+        const source = getEmail(to);
 
         // Removing forward subject label
         if (subject.includes('Fwd: ')) {
@@ -23,10 +20,11 @@ module.exports.process = async (event, context, callback) => {
         }
 
         // Search for bank by subject
-        const bank = await getBanks({ subject: RegExp(subject) })
+        const banks = await getBanks({})
+
+        const bank = banks.filter(bank => subject.includes(bank.subject));
 
         if (Array.isArray(bank) && bank.length == 1) {
-
             // Get bank information
             const { filters, ignore_phrase, name: bankName } = bank[0]
 
@@ -36,13 +34,11 @@ module.exports.process = async (event, context, callback) => {
                 Key: messageId
             }).promise();
 
-            console.log(data);
-            
             if (!([undefined, null].includes(data.Body))) {
                 const emailData = data.Body.toString('utf-8')
                 const result = await utils.readRawEmail(emailData)
 
-                console.log(result);
+                console.log('result', result);
 
                 for (let index = 0; index < filters.length; index++) {
                     const filter = filters[index];
@@ -95,7 +91,7 @@ const getEmail = (from) => {
         source = from[0].match(/\<(.*?)\>/g)
         if (Array.isArray(source) && source.length > 0) {
             source = source[0].replace('<', '').replace('>', '')
-        }else{
+        } else {
             source = from[0];
         }
     }
