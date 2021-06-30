@@ -11,9 +11,11 @@ module.exports.process = async (event, context, callback) => {
         const mailEvent = event.Records[0].ses
         const { messageId, timestamp, commonHeaders } = mailEvent.mail
         let { subject, to, from } = commonHeaders
-
+        
+        console.log('commonHeaders', commonHeaders)
         const source = getEmail(to);
 
+        console.log('source', source)
         // Removing forward subject label
         if (subject.includes('Fwd: ')) {
             subject = subject.replace('Fwd: ', '')
@@ -24,6 +26,7 @@ module.exports.process = async (event, context, callback) => {
 
         const bank = banks.filter(bank => subject.includes(bank.subject));
 
+        console.log('bank', bank)
         if (Array.isArray(bank) && bank.length == 1) {
             // Get bank information
             const { filters, ignore_phrase, name: bankName } = bank[0]
@@ -36,6 +39,7 @@ module.exports.process = async (event, context, callback) => {
 
             if (!([undefined, null].includes(data.Body))) {
                 const emailData = data.Body.toString('utf-8')
+                console.log(emailData);
                 const result = await utils.readRawEmail(emailData)
 
                 console.log('result', result);
@@ -54,7 +58,7 @@ module.exports.process = async (event, context, callback) => {
                         source: res.TRANSACTION_SOURCE,
                         destination: res.TRANSACTION_DESTINATION,
                         amount: res.TRANSACTION_VALUE,
-                        cardType: res.TRANSACTION_CARD_TYPE,
+                        cardType: res.TRANSACTION_CARD_TYPE ? res.TRANSACTION_CARD_TYPE  : 'Manual',
                         account: res.TRANSACTION_ACCOUNT,
                         category: res.TRANSACTION_TYPE,
                         text: res.description,

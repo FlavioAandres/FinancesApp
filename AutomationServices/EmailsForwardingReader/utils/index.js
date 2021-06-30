@@ -20,11 +20,13 @@ module.exports.readRawEmail = async (body) => {
     let textAsHtml = null;
 
     if (body !== null && isBase64(body.replace(/\r?\n|\r/g, ""))) {
+        console.log('Base64')
         body = Buffer.from(body.replace(/\r?\n|\r/g, ""), 'base64').toString()
         textAsHtml = '<p>' + htmlToText(body).replace(/\r?\n|\r|\t/g, " ") + '</p>'
     } else {
+        console.log('Parser')
         const result = await mailparser(body);
-        textAsHtml = result.textAsHtml
+        textAsHtml = result.textAsHtml ? result.textAsHtml  : '<p>' + htmlToText(result.html).replace(/\r?\n|\r|\t/g, " ") + '</p>'
     }
 
 
