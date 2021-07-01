@@ -15,7 +15,7 @@ custom:
     dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
     test: 
       Ref: EmailUsersQueue
-    prod: 
+    prod:
       Ref: EmailUsersQueue
 
 provider:
@@ -92,6 +92,27 @@ functions:
             claims:
               - sub
 
+  PostPrepayments:
+    handler: API/Functions/Payments.post
+    name: PrepaymentsRepo-post-${opt:stage}
+    events:
+      - http:
+          path: /payments
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
   GetStats:
     handler: API/Functions/BoxFlow.get
     name: StatsRepo-get-${opt:stage}
@@ -117,7 +138,7 @@ functions:
     name: UpdateEmailCredentials-put-${opt:stage}
     events:
       - http:
-          path: /user/settings/email  
+          path: /user/settings/email
           method: PUT
           integration: lambda
           cors:
@@ -153,7 +174,7 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
-  
+
   AddBankToUser:
     handler: API/Functions/Users.addBankToUser
     name: UserRepo-banks-PUT-${opt:stage}
@@ -174,7 +195,7 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
-  GetBanks: 
+  GetBanks:
     handler: API/Functions/Banks.getBanks
     name: BanksRepo-GET-${opt:stage}
     events:
@@ -283,13 +304,80 @@ functions:
     handler: API/Functions/Users.postConfirmation
     name: PostConfirmationUser-${opt:stage}
 
+  #INCOMES
+  
+  GetIncomes:
+    handler: API/Functions/Incomes.get
+    name: Incomes-GET-${opt:stage}
+    events:
+      - http:
+          path: /incomes
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
 
+  PostIncomes:
+    handler: API/Functions/Incomes.post
+    name: Incomes-POST-${opt:stage}
+    events:
+      - http:
+          path: /incomes
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  PutIncomes:
+    handler: API/Functions/Incomes.get
+    name: Incomes-PUT-${opt:stage}
+    events:
+      - http:
+          path: /incomes/{income}
+          method: PUT
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+
+
+  #AUTOMATIONS
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
     name: AutomationServices-EmailChecker-${opt:stage}
     timeout: 120
     events:
-      - sqs: 
+      - sqs:
           arn:
             Fn::GetAtt:
               - EmailUsersQueue
@@ -307,35 +395,35 @@ functions:
           description: "Runs every month"
           rate: cron(0 0 1 * ? *) # First day of the month
           enabled: true
-          input: 
+          input:
             ExecutionType: "MONTHLY"
       - schedule:
           description: "Runs every sunday"
-          rate: cron(0 0 ? * SUN *) 
+          rate: cron(0 0 ? * SUN *)
           enabled: true
           input:
             ExecutionType: "WEEKLY"
     environment:
       EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
       EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
-      TWILIO_ACCESS_TOKEN:  ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
-      TWILIO_SECTRET_KEY:  ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
+      TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
+      TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
 
-  ##Deprecated function since DataCredito updates the backend 
-  DataCreditoScraper:
-    handler: AutomationServices/DataCreditoScraper/scraper.start
-    name: AutomationServices-DataCreditoScraper-${opt:stage}
-    memorySize: 2048 # Recomended, in MB, default is 1024
-    timeout: 60 # Recomended, in seconds, default is 6
-    events:
-      - schedule:
-          name: "cw-start-datacredito-scraper"
-          description: "Function to scraper datacredito data"
-          rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
-          enabled: false
-    environment:
-      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-      SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
+  ##Deprecated function since DataCredito updates the backend
+  # DataCreditoScraper:
+  #   handler: AutomationServices/DataCreditoScraper/scraper.start
+  #   name: AutomationServices-DataCreditoScraper-${opt:stage}
+  #   memorySize: 2048 # Recomended, in MB, default is 1024
+  #   timeout: 60 # Recomended, in seconds, default is 6
+  #   events:
+  #     - schedule:
+  #         name: "cw-start-datacredito-scraper"
+  #         description: "Function to scraper datacredito data"
+  #         rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
+  #         enabled: false
+  #   environment:
+  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+  #     SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
 
   HideNoAcceptedPayments:
     handler: AutomationServices/AutoHidePayments/handler.start
@@ -364,7 +452,7 @@ functions:
       - schedule: 
           enabled: true
           rate: rate(20 minutes)
-    environment: 
+    environment:
       USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
 resources:

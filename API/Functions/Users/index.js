@@ -64,7 +64,7 @@ module.exports.addNewCategory = async (event) => {
       {
         sub
       },
-      { label: body.label, value: body.value }
+      { label: body.label, value: body.value, type: body.type }
     );
     return {
       statusCode: result ? 200 : 409,

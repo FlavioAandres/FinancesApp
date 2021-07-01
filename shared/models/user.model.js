@@ -36,8 +36,15 @@ const userSchema = mongoose.Schema(
         ],
         categories: [{
             label: String, 
-            value: String, 
             budget: Number, 
+            value: String,
+            type: {
+                 type: String,
+                 index: false,
+                 required: true,
+                 trim: true,
+                 enum: [ 'INCOME', 'EXPENSE' ]
+            } 
         }],
         emails: [
             {

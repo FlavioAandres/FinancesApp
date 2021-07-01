@@ -10,8 +10,8 @@ const PaymentSchema = mongoose.Schema(
         source: { type: String, required: false, default: null },
         account: { type: String, required: false },
         destination: { type: String, required: false },
-        cardType: { type: String, required: false },
-        type: { type: String, required: false },
+        cardType: { type: String, required: true, default: "Manual" },
+        type: { type: String, required: true, default: "EXPENSE" },
         createdBy: { type: String, required: true },
         amount: { type: Number, required: true },
         text: { type: String, required: true },
@@ -21,7 +21,7 @@ const PaymentSchema = mongoose.Schema(
         createdAt: { type: Date, },
         category: { type: String, default: null },
         secondCategory: { type: String, default: null },
-        user: { type: mongoose.Types.ObjectId, require: true }
+        user: { type: mongoose.Types.ObjectId, required: true }
     },
     {
         timestamps: true
@@ -33,4 +33,4 @@ const PaymentSchema = mongoose.Schema(
 /**
  * @typedef Payments
  */
-module.exports = mongoose.model('Payments', PaymentSchema) 
+module.exports = mongoose.model('Payments', PaymentSchema)

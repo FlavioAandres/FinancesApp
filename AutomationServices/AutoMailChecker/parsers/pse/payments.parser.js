@@ -7,7 +7,7 @@ module.exports.paymentsParser = (text) => {
     return {
         TRANSACTION_VALUE,
         TRANSACTION_DESTINATION,
-        TRANSACTION_CARD_TYPE: null,
+        TRANSACTION_CARD_TYPE: 't.debt',
         TRANSACTION_ACCOUNT: null
     }
 }

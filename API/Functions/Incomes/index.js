@@ -1,4 +1,4 @@
-const PaymentRepo = require("../../../shared/database/repos/payment.repo");
+const IncomeRepo = require("../../../shared/database/repos/income.repo");
 const { getUser } = require("../../../shared/database/repos/user.repo");
 const { destroy: detroyMongoConnection } = require("../../../shared/database/mongo");
 
@@ -9,7 +9,8 @@ module.exports.get = async (event, context, callback) => {
     sub
   } = cognitoPoolClaims
   try {
-    results = await PaymentRepo.getActive({ sub });
+    const { _id } = await getUser({ sub })
+    results = await IncomeRepo.getAll(_id);
   } catch (error) {
     return {
       statusCode: "500",
@@ -34,8 +35,8 @@ module.exports.put = async (event, context, callback) => {
     id,
     description,
     category,
-    hide = false,
-    accepted = true
+    amount,
+    source
   } = bodyString
 
   const {
@@ -43,15 +44,15 @@ module.exports.put = async (event, context, callback) => {
   } = cognitoPoolClaims
 
   try {
-    if (!id || !description || !category) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
+    if (!id || !description || !category || !amount || !source) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
     const user = await getUser({ sub })
-    const data = await PaymentRepo.updatePayment({
+    const data = await IncomeRepo.updateIncome({
       id,
       user: user._id,
-      isHidden: hide,
-      isAccepted: accepted,
-      description: description,
-      category: category
+      amount,
+      description,
+      category,
+      source
     })
     const statusCode = (data.nModified > 0) ? 204 : 400
     await detroyMongoConnection()
@@ -70,10 +71,11 @@ module.exports.put = async (event, context, callback) => {
 
 module.exports.post = async (event, context, callback) => {
   const { body: bodyString, cognitoPoolClaims } = event
+
   const {
     description,
     category,
-    amount,
+    amount, 
     source
   } = bodyString
 
@@ -82,20 +84,15 @@ module.exports.post = async (event, context, callback) => {
   } = cognitoPoolClaims
 
   try {
-    if (!description || !category || !amount || !source) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
-    const user = await getUser({ sub })
+    if ( !description || !amount || !source ) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
 
-    await PaymentRepo.create({
+    const user = await getUser({ sub })
+    const data = await IncomeRepo.create({
       user: user._id,
-      isHidden: false,
-      isAccepted: true,
-      description: description,
-      category: category,
       amount,
-      source,
-      createdBy: 'API',
-      text: `${description} by ${amount}`,
-      type: 'EXPENSE'
+      description,
+      category,
+      source
     })
 
     return {
@@ -103,7 +100,7 @@ module.exports.post = async (event, context, callback) => {
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ success: 'Payment Created' })
+      body: JSON.stringify({ success: 'Income Created' })
     }
   } catch (error) {
     console.error(error)
