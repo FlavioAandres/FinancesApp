@@ -32,6 +32,6 @@ const BankSchema = mongoose.Schema(
 /**
  * @typedef Bank
  */
-const Bank = mongoose.model('bank', BankSchema);
+const Bank = mongoose.model('Bank', BankSchema);
 
 module.exports = Bank;

@@ -91,7 +91,7 @@ module.exports.post = async (event, context, callback) => {
       isAccepted: true,
       description: description,
       category: category,
-      amount,
+      amount: parseInt(amount),
       source,
       createdBy: 'API',
       text: `${description} by ${amount}`,
