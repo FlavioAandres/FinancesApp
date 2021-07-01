@@ -198,7 +198,7 @@ class HomeComponent extends React.Component {
           <Table title={
             <>
               Last payments:  {' '}
-              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="primary">
+              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="info">
                 ➕ Add
               </Label>
             </>
@@ -207,7 +207,7 @@ class HomeComponent extends React.Component {
           <Table title={
             <>
               Last Incomes {' '}
-              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="primary">
+              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="info">
                 ➕ Add
               </Label>
             </>
