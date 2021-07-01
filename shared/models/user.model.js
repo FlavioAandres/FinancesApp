@@ -41,10 +41,13 @@ const userSchema = mongoose.Schema(
                 year: Number,
                 month: Number,
                 value: Number,
-                payments: {
-                    type: mongoose.Types.ObjectId,
-                    ref: PaymentModel,
-                    autopopulate: false 
+                current: {
+                    type: Number,
+                    default: 0
+                },
+                progress: {
+                    type: Number,
+                    default: 0
                 }
             }], 
             value: String,

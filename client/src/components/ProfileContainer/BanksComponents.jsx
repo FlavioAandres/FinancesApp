@@ -26,7 +26,7 @@ export default (props) => {
             <h2>Correos seguidos: </h2>
             <div className="bank-filters-information">
               {props.filters.map((item) => (
-                <p className="text-muted">{item.phrase}</p>
+                <p className="text-muted" key={item.phrase}>{item.phrase}</p>
               ))}
             </div>
           </div>

@@ -16,23 +16,20 @@ const NewBudgetModal = ({ categories = [], close, show, loading }) => {
 
   }
 
-  const onCreateBudget = (data) => {
-    console.log(data)
-    // if (categoryBudget.trim() === "" || categorySelected.trim() === "")
-    //   return alert("You must type a monthly budget amount for the category. ");
+  const onCreateBudget = ({ category, budget}) => {
 
-    // const date = moment();
-    // const newBudget = {
-    //   value: categorySelected,
-    //   budget: typedByUserAmount,
-    //   year: date.year(),
-    //   month: date.month()
-    // }
+    if (budget.trim() === "" || category.trim() === "")
+      return alert("You must type a monthly budget amount for the category. ");
 
-    // console.log(newBudget)
-    // //send alert
-    // setCategoryBudget("")
-    // categorySelected = null;
+    const date = moment();
+    const newBudget = {
+      category,
+      budget,
+      year: date.year(),
+      month: date.month()
+    }
+    console.log(newBudget)
+
   }
 
 
@@ -47,7 +44,7 @@ const NewBudgetModal = ({ categories = [], close, show, loading }) => {
           <Controller
             name="category"
             control={control}
-            rules={{ required: true }}
+            rules={{ required: 'This field is required' }}
             render={({ field }) => (
               <SingleSelect
                 placeholder="Select Category..."
@@ -71,11 +68,13 @@ const NewBudgetModal = ({ categories = [], close, show, loading }) => {
             name="budget"
             control={control}
             defaultValue=""
-            rules={{ required: true }}
+            rules={{ required: 'This field is required', min: 1 }}
             render={({ field }) => (
               <TextField
                 onChange={field.onChange}
                 value={field.value}
+                type='number'
+                step='0.01'
                 errorMessage={errors.budget && errors.budget.message}
                 label="Expected Value: "
               />

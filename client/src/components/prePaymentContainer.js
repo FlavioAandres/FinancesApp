@@ -12,7 +12,7 @@ class PrepaymentComponent extends React.Component {
   }
   render() {
     const { payments = [], categories } = this.props;
- 
+
     return (
       <ExpansionTableRowGroup>
         <TableHeader checkboxAriaLabel="Name">
@@ -22,7 +22,8 @@ class PrepaymentComponent extends React.Component {
         </TableHeader>
         {payments.map((item, i) => (
           <PrepaymentItem
-            categories={categories.filter( category => category.type === 'EXPENSE')}
+            key={ item.id}
+            categories={categories.filter(category => category.type === 'EXPENSE')}
             onSubmitPrepayment={this.onSubmitPrepayment}
             item={item}
             key={"prepayment-item-" + i + "-" + item.amount}
