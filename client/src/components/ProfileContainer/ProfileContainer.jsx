@@ -44,7 +44,28 @@ class ProfileContainer extends React.Component {
       this.props.saveCategory(category)
     }).catch(err => console.error(err))
   }
+
   onCloseCategoryModal = (evt) => this.setState({ showCategoryModal: false })
+
+  onSaveBudget = ({ category, budget }) => {
+    this.setState({
+      showSpinningBudgetModal: true
+    })
+
+    API.post('finances', '/user/categories/budget', {
+      body: {
+        category,
+        budget
+      }
+    })
+      .then(response => {
+        this.setState({
+          showNewBudgetModal: false,
+          showSpinningBudgetModal: false,
+        })
+      })
+      .catch(err => console.error(err))
+  }
 
   render() {
     const { user = {}, banks } = this.props
@@ -83,14 +104,14 @@ class ProfileContainer extends React.Component {
           <div className="user-budgets-category">
             <h2>Category Budgets:</h2>
             <p>Welcome to this new functionality,
-            you'll be able to set budgets to your
-            categories,
-            every new payment is processed,
-            we'll let you know if you've exceded
-            your budget to the category. Use wisely. <b>We will use the entire month to calculate the budget status, since day 1 to 31 of the month. </b>
-            <Label onClick={()=>this.setState({showNewBudgetModal: true})} className="add-new-budget" color="warning">
+              you'll be able to set budgets to your
+              categories,
+              every new payment is processed,
+              we'll let you know if you've exceded
+              your budget to the category. Use wisely. <b>We will use the entire month to calculate the budget status, since day 1 to 31 of the month. </b>
+              <Label onClick={() => this.setState({ showNewBudgetModal: true })} className="add-new-budget" color="warning">
                 ➕ Create Budget
-            </Label>
+              </Label>
             </p>
             <br />
             {categoriesWithBudgets && categoriesWithBudgets.map((category) => (
@@ -114,8 +135,8 @@ class ProfileContainer extends React.Component {
             }
           </div>
         </div>
-        <NewCategoryModal save={this.onSaveCategory} loading={this.state.showSpinningCategoryModal} show={this.state.showCategoryModal}close={this.onCloseCategoryModal} />
-        <NewBudgetModal categories={categories} close={()=>this.setState({showNewBudgetModal: false})} show={this.state.showNewBudgetModal}/>
+        <NewCategoryModal save={this.onSaveCategory} loading={this.state.showSpinningCategoryModal} show={this.state.showCategoryModal} close={this.onCloseCategoryModal} />
+        <NewBudgetModal save={this.onSaveBudget} loading={this.state.showSpinningBudgetModal} categories={categories} close={() => this.setState({ showNewBudgetModal: false })} show={this.state.showNewBudgetModal} />
         <NewBankModal onBankAdded={this.onBankAdded} close={() => this.setState({ showAddBankModal: false })} show={this.state.showAddBankModal} />
         <UpdateEmailCredentials close={() => this.setState({ showConfigEmailModal: false })} show={this.state.showConfigEmailModal} />
       </div>

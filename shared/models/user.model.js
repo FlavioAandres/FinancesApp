@@ -37,10 +37,11 @@ const userSchema = mongoose.Schema(
         ],
         categories: [{
             label: String, 
-            budgets: [{
-                year: Number,
-                month: Number,
-                value: Number,
+            budget: {
+                value: {
+                    type: Number,
+                    default: 0
+                },
                 current: {
                     type: Number,
                     default: 0
@@ -49,7 +50,7 @@ const userSchema = mongoose.Schema(
                     type: Number,
                     default: 0
                 }
-            }], 
+            }, 
             value: String,
             type: {
                  type: String,

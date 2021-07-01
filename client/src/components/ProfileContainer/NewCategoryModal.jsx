@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Modal, TextField, Button, SingleSelect } from "emerald-ui/lib/";
 
 const NewCategoryModal = ({ save, close, show, loading, }) => {
-  const { handleSubmit, formState: { errors }, control } = useForm();
+  const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
   const onCreateCategory = ({ categoryLabel, categoryValue, categoryType }) => {
     if (categoryLabel.trim() === "" || categoryValue.trim() === "") return alert("Hey, agrega datos!");
@@ -13,6 +13,7 @@ const NewCategoryModal = ({ save, close, show, loading, }) => {
       value: categoryValue,
       type: categoryType
     })
+    reset();
   }
 
   return (

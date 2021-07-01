@@ -4,10 +4,9 @@ import { DevTool } from "@hookform/devtools";
 import { Modal, Button, SingleSelect, TextField } from "emerald-ui/lib/";
 import formatCash from "../../utils/formatCash";
 import { API } from 'aws-amplify'
-import moment from "moment";
 
-const NewBudgetModal = ({ categories = [], close, show, loading }) => {
-  const { handleSubmit, formState: { errors }, control } = useForm();
+const NewBudgetModal = ({ categories = [], close, show, loading, save }) => {
+  const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
 
   const skipWhiteSpaces = ({ target }) => {
@@ -16,19 +15,16 @@ const NewBudgetModal = ({ categories = [], close, show, loading }) => {
 
   }
 
-  const onCreateBudget = ({ category, budget}) => {
+  const onCreateBudget = ({ category, budget }) => {
 
     if (budget.trim() === "" || category.trim() === "")
       return alert("You must type a monthly budget amount for the category. ");
 
-    const date = moment();
-    const newBudget = {
+    save({
       category,
-      budget,
-      year: date.year(),
-      month: date.month()
-    }
-    console.log(newBudget)
+      budget
+    })
+    reset();
 
   }
 
@@ -85,7 +81,6 @@ const NewBudgetModal = ({ categories = [], close, show, loading }) => {
           </Button>
           <Button loading={loading} type="submit" color="info">Create Budget!</Button>
         </form>
-        <DevTool control={control} />
       </Modal.Body>
       <Modal.Footer>
 

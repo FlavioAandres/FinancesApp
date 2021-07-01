@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Modal, TextField, Button, SingleSelect } from "emerald-ui/lib/";
 
 const NewIncomeModal = ({ save, categories, close, loading, show }) => {
-    const { handleSubmit, formState: { errors }, control } = useForm();
+    const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
 
     const onCreateIncome = ({ source, amount, category, description }) => {
@@ -14,6 +14,7 @@ const NewIncomeModal = ({ save, categories, close, loading, show }) => {
             category,
             description
         })
+        reset();
     }
 
     return (
