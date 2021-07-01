@@ -75,8 +75,9 @@ class ProfileContainer extends React.Component {
             {user.categories && user.categories.map((category) => (
               <Label>{category.label}</Label>
             ))}
-            <Label onClick={this.onCreateCategoryClick} className="add-new-category" color="primary">
-              ➕ Add
+            <Label onClick={this.onCreateCategoryClick} className="add-new-category" color="info">
+              {" "}
+              ➕ Add {" "}
             </Label>
           </div>
           <div className="user-budgets-category">
