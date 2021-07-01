@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const BankModel = require('./bank.model')
+const PaymentModel = require('./payment.model')
 const { encrypt } = require('../utils/crypto')
 
 const userSchema = mongoose.Schema(
@@ -36,7 +37,16 @@ const userSchema = mongoose.Schema(
         ],
         categories: [{
             label: String, 
-            budget: Number, 
+            budgets: [{
+                year: Number,
+                month: Number,
+                value: Number,
+                payments: {
+                    type: mongoose.Types.ObjectId,
+                    ref: PaymentModel,
+                    autopopulate: false 
+                }
+            }], 
             value: String,
             type: {
                  type: String,
