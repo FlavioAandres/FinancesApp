@@ -84,11 +84,9 @@ module.exports.updateBudget = async (searchCriteria, update) => {
     if (category.budget.current !== update['categories.$.budget'].current) {
 
         update['categories.$.budget']['progress'] = (update['categories.$.budget'].current / category.budget.value) * 100
-        update['categories.$.budget']['current'] = update['categories.$.budget'].current
         update['categories.$.budget']['value'] = category.budget.value
     }
 
     const result = await userModel.updateOne({ ...searchCriteria }, update)
-    await destroy()
     return result.nModified > 0
 }

@@ -11,7 +11,7 @@ module.exports.create = async (PaymentBody) => {
 
     const current = category.budget.current + PaymentBody.amount
 
-    const result = await updateBudget(
+    await updateBudget(
       {
         sub,
         'categories.value': category.value
@@ -38,7 +38,7 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
 
       const current = category.budget.current + PaymentBody.amount
 
-      const result = await updateBudget(
+      await updateBudget(
         {
           sub,
           'categories.value': category.value
@@ -58,7 +58,7 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
 module.exports.getAllByDate = async ({ userId, date }) => {
   if (!userId) return [];
   await connect()
-  const result = await Payments.find(
+  return await Payments.find(
     {
       createdAt: { $gte: new Date(date) },
       user: userId,
@@ -66,7 +66,7 @@ module.exports.getAllByDate = async ({ userId, date }) => {
     },
     { amount: 1, description: 1, createdAt: 1, category: 1, isAccepted: 1 }
   ).sort({ createdAt: -1 });
-  return result;
+
 };
 
 //get all prepayments without category
@@ -101,7 +101,7 @@ module.exports.updatePayment = async (Payment) => {
 
     const current = category.budget.current + amount
 
-    const result = await updateBudget(
+    await updateBudget(
       {
         sub,
         'categories.value': category.value
@@ -122,7 +122,7 @@ module.exports.updatePayment = async (Payment) => {
     }
   );
   await destroy()
-  return 0;
+  return result;
 };
 
 module.exports.getByCategories = async (userId, date) => {
