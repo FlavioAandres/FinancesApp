@@ -274,9 +274,10 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+
   AddBudgetCategory:
     handler: API/Functions/Users.addBudgetCategory
-    name: UserRepo-Categories-POST-${opt:stage}
+    name: UserRepo-Categories-budget-POST-${opt:stage}
     events:
       - http:
           path: /user/categories/budget
@@ -394,7 +395,7 @@ functions:
     handler: AutomationServices/EmailsForwardingReader.process
     name: ProcessEmail-${opt:stage}
     environment: 
-      BUCKETNAME: finance-emails-andresmorelos-dev${opt:stage}
+      BUCKETNAME: finance-emails-${opt:stage}
 
   # EmailChecker:
   #   handler: AutomationServices/AutoMailChecker/checker.start
@@ -496,7 +497,7 @@ resources:
     EmailsBucket:
      Type: AWS::S3::Bucket
      Properties:
-        BucketName: finance-emails-andresmorelos-dev${opt:stage}
+        BucketName: finance-emails-${opt:stage}
 
     EmailsBucketPolicy:
       Type: AWS::S3::BucketPolicy
@@ -536,5 +537,5 @@ resources:
                 FunctionArn:
                   { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
             - S3Action:
-                BucketName: finance-emails-andresmorelos-dev${opt:stage}
+                BucketName: finance-emails-${opt:stage}
         RuleSetName: default-rule-set

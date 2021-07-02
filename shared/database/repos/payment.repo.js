@@ -109,12 +109,12 @@ module.exports.updatePayment = async (Payment) => {
 
     const { categories, sub } = await getUser({ _id: Payment.user })
 
-    const results = categories.filter(category => category.label = Payment.category)
+    const results = categories.filter(category => category.label === Payment.category)
     let category = results[0]
 
     const current = category.budget.current + amount
-
-    const result = await updateBudget(
+    
+    await updateBudget(
       {
         sub,
         'categories.value': category.value
@@ -135,7 +135,7 @@ module.exports.updatePayment = async (Payment) => {
     }
   );
   await destroy()
-  return 0;
+  return result;
 };
 
 module.exports.getByCategories = async (userId, date) => {
