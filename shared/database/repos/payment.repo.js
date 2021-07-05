@@ -6,7 +6,7 @@ module.exports.create = async (PaymentBody) => {
   try {
     await connect();
     const { categories, sub } = await getUser({ _id: PaymentBody.user })
-    const results = categories.filter(category => category.value == PaymentBody.category)
+    const results = categories.filter(category => category.value === PaymentBody.category)
     let category = results[0]
 
     const current = category.budget.current + PaymentBody.amount
@@ -33,7 +33,7 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
     await connect();
     for (const PaymentBody of PaymentBodies) {
       const { categories, sub } = await getUser({ _id: PaymentBody.user })
-      const results = categories.filter(category => category.value = PaymentBody.category)
+      const results = categories.filter(category => category.value === PaymentBody.category)
       let category = results[0]
 
       const current = category.budget.current + PaymentBody.amount
@@ -96,7 +96,7 @@ module.exports.updatePayment = async (Payment) => {
 
     const { categories, sub } = await getUser({ _id: Payment.user })
 
-    const results = categories.filter(category => category.value == Payment.category)
+    const results = categories.filter(category => category.value === Payment.category)
     let category = results[0]
 
     const current = category.budget.current + amount
