@@ -190,7 +190,7 @@ class HomeComponent extends React.Component {
         <div className="categories-container">
           {
             categories && categories.map((item, index) => {
-              const [category] = user && user.categories && user.categories.filter(category => category.label === item.name)
+              const [category] = user && user.categories && user.categories.filter(category => category.value === item.name)
               const progressValue = category && category.budget && category.budget.progress ? category.budget.progress : 0
 
               let color = 'success'

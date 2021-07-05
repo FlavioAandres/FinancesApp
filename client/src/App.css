@@ -409,3 +409,9 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
   cursor: pointer;
   display: inline-block;
 }
+
+.budget-label{
+  display: block;
+  margin-right: 10px;
+  margin-top: 5px; 
+}

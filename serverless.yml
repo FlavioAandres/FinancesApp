@@ -274,7 +274,7 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
-
+              
   AddBudgetCategory:
     handler: API/Functions/Users.addBudgetCategory
     name: UserRepo-Categories-budget-POST-${opt:stage}
