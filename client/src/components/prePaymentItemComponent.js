@@ -29,7 +29,7 @@ const PrePaymentItemComponent = (props = { item: {} }) => {
 
 
   return (
-    <ExpansionTableRow onToggle={onClick} expanded={expanded}>
+    <ExpansionTableRow onToggle={onClick} expanded={expanded} checkboxAriaLabel="Accept or Reject Payment">
       <ExpansionTableRow.Summary>
         <td>{formatCash(amount)}</td>
         <td>{text}</td>
@@ -83,7 +83,7 @@ const PrePaymentItemComponent = (props = { item: {} }) => {
                   <option defaultValue>Categoria...</option>
                   {
                     props.categories && props.categories.map(item=>(
-                      <option value={item.value}>{item.label}</option>
+                      <option value={item.value} key={`${item.label}-${text}`}>{item.label}</option>
                     ))
                   }
                 </select>
