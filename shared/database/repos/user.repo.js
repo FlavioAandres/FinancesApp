@@ -45,7 +45,7 @@ module.exports.updateUser = async (filter, newDocument, single) => {
 };
 
 module.exports.createCategory = async (userCriteria, category) => {
-    if (!category.value || !category.label || !Object.keys(userCriteria).length) return null;
+    if (!category.value || !category.value || !Object.keys(userCriteria).length) return null;
 
     await connect()
     const result = await userModel.updateOne({ ...userCriteria }, {
@@ -61,9 +61,9 @@ module.exports.updateCategory = async (searchCriteria, update) => {
 
     const [{ categories }] = await userModel.find(searchCriteria, { categories: 1 });
 
-    const [category] = categories.filter(category => category.label === searchCriteria['categories.value'])
+    const [category] = categories.filter(category => category.value === searchCriteria['categories.value'])
 
-    if (category.budget.value !== update.value) {
+    if (category && category.budget && category.budget.value !== update.value) {
         const newValue = update['categories.$.budget']['value'];
         update['categories.$.budget']['progress'] = (category.budget.current / newValue) * 100
         update['categories.$.budget']['current'] = category.budget.current
@@ -79,9 +79,9 @@ module.exports.updateBudget = async (searchCriteria, update) => {
 
     const [{ categories }] = await userModel.find(searchCriteria, { categories: 1 });
 
-    const [category] = categories.filter(category => category.label === searchCriteria['categories.value'])
+    const [category] = categories.filter(category => category.value === searchCriteria.categories.$elemMatch.value)
 
-    if (category.budget.current !== update['categories.$.budget'].current) {
+    if (category && category.budget.current !== update['categories.$.budget'].current) {
 
         update['categories.$.budget']['progress'] = (update['categories.$.budget'].current / category.budget.value) * 100
         update['categories.$.budget']['value'] = category.budget.value

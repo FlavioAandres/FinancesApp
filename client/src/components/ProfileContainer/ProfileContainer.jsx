@@ -71,7 +71,7 @@ class ProfileContainer extends React.Component {
     const { user = {}, banks } = this.props
     const { categories = [] } = user
     const categoriesWithBudgets = categories.filter(cat => {
-      return cat.budget && cat.budget > 0
+      return cat.budget && cat.budget.value > 0
     })
     return (
       <div className="profile-container">
@@ -115,7 +115,7 @@ class ProfileContainer extends React.Component {
             </p>
             <br />
             {categoriesWithBudgets && categoriesWithBudgets.map((category) => (
-              <Label className="budget-label">{category.label} - {formatCash(category.budget)}</Label>
+              <Label color="default" className="budget-label">{category.label} - {formatCash(category.budget.value)}</Label>
             ))}
           </div>
         </div>
