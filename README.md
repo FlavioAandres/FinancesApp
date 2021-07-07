@@ -1,3 +1,11 @@
+## Deploy SES email parser
+
+```
+    1. Verify a domain at https://console.aws.amazon.com/ses/home?region=us-east-1#verified-senders-domain:
+    2. sls deploy --stage prod # Make sure about the config parameters
+    3. Forward your messages to the EMAIL_RECIPIENTS
+```
+
 ## Deploy Client
 
 ### Deploy Cognito Pool 
@@ -75,7 +83,37 @@ export default {
         "MONGO_SECRET": "password",
         "MONGO_SET": "replicas_only",
         "MONGO_USER": "FlavioAandres",
-        "SRV_CONFIG": false // Note the SRV CONFIG flag off
+        "SRV_CONFIG": false, // Note the SRV CONFIG flag off
+        "EMAIL_USERNAME": "me@andresmorelos.dev", //Only needed if you will not use the emails process with SES
+        "EMAIL_PASSWORD": "PASSWORD", //Only needed if you will not use the emails process with SES
+        "SECRET_KEY": "GENERATE_ME!",
+        "BODY_REQUEST": "",
+        "EMAIL_RECIPIENTS": ["finance_email@andresmorelos.dev"],
+        "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:ID:userpool/us-east-1_ID",
+        "TWILIO_ACCESS_TOKEN": "TOKEN",
+        "TWILIO_SECTRET_KEY" : "SECRET_TOKEN",
+        "TELEGRAM_BOT_KEY": "TELEGRAM_KEY"
+    }
+```
+
+```js
+    {
+        "MONGO_HOST": "mongodb+srv://USER:PASSWORD@clustername.ixvju.mongodb.net/DATABASE?authSource=admin&replicaSet=REPLICASET&w=majority&readPreference=primary&appname=Personal%20Finances&retryWrites=true&ssl=true",
+        "MONGO_PORT": 27017,
+        "MONGO_SECRET": "",
+        "MONGO_SET": "",
+        "MONGO_USER": "",
+        "MONGO_DATABASE": "",
+        "SRV_CONFIG": true, //Note SRV CONFIG flag on
+        "EMAIL_USERNAME": "me@andresmorelos.dev", //Only needed if you will not use the emails process with SES
+        "EMAIL_PASSWORD": "PASSWORD", //Only needed if you will not use the emails process with SES
+        "SECRET_KEY": "GENERATE_ME!",
+        "BODY_REQUEST": "",
+        "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:ID:userpool/us-east-1_ID",
+        "EMAIL_RECIPIENTS": ["finance_email@andresmorelos.dev"],
+        "TWILIO_ACCESS_TOKEN": "TOKEN",
+        "TWILIO_SECTRET_KEY" : "SECRET_TOKEN",
+        "TELEGRAM_BOT_KEY": "TELEGRAM_KEY"
     }
 ```
 
@@ -175,9 +213,6 @@ sls deploy --stage [DEV/TEST/PROD]
         "ignore_phrase": "Bancolombia le informa que su factura inscrita",
         "index_value": {
             "$numberLong": "0"
-        },
-        "user": {
-            "$oid": "5fc43e5e607f370ee4f66308"
         }
     }
     // PSE
@@ -195,9 +230,6 @@ sls deploy --stage [DEV/TEST/PROD]
         "ignore_phrase": "Estado de la transacción: Rechazada",
         "index_value": {
             "$numberLong": "0"
-        },
-        "user": {
-            "$oid": "5fc43e5e607f370ee4f66308"
         }
     }
 ]

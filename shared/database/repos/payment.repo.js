@@ -55,6 +55,19 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
   }
 };
 
+
+
+module.exports.create = async (PaymentBody) => {
+  try {
+    await connect();
+    const payment = await Payments.create(PaymentBody);
+    await destroy();
+    return payment
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports.getAllByDate = async ({ userId, date }) => {
   if (!userId) return [];
   await connect()
