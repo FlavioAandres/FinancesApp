@@ -3,8 +3,7 @@
 const getUserInfo = require('../../controllers/getUserInfo');
 const saveIncome = require('../../controllers/saveIncome');
 const savePayment = require('../../controllers/savePayment');
-const Markup = require('telegraf/lib/markup')
-const { Scenes, Stage, session } = require('telegraf')
+const { Scenes, session, Markup } = require('telegraf')
 
 
 module.exports = add = (bot) => {
