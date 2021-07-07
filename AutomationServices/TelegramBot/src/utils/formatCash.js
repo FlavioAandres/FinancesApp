@@ -1,0 +1,1 @@
+module.exports = formatCash = (money) => Intl.NumberFormat('es-co', { style: 'currency', currency: 'COP' }).format(money)

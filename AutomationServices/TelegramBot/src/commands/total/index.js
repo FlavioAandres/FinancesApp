@@ -1,6 +1,7 @@
 const getUserInfo = require('../../controllers/getUserInfo')
 const moment = require('moment')
 const PaymentModel = require('../../../../../shared/models/payment.model')
+const formatCahs = require('../../utils/formatCash')
 
 module.exports = total = (bot) => {
     bot.command('total', async (ctx) => {
@@ -13,7 +14,7 @@ module.exports = total = (bot) => {
             try {
                 const { _id } = await getUserInfo(ctx.chat.id);
                 if ([undefined, null, ""].includes(_id)) {
-                    return ctx.reply("Por favor associa una cuenta /associate")
+                    return ctx.reply("Please associate your account /associate")
                 }
 
                 const fromAux = category
@@ -50,14 +51,14 @@ module.exports = total = (bot) => {
 
                 let data = "👽 *Resumen de " + fromAux + "*\n\n"
                 data += result.reduce((prev, current, idx) => {
-                    prev += `${idx + 1}-${current.description}: $${current.amount}\n`
+                    prev += `${idx + 1}-${current.description}: ${formatCahs(current.amount)}\n`
                     return prev
                 }, "")
 
-                data += "\n*Total:* $" + result.reduce((prev, current, index) => {
+                data += "\n*Total:* $" + formatCahs(result.reduce((prev, current, index) => {
                     prev += current.amount
                     return prev
-                }, 0)
+                }, 0))
 
                 return ctx.replyWithMarkdown(data)
             } catch (error) {
