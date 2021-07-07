@@ -6,7 +6,7 @@ import ModalShowCategories from './ModalShowCategories/ModalShowCategories'
 import ModalAddIncome from './ModalAddIncome/ModalAddIncome'
 import ModalAddPayment from './ModalAddPayment/ModalAddPayment'
 import SelectorTimming from './SelectorTiming'
-import { Label } from 'emerald-ui/lib'
+import { Label, Progressbar } from 'emerald-ui/lib'
 import { API } from 'aws-amplify'
 
 class HomeComponent extends React.Component {
@@ -36,6 +36,7 @@ class HomeComponent extends React.Component {
         const data = JSON.parse(response.body)
         const categories = [];
         const { latestPayments, expensivePayments, prepayments, totalByCategory, latestIncomes } = data;
+
         Object.keys(totalByCategory).forEach((key) => {
           const catName = key
           const total = totalByCategory[key].reduce((prev, curr) => prev + curr.amount, 0)
@@ -44,11 +45,14 @@ class HomeComponent extends React.Component {
             total
           })
         });
+
         const totalTotales = categories.reduce((prev, curr) => prev + curr.total, 0)
+
         categories.push({
           name: 'Total',
           total: totalTotales
         })
+
         if (this._isMounted) {
           this.setState({
             latestIncomes,
@@ -134,7 +138,7 @@ class HomeComponent extends React.Component {
 
   onCreatePaymentClick = (evt) => {
     this.setState({
-      showAddPaymentModal : true
+      showAddPaymentModal: true
     })
   }
 
@@ -185,20 +189,37 @@ class HomeComponent extends React.Component {
         />
         <div className="categories-container">
           {
-            categories.map((item, index) => (
-              <button onClick={(evt) => this.showCategoriesContainer(evt, item.name)} className="category-item" key={`item-${index}`}>
-                <p>
-                  {item.name}: <span>{formatCash(item.total)}</span>
-                </p>
-              </button>
-            ))
+            categories && categories.map((item, index) => {
+              const [category] = user && user.categories && user.categories.filter(category => category.value === item.name)
+              const progressValue = category && category.budget && category.budget.progress ? category.budget.progress : 0
+
+              let color = 'success'
+              if (progressValue >= 100) {
+                color = 'danger'
+              } else if (progressValue >= 70) {
+                color = 'warning'
+              } else if (progressValue >= 50) {
+                color = 'info'
+              }
+
+              return (
+                <div style={{ paddingRight: '5px' }}>
+                  <button onClick={(evt) => this.showCategoriesContainer(evt, item.name)} className="category-item" key={`item-${index}`}>
+                    <p>
+                      {item.name}: <span>{formatCash(item.total)}</span>
+                    </p>
+                  </button>
+                  <Progressbar color={color} progress={progressValue} />
+                </div>
+              )
+            })
           }
         </div>
         <div className="stats-container">
           <Table title={
             <>
               Last payments:  {' '}
-              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="primary">
+              <Label onClick={this.onCreatePaymentClick} className="add-new-payment" color="info">
                 ➕ Add
               </Label>
             </>
@@ -207,7 +228,7 @@ class HomeComponent extends React.Component {
           <Table title={
             <>
               Last Incomes {' '}
-              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="primary">
+              <Label onClick={this.onCreateIncomeClick} className="add-new-income" color="info">
                 ➕ Add
               </Label>
             </>

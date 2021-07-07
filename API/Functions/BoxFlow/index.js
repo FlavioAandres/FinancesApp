@@ -24,6 +24,7 @@ const processMonthlyMetrics = async (userId) => {
 
   return { payments, incomes }
 }
+
 const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
   let payments = await PaymentRepo.getByCategories(userId, date);
   let incomesData = await IncomeRepo.getByCategories(userId, date)
@@ -100,7 +101,7 @@ const processHomeMetrics = async (userId, date) => {
   let latestPayments = [], expensivePayments = [], totalByCategory = [], acceptedPayments = [], prepayments = [], latestIncomes = []
   //Split types
 
-  payments= payments.filter(payment => payment.isAccepted);
+  payments = payments.filter(payment => payment.isAccepted);
 
   //prepayments 
   prepayments = prepayments.slice(0, 10)
@@ -126,6 +127,13 @@ const processHomeMetrics = async (userId, date) => {
   }
 }
 
+const processStatsMetrics = async (userId, date) => {
+  const cardTypeStats = await PaymentRepo.percentageByCardTypeStat(userId, date);
+  const categoryTypeStats = await PaymentRepo.percentageByCategoryTypeStat(userId, date);
+
+  return { cardTypeStats, categoryTypeStats }
+}
+
 module.exports.processHomeMetrics = processHomeMetrics;
 
 //stats endpoint 
@@ -145,6 +153,9 @@ module.exports.get = async (event, context, callback) => {
         break;
       case 'category':
         results = await processCategoryMetrics(user._id, queryParams.date ? date : undefined, groupBy)
+        break;
+      case 'stats':
+        results = await processStatsMetrics(user._id, date);
         break;
       case 'home':
         results = await processHomeMetrics(user._id, date)

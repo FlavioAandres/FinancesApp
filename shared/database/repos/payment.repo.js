@@ -1,10 +1,25 @@
 const Payments = require("../../models/payment.model");
-const { getUser } = require("../repos/user.repo");
+const { getUser, updateBudget } = require("../repos/user.repo");
 const { connect, destroy } = require("../mongo");
 
 module.exports.create = async (PaymentBody) => {
   try {
     await connect();
+    const { categories, sub } = await getUser({ _id: PaymentBody.user })
+    const results = categories.filter(category => category.value === PaymentBody.category)
+    let category = results[0]
+
+    const current = category.budget.current + PaymentBody.amount
+
+    await updateBudget(
+      {
+        sub,
+        'categories.value': category.value
+      },
+      {
+        'categories.$.budget': { current }
+      })
+
     await Payments.create(PaymentBody);
   } catch (error) {
     console.log(error);
@@ -16,10 +31,38 @@ module.exports.create = async (PaymentBody) => {
 module.exports.createMultiple = async (PaymentBodies = []) => {
   try {
     await connect();
-    for (const payment of PaymentBodies) {
-      await Payments.create(payment);
+    for (const PaymentBody of PaymentBodies) {
+      const { categories, sub } = await getUser({ _id: PaymentBody.user })
+      const results = categories.filter(category => category.value === PaymentBody.category)
+      let category = results[0]
+
+      const current = category.budget.current + PaymentBody.amount
+
+      await updateBudget(
+        {
+          sub,
+          'categories': { $elemMatch: { value: category.value } }
+        },
+        {
+          'categories.$.budget': { current }
+        })
+
+      await Payments.create(PaymentBody);
     }
     await destroy();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+
+module.exports.create = async (PaymentBody) => {
+  try {
+    await connect();
+    const payment = await Payments.create(PaymentBody);
+    await destroy();
+    return payment
   } catch (error) {
     console.log(error);
   }
@@ -28,7 +71,7 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
 module.exports.getAllByDate = async ({ userId, date }) => {
   if (!userId) return [];
   await connect()
-  const result = await Payments.find(
+  return await Payments.find(
     {
       createdAt: { $gte: new Date(date) },
       user: userId,
@@ -36,7 +79,7 @@ module.exports.getAllByDate = async ({ userId, date }) => {
     },
     { amount: 1, description: 1, createdAt: 1, category: 1, isAccepted: 1 }
   ).sort({ createdAt: -1 });
-  return result;
+
 };
 
 //get all prepayments without category
@@ -57,9 +100,31 @@ module.exports.getActive = async (criteria) => {
     return [];
   }
 };
+
 module.exports.updatePayment = async (Payment) => {
   if (!Payment.id) throw new Error("PaymentsRepo::missing id for Payment");
   await connect()
+  if (Payment.isAccepted) {
+    const { amount } = await Payments.findOne({ _id: Payment.id, user: Payment.user }, { amount: 1 })
+
+    const { categories, sub } = await getUser({ _id: Payment.user })
+
+    const results = categories.filter(category => category.value === Payment.category)
+    let category = results[0]
+
+    const current = category.budget.current + amount
+
+    await updateBudget(
+      {
+        sub,
+        'categories': { $elemMatch: { value: category.value } }
+      },
+      {
+        'categories.$.budget': { current }
+      })
+
+  }
+
   const result = await Payments.updateOne(
     { _id: Payment.id, user: Payment.user },
     {
@@ -194,6 +259,137 @@ module.exports.usersHavePayments = async (userList = []) => {
     }
   }];
   const result = await Payments.aggregate(aggregation)
-  await destroy()
+  return result
+}
+
+module.exports.percentageByCardTypeStat = async (userId, date) => {
+  await connect();
+
+  const aggregation = [
+    {
+      '$match': {
+        'category': {
+          '$ne': null
+        },
+        'user': userId,
+        'isAccepted': true,
+        'createdAt': { '$gte': new Date(date) },
+      }
+    }, {
+      '$group': {
+        '_id': {
+          '$cond': {
+            'if': {
+              '$eq': [
+                '$cardType', null
+              ]
+            },
+            'then': 'Manual',
+            'else': '$cardType'
+          }
+        },
+        'payments': {
+          '$push': {
+            'payment': '$$ROOT'
+          }
+        },
+        'sum': {
+          '$sum': '$amount'
+        }
+      }
+    }, {
+      '$group': {
+        '_id': null,
+        'sum': {
+          '$sum': '$sum'
+        },
+        'card': {
+          '$push': {
+            'cardType': '$_id',
+            'amount': '$sum'
+          }
+        }
+      }
+    }, {
+      '$unwind': {
+        'path': '$card'
+      }
+    }, {
+      '$project': {
+        'cardType': '$card.cardType',
+        'amount': '$card.amount',
+        'sum': '$sum',
+        'percent': {
+          '$multiply': [
+            {
+              '$divide': [
+                '$card.amount', '$sum'
+              ]
+            }, 100
+          ]
+        }
+      }
+    }
+  ]
+
+  const result = await Payments.aggregate(aggregation)
+  return result
+}
+
+module.exports.percentageByCategoryTypeStat = async (userId, date) => {
+  await connect();
+
+  const aggregation = [
+    {
+      '$match': {
+        'category': {
+          '$ne': null
+        },
+        'user': userId,
+        'isAccepted': true,
+        'createdAt': { '$gte': new Date(date) },
+      }
+    }, {
+      '$group': {
+        '_id': '$category',
+        'sum': {
+          '$sum': '$amount'
+        }
+      }
+    }, {
+      '$group': {
+        '_id': null,
+        'sum': {
+          '$sum': '$sum'
+        },
+        'categories': {
+          '$push': {
+            'category': '$_id',
+            'amount': '$sum'
+          }
+        }
+      }
+    }, {
+      '$unwind': {
+        'path': '$categories'
+      }
+    }, {
+      '$project': {
+        'cardType': '$categories.category',
+        'amount': '$categories.amount',
+        'sum': '$sum',
+        'percent': {
+          '$multiply': [
+            {
+              '$divide': [
+                '$categories.amount', '$sum'
+              ]
+            }, 100
+          ]
+        }
+      }
+    }
+  ]
+  const result = await Payments.aggregate(aggregation)
   return result
 }

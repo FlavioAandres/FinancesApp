@@ -4,15 +4,17 @@
   "private": true,
   "dependencies": {
     "@aws-amplify/ui-react": "^0.2.33",
+    "@hookform/devtools": "^3.1.0",
     "apexcharts": "^3.20.0",
     "aws-amplify": "^3.3.13",
     "d3-format": "^2.0.0",
     "d3-scale": "^3.2.3",
     "d3-shape": "^2.0.0",
-    "emerald-ui": "^1.5.0",
+    "emerald-ui": "^2.11.0",
     "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-hook-form": "^7.9.0",
     "react-scripts": "3.4.1",
     "sweetalert2": "^9.17.1"
   },

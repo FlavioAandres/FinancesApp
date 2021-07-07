@@ -42,7 +42,7 @@ module.exports.getUserInformation = async (event) => {
 module.exports.addNewCategory = async (event) => {
 
   const body = event.body ? event.body : {};
-  
+
   if (!body.label || !body.value)
     return {
       statusCode: 400,
@@ -65,6 +65,53 @@ module.exports.addNewCategory = async (event) => {
         sub
       },
       { label: body.label, value: body.value, type: body.type }
+    );
+    return {
+      statusCode: result ? 200 : 409,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      statusCode: "500",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(error),
+    };
+  }
+};
+
+module.exports.addBudgetCategory = async (event) => {
+  const { body } = event;
+  const { category, budget } = body;
+
+
+  if (!category || !budget || isNaN(budget))
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
+
+  const {
+    cognitoPoolClaims
+  } = event
+
+  const {
+    sub
+  } = cognitoPoolClaims
+
+  try {
+    const result = await UserRepo.updateCategory(
+      {
+        sub,
+        "categories.value": category
+      },
+      { 'categories.$.budget': { value: parseInt(budget) } }
     );
     return {
       statusCode: result ? 200 : 409,
@@ -157,25 +204,25 @@ module.exports.postConfirmation = async (event, context, callback) => {
 
 const encryptBase64 = (data) => encrypt(Buffer.from(data, 'base64').toString('utf8'))
 
-module.exports.updateEmailSourceCredentials = async (event)=>{
+module.exports.updateEmailSourceCredentials = async (event) => {
   const { cognitoPoolClaims, body } = event;
   const { sub } = cognitoPoolClaims
 
-  if(!body || !body.credentials || !body.credentials.user || !body.credentials.key) return {
-    statusCode: 400, 
-    body: JSON.stringify({error: 'Bad Request'})
+  if (!body || !body.credentials || !body.credentials.user || !body.credentials.key) return {
+    statusCode: 400,
+    body: JSON.stringify({ error: 'Bad Request' })
   }
 
   const credentials = {
     user: encryptBase64(body.credentials.user),
     key: encryptBase64(body.credentials.key),
   }
-  
+
   const response = await UserRepo.updateUser({
     sub: sub
   }, {
     $set: {
-      'settings.email.user': credentials.user, 
+      'settings.email.user': credentials.user,
       'settings.email.key': credentials.key
     }
   })
@@ -186,7 +233,7 @@ module.exports.updateEmailSourceCredentials = async (event)=>{
 
 }
 
-module.exports.addBankToUser = async (event) =>{
+module.exports.addBankToUser = async (event) => {
   const body = event.body
   const { bankId } = body
   const {
@@ -197,11 +244,11 @@ module.exports.addBankToUser = async (event) =>{
     sub
   } = cognitoPoolClaims
 
-  if(!bankId) return { statusCode: 400, body: JSON.stringify({error: 'Missing bank to add'}) }
+  if (!bankId) return { statusCode: 400, body: JSON.stringify({ error: 'Missing bank to add' }) }
 
-  const result = await UserRepo.updateUser({ sub }, { $addToSet: { banks: bankId } } );
-  
+  const result = await UserRepo.updateUser({ sub }, { $addToSet: { banks: bankId } });
+
   return {
-    statusCode: result ? 200 : 409, 
+    statusCode: result ? 200 : 409,
   }
 }

@@ -1,6 +1,167 @@
 :root{
   --amplify-primary-color: #232526;
 }
+
+.eui-nav>.eui-btn,
+.eui-nav>.eui-btn .eui-btn-styles,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle .eui-btn-styles,
+.eui-nav>a,
+.eui-nav>a .eui-btn-styles {
+  color: rgba(255, 255, 255, .87)
+}
+
+.eui-nav>.eui-btn:hover,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:hover,
+.eui-nav>a:hover {
+    color: rgba(255, 255, 255, .99);
+    background: 0 0 !important
+}
+
+.eui-nav>.eui-btn:hover,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:hover,
+.eui-nav>a:hover {
+    color: rgba(255, 255, 255, .99);
+    background: 0 0 !important
+}
+
+.eui-nav>.eui-btn:hover .eui-btn-styles,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:hover .eui-btn-styles,
+.eui-nav>a:hover .eui-btn-styles {
+    background: 0 0 !important
+}
+
+.eui-nav>.eui-btn:focus,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:focus,
+.eui-nav>a:focus {
+    box-shadow: inset 0 -3px 0 #8ccbff !important
+}
+
+.eui-nav>.eui-btn:focus .eui-btn-styles,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:focus .eui-btn-styles,
+.eui-nav>a:focus .eui-btn-styles {
+    background-color: transparent !important
+}
+
+.eui-nav>.eui-btn.active,
+.eui-nav>.eui-btn:active,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle.active,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:active,
+.eui-nav>a.active,
+.eui-nav>a:active {
+    color: rgba(255, 255, 255, .99);
+    background-color: transparent !important
+}
+
+.eui-nav>.eui-btn.active.eui-btn-default:hover .eui-btn-styles,
+.eui-nav>.eui-btn:active.eui-btn-default:hover .eui-btn-styles,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle.active.eui-btn-default:hover .eui-btn-styles,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:active.eui-btn-default:hover .eui-btn-styles,
+.eui-nav>a.active.eui-btn-default:hover .eui-btn-styles,
+.eui-nav>a:active.eui-btn-default:hover .eui-btn-styles {
+    background-color: transparent !important
+}
+
+.eui-nav>.eui-btn.active:focus,
+.eui-nav>.eui-btn:active:focus,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle.active:focus,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle:active:focus,
+.eui-nav>a.active:focus,
+.eui-nav>a:active:focus {
+    box-shadow: inset 0 -4px 0 #8ccbff !important
+}
+
+.eui-nav>.eui-btn.tab-focus:focus,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle.tab-focus:focus,
+.eui-nav>a.tab-focus:focus {
+    box-shadow: 0 0 0 3px rgba(194, 219, 249, .5), inset 0 -3px 0 #8ccbff !important
+}
+
+.eui-navbar .eui-navbar-bar .eui-navbar-brand a:focus {
+    box-shadow: 0 0 0 3px rgba(194, 219, 249, .5)
+}
+
+.eui-nav>.eui-btn[disabled],
+.eui-nav>.eui-dropdown .eui-dropdown-toggle[disabled],
+.eui-nav>a[disabled] {
+    color: #fff
+}
+
+.eui-navbar,
+.eui-navbar.eui-navbar-inverse {
+    background: rgba(29, 33, 33, .99) !important
+}
+
+.eui-navbar .eui-navbar-toggle span {
+    background: rgba(255, 255, 255, .99)
+}
+
+.eui-navbar .eui-navbar-bar,
+.eui-navbar .eui-navbar-bar .eui-navbar-brand a {
+    color: rgba(255, 255, 255, .99)
+}
+
+.eui-navbar .eui-navbar-bar .eui-nav .eui-dropdown .eui-dropdown-toggle .eui-btn-styles,
+.eui-navbar .eui-navbar-bar .eui-nav>a,
+.eui-navbar .eui-navbar-bar .eui-nav>a i {
+    color: rgba(255, 255, 255, .99)
+}
+
+.eui-navbar .eui-navbar-collapsed {
+    background: rgba(0, 0, 0, .99)
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav>a {
+    color: rgba(255, 255, 255, .99);
+    border-bottom: 1px solid rgba(255, 255, 255, .1)
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav .eui-dropdown .eui-dropdown-toggle {
+    color: rgba(255, 255, 255, .99);
+    border-bottom-color: transparent
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav .eui-dropdown .eui-dropdown-menu {
+    border-top: none
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav .eui-dropdown .eui-dropdown-menu a {
+    color: rgba(255, 255, 255, .99)
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav .eui-dropdown.show .eui-dropdown-toggle {
+    border-bottom: 1px solid rgba(255, 255, 255, .1)
+}
+
+.eui-navbar .eui-navbar-bar .eui-nav .eui-dropdown-toggle:after,
+.eui-navbar .eui-navbar-bar .eui-nav>a:after,
+.eui-navbar.open .eui-navbar-collapsed .eui-nav a.active:after {
+    background: #8ccbff
+}
+
+
+
+.eui-navbar .eui-navbar-bar .eui-nav .eui-dropdown.show .eui-dropdown-toggle .eui-btn-styles,
+.eui-navbar .eui-navbar-bar .eui-nav>a:focus,
+.eui-navbar .eui-navbar-bar .eui-nav>a:focus i,
+.eui-navbar .eui-navbar-bar .eui-nav>a:hover,
+.eui-navbar .eui-navbar-bar .eui-nav>a:hover i,
+.eui-show-more-toggle,
+.eui-steps ul li.active .eui-step-label,
+a {
+    color: #8ccbff
+}
+
+.eui-nav>.eui-btn.active,
+.eui-nav>.eui-dropdown .eui-dropdown-toggle.active,
+.eui-nav>a.active {
+    box-shadow: inset 0 -3px 0 #8ccbff
+}
+
+.eui-navbar .eui-navbar-collapsed .eui-nav .eui-dropdown .eui-dropdown-toggle .eui-btn-styles {
+    color: rgba(255, 255, 255, .99)
+}
+
 .full-container{
   width: 90%;
   margin: 30px auto;
@@ -205,6 +366,9 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
 .user-phones p{
   margin-left: 10px;
 }
+.user-categories h2{
+  display: block;
+}
 .user-categories .eui-label{
   margin-right: 5px;
   margin-top: 5px; 
@@ -212,6 +376,9 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
 }
 .add-new-category{
   cursor: pointer;
+}
+.user-budgets-category p{
+  color: grey; 
 }
 .eui-text-field + .eui-text-field{
   margin-top: 10px !important;
@@ -236,4 +403,15 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
 
 .bank-list-header h2{
   margin: 0;
+}
+
+.add-new-budget{
+  cursor: pointer;
+  display: inline-block;
+}
+
+.budget-label{
+  display: block;
+  margin-right: 10px;
+  margin-top: 5px; 
 }
