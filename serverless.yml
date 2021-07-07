@@ -11,10 +11,17 @@ package:
     - devutils/**
     - AutomationServices/AutoMailChecker/**
 
-# custom: 
-#   ArnSQSEmails: 
+custom:
+  ArnSQSForwardingConfirmation:
+    dev: ${file(./config/dev.json):EMAIL_FORWARDING_CONFIRMATION_SQS}
+    test:
+      Ref: EmailForwardingAceptationQueue
+    prod:
+      Ref: EmailForwardingAceptationQueue
+
+#   ArnSQSEmails:
 #     dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
-#     test: 
+#     test:
 #       Ref: EmailUsersQueue
 #     prod:
 #       Ref: EmailUsersQueue
@@ -36,16 +43,6 @@ provider:
     MONGO_USER: ${file(./config/${opt:stage}.json):MONGO_USER}
     MONGO_SSL: true
   iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-      Resource:
-        - Fn::Join:
-          - ''
-          -
-            - Fn::GetAtt: [EmailsBucket, Arn]
-            - '/*'
     - Effect: Allow
       Action: ses:SendRawEmail
       Resource:
@@ -274,7 +271,7 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
-              
+
   AddBudgetCategory:
     handler: API/Functions/Users.addBudgetCategory
     name: UserRepo-Categories-budget-POST-${opt:stage}
@@ -323,7 +320,7 @@ functions:
     name: PostConfirmationUser-${opt:stage}
 
   #INCOMES
-  
+
   GetIncomes:
     handler: API/Functions/Incomes.get
     name: Incomes-GET-${opt:stage}
@@ -387,15 +384,48 @@ functions:
             claims:
               - sub
 
-
-
   #AUTOMATIONS
+  EmailForwardingAcceptation:
+    handler: AutomationServices/EmailFowardingAccept/scraper.start
+    name: EmailForwardingAcceptation-${opt:stage}
+    timeout: 120
+    memorySize: 2048
+    layers:
+      - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - EmailForwardingAceptationQueue
+              - Arn
+          batchSize: 1
 
   ProcessEmails:
     handler: AutomationServices/EmailsForwardingReader.process
     name: ProcessEmail-${opt:stage}
-    environment: 
+    iamRoleStatementsName: write-sqs-finances-email-forwarding-confirmation-${opt:stage}-role
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "sqs:SendMessage"
+          - "sqs:SendMessageBatch"
+        Resource:
+          Fn::GetAtt:
+            - EmailForwardingAceptationQueue
+            - Arn
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:DeleteObject
+        Resource:
+          - Fn::Join:
+              - ""
+              - - Fn::GetAtt: [EmailsBucket, Arn]
+                - "/*"
+    environment:
       BUCKETNAME: finance-emails-${opt:stage}
+      EMAIL_FORWARDING_CONFIRMATION_SQS: ${self:custom.ArnSQSForwardingConfirmation.${opt:stage, self:provider.stage}}
 
   # EmailChecker:
   #   handler: AutomationServices/AutoMailChecker/checker.start
@@ -432,7 +462,7 @@ functions:
       TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
       TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
 
-  ##Deprecated function since DataCredito updates the backend
+  # Deprecated function since DataCredito updates the backend
   # DataCreditoScraper:
   #   handler: AutomationServices/DataCreditoScraper/scraper.start
   #   name: AutomationServices-DataCreditoScraper-${opt:stage}
@@ -444,6 +474,8 @@ functions:
   #         description: "Function to scraper datacredito data"
   #         rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
   #         enabled: false
+  #   layers:
+  #     - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
   #   environment:
   #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
   #     SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
@@ -462,17 +494,17 @@ functions:
   #   handler: AutomationServices/AutoMailChecker/schedule.start
   #   name: AutomationServices-ScheduleUsers-${opt:stage}
   #   iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
-  #   iamRoleStatements: 
+  #   iamRoleStatements:
   #     - Effect: 'Allow'
-  #       Action: 
+  #       Action:
   #         - 'sqs:SendMessage'
   #         - 'sqs:SendMessageBatch'
   #       Resource:
   #         Fn::GetAtt:
   #           - EmailUsersQueue
   #           - Arn
-  #   events: 
-  #     - schedule: 
+  #   events:
+  #     - schedule:
   #         enabled: true
   #         rate: rate(20 minutes)
   #   environment:
@@ -486,6 +518,12 @@ resources:
     #     QueueName: "email-users-checker"
     #     VisibilityTimeout: 300
 
+    EmailForwardingAceptationQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "email-forwarding-aceptation"
+        VisibilityTimeout: 300
+
     GiveSESPermissionToInvokeProcessEmailLambdaFunction:
       Type: AWS::Lambda::Permission
       Properties:
@@ -493,10 +531,10 @@ resources:
         Principal: ses.amazonaws.com
         Action: "lambda:InvokeFunction"
         SourceAccount: { Ref: AWS::AccountId }
-    
+
     EmailsBucket:
-     Type: AWS::S3::Bucket
-     Properties:
+      Type: AWS::S3::Bucket
+      Properties:
         BucketName: finance-emails-${opt:stage}
 
     EmailsBucketPolicy:
@@ -505,15 +543,13 @@ resources:
         Bucket: { Ref: EmailsBucket }
         PolicyDocument:
           Statement:
-            -
-              Action: 
+            - Action:
                 - s3:PutObject
               Effect: Allow
               Resource:
                 Fn::Join:
                   - ""
-                  -
-                    - { "Fn::GetAtt": ["EmailsBucket", "Arn"] }
+                  - - { "Fn::GetAtt": ["EmailsBucket", "Arn"] }
                     - "/*"
               Principal:
                 Service: ses.amazonaws.com

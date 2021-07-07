@@ -1,3 +1,4 @@
+const AWS = require('aws-sdk')
 const mailparser = require('mailparser').simpleParser
 const _ = require('lodash')
 const cheerio = require('cheerio');
@@ -10,6 +11,7 @@ const { transfersParser } = require('../parsers/bancolombia/transfers.parser')
 const { transferReceptionParser } = require('../parsers/bancolombia/transferReception.parser')
 const { debitWithdrawalParser } = require('../parsers/bancolombia/debitWithdrawal.parser')
 const { creditCardWithdrawalParser } = require('../parsers/bancolombia/creditCardWithdrawal.parser')
+const { forwardingConfirmation } = require('../parsers/gmail/FowardingConfirmation')
 
 
 function isBase64(str) {
@@ -24,7 +26,7 @@ module.exports.readRawEmail = async (body) => {
         textAsHtml = '<p>' + htmlToText(body).replace(/\r?\n|\r|\t/g, " ") + '</p>'
     } else {
         const result = await mailparser(body);
-        textAsHtml = result.textAsHtml ? result.textAsHtml  : '<p>' + htmlToText(result.html).replace(/\r?\n|\r|\t/g, " ") + '</p>'
+        textAsHtml = result.textAsHtml ? result.textAsHtml : '<p>' + htmlToText(result.html).replace(/\r?\n|\r|\t/g, " ") + '</p>'
     }
 
 
@@ -105,4 +107,28 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
         }
     }
     return undefined
+}
+module.exports.processForwardingConfirmationGmail = async (html) => {
+    const $ = cheerio.load(html)
+    const res = $('p')
+    const value = res.text().trim().replace(/=/g, '')
+    const result = await forwardingConfirmation(value);
+
+
+    const SQS = new AWS.SQS({
+        region: 'us-east-1',
+    })
+
+    try {
+        await SQS.sendMessage({
+            QueueUrl: process.env.EMAIL_FORWARDING_CONFIRMATION_SQS,
+            MessageBody: JSON.stringify({
+                destination: result.EMAIL_DESTINATION,
+                url: result.URL_CONFIRMATION
+            })
+        }).promise()
+    } catch (error) {
+        console.log('access denied error', JSON.stringify(error))
+    }
+
 }
