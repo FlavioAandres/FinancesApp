@@ -55,7 +55,7 @@ module.exports = total = (bot) => {
                     return prev
                 }, "")
 
-                data += "\n*Total:* $" + formatCahs(result.reduce((prev, current, index) => {
+                data += "\n*Total:* " + formatCahs(result.reduce((prev, current, index) => {
                     prev += current.amount
                     return prev
                 }, 0))
