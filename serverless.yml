@@ -384,6 +384,29 @@ functions:
             claims:
               - sub
 
+  #Telegram Bot
+  TelegramBotSetWebhook:
+    handler: AutomationServices/TelegramBot/handler.setWebhook
+    name: TelegramBotSetWebhook-POST-${opt:stage}
+    events:
+      - http:
+          path: /telegram/setWebhook
+          method: POST
+          cors: true
+    environment:
+      BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
+
+  TelegramBotWebHook:
+    handler: AutomationServices/TelegramBot/handler.webhook
+    name: TelegramBotWebHook-POST-${opt:stage}
+    events:
+      - http:
+          path: /telegram/webhook
+          method: POST
+          cors: true
+    environment:
+      BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
+
   #AUTOMATIONS
   EmailForwardingAcceptation:
     handler: AutomationServices/EmailFowardingAccept/scraper.start
@@ -510,6 +533,7 @@ functions:
   #   environment:
   #     USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
+# Resources
 resources:
   Resources:
     # EmailUsersQueue:

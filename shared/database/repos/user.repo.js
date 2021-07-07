@@ -12,7 +12,7 @@ module.exports.create = async (UserBody = []) => {
     }
 };
 
-module.exports.getUser = async (searchCriteria, configs = {}) => {
+module.exports.getUser = async (searchCriteria, configs = {}, projections = {}) => {
     try {
         await connect();
         if (configs.banks)
@@ -20,7 +20,7 @@ module.exports.getUser = async (searchCriteria, configs = {}) => {
                 ...searchCriteria
             }).populate('bank')
 
-        return Users.findOne(searchCriteria);
+        return Users.findOne(searchCriteria, { ...projections });
     } catch (e) {
         console.error(e);
         return configs.banks ? [] : {};
@@ -54,6 +54,17 @@ module.exports.createCategory = async (userCriteria, category) => {
         }
     })
     return result.nModified > 0
+}
+
+module.exports.addChat = async (userCriteria, chat) => {
+    if (!chat.id) return null;
+
+    await connect()
+    const result = await userModel.updateOne({ ...userCriteria }, {
+        $push: {
+            "settings.bots.chats": { ...chat }
+        }
+    })
 }
 
 module.exports.updateCategory = async (searchCriteria, update) => {
