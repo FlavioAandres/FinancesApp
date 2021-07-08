@@ -1,19 +1,10 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
+// import { DevTool } from "@hookform/devtools";
 import { Modal, Button, SingleSelect, TextField } from "emerald-ui/lib/";
-import formatCash from "../../utils/formatCash";
-import { API } from 'aws-amplify'
 
 const NewBudgetModal = ({ categories = [], close, show, loading, save }) => {
   const { handleSubmit, formState: { errors }, control, reset } = useForm();
-
-
-  const skipWhiteSpaces = ({ target }) => {
-    const typedByUser = target.value.replace(/\D/g, '');
-    const formatedString = formatCash(typedByUser)
-
-  }
 
   const onCreateBudget = ({ category, budget }) => {
 

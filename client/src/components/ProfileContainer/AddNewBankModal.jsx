@@ -3,7 +3,7 @@ import { Modal, Button, SearchableSelect } from 'emerald-ui/lib'
 import { API } from 'aws-amplify'
 import swalert from 'sweetalert2'
 
-const AddNewBankModal = (props) => {
+const AddNewBankModal = ({ close, onBankAdded, show }) => {
     const [loading, setLoading] = useState(false)
     const [availableBanks, setBanks] = useState([]); 
     let choosedBank = ""
@@ -13,14 +13,14 @@ const AddNewBankModal = (props) => {
             body: { bankId: choosedBank }
         }).then(data=>{
             choosedBank = ""
-            props.onBankAdded()
+            onBankAdded()
             swalert.fire('Bank added', 'Your new bank has been addeed and we are now tracking it', 'success')
         }).catch(e=>{
             console.error(e); 
             swalert.fire('Something went wrong', 'Take and screenshot of this and share with the administrator: ' + e.message, 'error')
         }).finally(()=>{
             setLoading(false)
-            props.close()
+            close()
         })
     }
     useEffect(() => {
@@ -30,7 +30,7 @@ const AddNewBankModal = (props) => {
         }).catch(console.error)
     }, []); 
     return (
-        <Modal show={props.show} onHide={props.close}>
+        <Modal show={show} onHide={close}>
             <Modal.Header closeButton={true}>
                 <Modal.Title>Add available banks</Modal.Title>
             </Modal.Header>

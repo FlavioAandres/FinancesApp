@@ -1,13 +1,13 @@
 import React from "react";
 import { ExpansionPanelGroup, Avatar } from "emerald-ui/lib/";
 
-export default (props) => {
+export default ({ name, subject, filters}) => {
   return (
     <ExpansionPanelGroup id="g1">
       <ExpansionPanelGroup.Panel>
         <ExpansionPanelGroup.Panel.Summary>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Avatar size="lg" title={props.name} />
+            <Avatar size="lg" title={name} />
             <div
               style={{
                 marginLeft: "35px",
@@ -15,9 +15,9 @@ export default (props) => {
               }}
             >
               <h3 style={{ marginTop: 0, marginBottom: "3px" }}>
-                <strong>{props.name}</strong>
+                <strong>{name}</strong>
               </h3>
-              <p style={{ margin: 0 }}>{props.subject}</p>
+              <p style={{ margin: 0 }}>{subject}</p>
             </div>
           </div>
         </ExpansionPanelGroup.Panel.Summary>
@@ -25,7 +25,7 @@ export default (props) => {
           <div className="bank-information-container">
             <h2>Correos seguidos: </h2>
             <div className="bank-filters-information">
-              {props.filters.map((item) => (
+              {filters.map((item) => (
                 <p className="text-muted" key={item.phrase}>{item.phrase}</p>
               ))}
             </div>

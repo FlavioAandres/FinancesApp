@@ -1,8 +1,7 @@
 import React from "react";
-import { PasswordStrengthMeter, TextField, Icon, Button } from "emerald-ui/lib";
+import { TextField, Icon, Button } from "emerald-ui/lib";
 
-const SecretCodeScreen = (props) => {
-  const { onLoginClick = () => null } = props;
+const SecretCodeScreen = ({ onLoginClick }) => {
   const [secretPassword, setSecret] = React.useState("");
   return (
     <div className="full-screen-secret-container">

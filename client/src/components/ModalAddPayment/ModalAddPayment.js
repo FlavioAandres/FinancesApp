@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Modal, TextField, Button, SingleSelect } from "emerald-ui/lib/";
 

@@ -1,29 +1,23 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import ApexCharts from "apexcharts";
 import { API } from 'aws-amplify'
-import SelectorTimming from './SelectorTiming'
+import SelectorTimming from '../SelectorTiming'
 import moment from 'moment'
 import './GraphContainer.css'
-import formatCash from '../utils/formatCash';
+import formatCash from '../../utils/formatCash';
 
-class GraphContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      timeAgo: 'year'
-    };
-  }
-  isGraphRendered = false;
-  ChartsRendered = {}
+const GraphContainer = () => {
+  const [timeAgo, setTimeAgo] = useState('year');
+  const ChartsRendered = {}
 
-  renderGraph = ({ type = "bar", series, categories = [], xaxis = {}, dataLabels = {}, plotOptions = {}, chartOptions = {} }, id) => {
+  const renderGraph = ({ type = "bar", series, categories = [], xaxis = {}, dataLabels = {}, plotOptions = {}, chartOptions = {} }, id) => {
     const basics = {
       chart: {
         type,
         ...chartOptions
       },
     };
-    if (!this.ChartsRendered[id]) {
+    if (!ChartsRendered[id]) {
       let chart;
       switch (type) {
         case 'donut':
@@ -63,28 +57,25 @@ class GraphContainer extends Component {
           break;
       }
       chart.render();
-      this.ChartsRendered[id] = chart;
+      ChartsRendered[id] = chart;
     } else {
-      this.ChartsRendered[id].updateSeries(series)
+      ChartsRendered[id].updateSeries(series)
       switch (type) {
         case 'donut':
-          
-          this.ChartsRendered[id].updateOptions({
+          ChartsRendered[id].updateOptions({
             labels: dataLabels
           })
-          console.log(dataLabels)
           break;
         default:
           break;
       }
     }
 
-  };
+  }
 
-  getMonthlyMetrics = () =>
+  const getMonthlyMetrics = () =>
     API.get("finances", '/boxflow/stats').then(response => {
       const { payments, incomes } = JSON.parse(response.body)
-
 
       // Payments
       const [paymentsAmount, paymentsMonths] = payments.reduce(
@@ -96,7 +87,7 @@ class GraphContainer extends Component {
         [[], []]
       );
 
-      this.renderGraph(
+      renderGraph(
         {
           categories: paymentsMonths,
           series: [
@@ -138,7 +129,7 @@ class GraphContainer extends Component {
         [[], []]
       );
 
-      this.renderGraph(
+      renderGraph(
         {
           categories: incomesMonths,
           series: [
@@ -176,7 +167,7 @@ class GraphContainer extends Component {
       );
     });
 
-  getMonthlyCategories = (date, period = 'month') =>
+  const getMonthlyCategories = (date, period = 'month') =>
     API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'category', date, groupBy: period } })
       .then((res) => {
         const { payments, incomes } = JSON.parse(res.body);
@@ -187,7 +178,7 @@ class GraphContainer extends Component {
           return {
             name: item.category,
             data: item.monthly.map((i) => {
-              const date = period != 'month'
+              const date = period !== 'month'
                 ? i.month.substring(5, 10)
                 : i.month
               monthsArray.push(date);
@@ -222,7 +213,7 @@ class GraphContainer extends Component {
           };
         });
 
-        this.renderGraph(
+        renderGraph(
           {
             categories: uniqueMonthsPayments,
             type: "line",
@@ -237,7 +228,7 @@ class GraphContainer extends Component {
           return {
             name: item.category,
             data: item.monthly.map((i) => {
-              const date = period != 'month'
+              const date = period !== 'month'
                 ? i.month.substring(5, 10)
                 : i.month
               monthsArrayIncomes.push(date);
@@ -272,7 +263,7 @@ class GraphContainer extends Component {
           };
         });
 
-        this.renderGraph(
+        renderGraph(
           {
             categories: uniqueMonthsIncomes,
             type: "line",
@@ -283,7 +274,7 @@ class GraphContainer extends Component {
       })
       .catch((err) => console.error(err));
 
-  getStats = (date) => {
+  const getStats = (date) => {
     API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'stats', date } })
       .then((res) => {
         const { cardTypeStats, categoryTypeStats } = JSON.parse(res.body);
@@ -298,7 +289,7 @@ class GraphContainer extends Component {
         }, { cardTypesNamesSeries: [], cardTypeStatsSeries: [] })
 
 
-        this.renderGraph(
+        renderGraph(
           {
             dataLabels: cardTypesNamesSeries,
             type: "donut",
@@ -316,7 +307,7 @@ class GraphContainer extends Component {
           return prev
         }, { categoriesTypeNamesSeries: [], categoryTypeSeries: [] })
 
-        this.renderGraph(
+        renderGraph(
           {
             dataLabels: categoriesTypeNamesSeries,
             type: "donut",
@@ -329,66 +320,62 @@ class GraphContainer extends Component {
       .catch((err) => console.error(err));
   }
 
-  componentDidMount = () => {
-    this.getMonthlyMetrics();
-    this.getMonthlyCategories();
-    this.getStats();
-  };
-
-  onChangeDate = (e, period) => {
+  const onChangeDate = (e, period) => {
     const date = moment().subtract(1, period).toISOString()
     const grpupBy = period === 'year'
       ? 'month'
       : 'day';
-    this.getMonthlyCategories(date, grpupBy)
-    this.getStats(date);
-    this.setState({
-      timeAgo: period
-    })
+    getMonthlyCategories(date, grpupBy)
+    getStats(date);
+    setTimeAgo(period)
   }
 
-  render() {
-    const { timeAgo } = this.state
-    return (
-      <div className="graph-container">
-        <SelectorTimming
-          onChangeDate={this.onChangeDate}
-          timeAgo={timeAgo}
-        />
-        <div className="container-graphs-general">
-          <div className="graph-monthly-container">
-            <h2>Total monthly payemnts</h2>
-            <div id="graph-montly"></div>
-          </div>
-          <div className="graph-category-monthly-container">
-            <h2>Payments Categories by month</h2>
-            <div id="graph-category-monthly"></div>
-          </div>
-        </div>
+  useEffect(() => {
+    getMonthlyMetrics();
+    getMonthlyCategories();
+    getStats();
+  }, []);
 
-        <div className="container-graphs-general">
-          <div className="graph-monthly-container">
-            <h2>Total Incomes vs Payments monthly</h2>
-            <div id="graph-montly-incomes-vs-payemnts"></div>
-          </div>
-          <div className="graph-category-monthly-container">
-            <h2>Incomes Categories by month</h2>
-            <div id="graph-category-monthly-incomes"></div>
-          </div>
+  return (
+    <div className="graph-container">
+      <SelectorTimming
+        onChangeDate={onChangeDate}
+        timeAgo={timeAgo}
+      />
+      <div className="container-graphs-general">
+        <div className="graph-monthly-container">
+          <h2>Total monthly payemnts</h2>
+          <div id="graph-montly"></div>
         </div>
-
-        <div className="container-graphs-general">
-          <div className="ggraph-monthly-container">
-            <h2>Percentage By Card Type</h2>
-            <div id="graph-card-stats"></div>
-          </div>
-          <div className="graph-category-monthly-container">
-            <h2>Percentage by Category</h2>
-            <div id="graph-category-stats"></div>
-          </div>
+        <div className="graph-category-monthly-container">
+          <h2>Payments Categories by month</h2>
+          <div id="graph-category-monthly"></div>
         </div>
       </div>
-    );
-  }
+
+      <div className="container-graphs-general">
+        <div className="graph-monthly-container">
+          <h2>Total Incomes vs Payments monthly</h2>
+          <div id="graph-montly-incomes-vs-payemnts"></div>
+        </div>
+        <div className="graph-category-monthly-container">
+          <h2>Incomes Categories by month</h2>
+          <div id="graph-category-monthly-incomes"></div>
+        </div>
+      </div>
+
+      <div className="container-graphs-general">
+        <div className="ggraph-monthly-container">
+          <h2>Percentage By Card Type</h2>
+          <div id="graph-card-stats"></div>
+        </div>
+        <div className="graph-category-monthly-container">
+          <h2>Percentage by Category</h2>
+          <div id="graph-category-stats"></div>
+        </div>
+      </div>
+    </div>
+  );
 }
+
 export default GraphContainer;

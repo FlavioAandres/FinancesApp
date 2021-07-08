@@ -1,26 +1,26 @@
 import React from 'react'
 
-const SelectorTimmingComponent = (props) => {
+const SelectorTimmingComponent = ({ onChangeDate, timeAgo }) => {
     return (
         <div className="container-timming-buton">
             <button
-                onClick={(evt) => props.onChangeDate(evt, "week")}
-                className={props.timeAgo === "week" ? "selected" : ""}
+                onClick={(evt) => onChangeDate(evt, "week")}
+                className={timeAgo === "week" ? "selected" : ""}
             >
                 Last Week
-          </button>
+            </button>
             <button
-                onClick={(evt) => props.onChangeDate(evt, "month")}
-                className={props.timeAgo === "month" ? "selected" : ""}
+                onClick={(evt) => onChangeDate(evt, "month")}
+                className={timeAgo === "month" ? "selected" : ""}
             >
                 Last Month
-          </button>
+            </button>
             <button
-                onClick={(evt) => props.onChangeDate(evt, "year")}
-                className={props.timeAgo === "year" ? "selected" : ""}
+                onClick={(evt) => onChangeDate(evt, "year")}
+                className={timeAgo === "year" ? "selected" : ""}
             >
                 Last Year
-          </button>
+            </button>
         </div>
     )
 }

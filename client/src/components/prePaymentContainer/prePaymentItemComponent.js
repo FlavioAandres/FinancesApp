@@ -1,6 +1,6 @@
 import React from "react";
 import { ExpansionTableRow } from "emerald-ui/lib/";
-import formatCash from '../utils/formatCash';
+import formatCash from '../../utils/formatCash';
 import moment from "moment";
 
 const PrePaymentItemComponent = (props = { item: {} }) => {
