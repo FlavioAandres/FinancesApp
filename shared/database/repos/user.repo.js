@@ -44,13 +44,13 @@ module.exports.updateUser = async (filter, newDocument, single) => {
     return userModel[updateType](filter, newDocument);
 };
 
-module.exports.createCategory = async (userCriteria, category) => {
-    if (!category.value || !category.value || !Object.keys(userCriteria).length) return null;
+module.exports.createCategory = async (userCriteria, { value, label, type }) => {
+    if (!value || !label  || !type || !Object.keys(userCriteria).length) return null;
 
     await connect()
     const result = await userModel.updateOne({ ...userCriteria }, {
         $push: {
-            categories: { ...category }
+            categories: { value, label, type }
         }
     })
     return result.nModified > 0
