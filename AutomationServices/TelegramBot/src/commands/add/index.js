@@ -12,13 +12,19 @@ module.exports = add = (bot) => {
         amount: 0,
         description: '',
         source: '',
-        category: 'INCOME'
+        category: {
+            _id: null,
+            value: ''
+        }
     }
 
     bot.context.payment = {
         amount: 0,
         description: '',
-        category: ''
+        category: {
+            _id: null,
+            value: ''
+        }
     }
 
     bot.context.action = {
@@ -85,10 +91,10 @@ module.exports = add = (bot) => {
                 let categoriesOptions = []
                 if (ctx.action.type === 'INCOME') {
                     ctx.income.description = ctx.update.message.text
-                    categoriesOptions = ctx.userInfo.incomesCategories.map(category => Markup.button.callback(category.value, `CATEGORY_${category.label.toUpperCase()}`));
+                    categoriesOptions = ctx.userInfo.incomesCategories.map(category => Markup.button.callback(category.value, `CATEGORY_${category._id}_${category.label}`));
                 } else {
                     ctx.payment.description = ctx.update.message.text
-                    categoriesOptions = ctx.userInfo.paymentsCategories.map(category => Markup.button.callback(category.value, `CATEGORY_${category.label.toUpperCase()}`));
+                    categoriesOptions = ctx.userInfo.paymentsCategories.map(category => Markup.button.callback(category.value, `CATEGORY_${category._id}_${category.label}`));
                 }
                 ctx.action.status = CATEGORY_ADD
                 const incomeCategoryOptions = Markup.inlineKeyboard([...categoriesOptions], { columns: 3 })
@@ -104,18 +110,22 @@ module.exports = add = (bot) => {
         if (ctx.action.status === CATEGORY_ADD) {
             switch (ctx.action.type) {
                 case 'INCOME':
-                    ctx.income.category = ctx.update.callback_query.data.replace('CATEGORY_', '').toLowerCase()
+                    const [idIncome, valueIncome] = ctx.update.callback_query.data.replace('CATEGORY_', '').split('_')
+                    ctx.income.category._id = idIncome;
+                    ctx.income.category.value = valueIncome;
                     message += `\n\n*Amount:* ${ctx.income.amount}`
                     message += `\n*Description:* ${ctx.income.description}`
                     message += `\n*Source:* ${ctx.income.source}`
-                    message += `\n*Category:* ${ctx.income.category}`
+                    message += `\n*Category:* ${ctx.income.category.value}`
                     break;
                 case 'PAYMENT':
-                    ctx.payment.category = ctx.update.callback_query.data.replace('CATEGORY_', '').toLowerCase()
+                    const [idPayment, valuePayemnt] = ctx.update.callback_query.data.replace('CATEGORY_', '').split('_')
+                    ctx.payment.category._id = idPayment;
+                    ctx.payment.category.value = valuePayemnt;
                     message += `\n\n*Amount:* ${ctx.payment.amount}`
                     message += `\n*Description:* ${ctx.payment.description}`
                     message += `\n*Source:* ${ctx.payment.source}`
-                    message += `\n*Category:* ${ctx.payment.category}`
+                    message += `\n*Category:* ${ctx.payment.category.value}`
                     break;
                 default:
                     break;
@@ -129,7 +139,7 @@ module.exports = add = (bot) => {
     addScene.action('SAVE_OPERATION', (ctx) => {
         switch (ctx.action.type) {
             case 'INCOME':
-                saveIncome({ ...ctx.income, user: ctx.userInfo._id })
+                saveIncome({ ...ctx.income, category: ctx.income.category._id, user: ctx.userInfo._id })
                 Object.assign(ctx.income, {
                     amount: 0,
                     description: '',
@@ -138,7 +148,7 @@ module.exports = add = (bot) => {
                 })
                 break;
             case 'PAYMENT':
-                savePayment({ ...ctx.payment, user: ctx.userInfo._id })
+                savePayment({ ...ctx.payment, category: ctx.payment.category._id, user: ctx.userInfo._id })
                 Object.assign(ctx.payment, {
                     amount: 0,
                     description: '',

@@ -2,6 +2,8 @@
 
 const getUserInfo = require('../../controllers/getUserInfo');
 const addCategory = require('../../controllers/categories/add')
+const deleteCategory = require('../../controllers/categories/delete')
+const updateCategory = require('../../controllers/categories/update')
 const { Scenes, session, Markup } = require('telegraf');
 
 
@@ -16,10 +18,21 @@ module.exports = categories = (bot) => {
 
     // Used for update Category
     bot.context.categoryUpdate = {
+        _id: null,
         oldLabel: '',
-        newLabel: '', // Only for delete method
         value: '',
         label: ''
+    }
+
+    bot.context.categoryDelete = {
+        delete: {
+            _id: null,
+            value: ''
+        },
+        replace: {
+            _id: null,
+            value: ''
+        }
     }
 
     // Used for Add a new Category
@@ -74,10 +87,10 @@ module.exports = categories = (bot) => {
 
     const forceReplyQuestion = Markup.forceReply().oneTime().selective(true);
 
-    const addScene = new Scenes.BaseScene('CategoryUpdate')
+    const addScene = new Scenes.BaseScene('CategoryManagement')
 
     addScene.enter((ctx) => ctx.reply('Which type of action you can perform?', typeOptions))
-    addScene.leave((ctx) => ctx.reply('Leaving Manipulate Categories section'))
+    addScene.leave((ctx) => ctx.reply('Leaving Categories management section'))
 
     addScene.on('reply_to_message', (ctx) => {
         if (![undefined, null, ''].includes(ctx.action.type)) {
@@ -89,8 +102,8 @@ module.exports = categories = (bot) => {
                 ctx.reply('Which kind of category is?', categoryTypeOptions)
 
             } else if (ctx.action.status === NEW_CATEGORY_VALUE) {
-                ctx.categoryUpdate.value = ctx.update.message.text
-                ctx.categoryUpdate.label = ctx.update.message.text.toLowerCase().replace(' ', '_').replace('/', '_')
+                ctx.categoryUpdate.value = ctx.update.message.text.toLowerCase();
+                ctx.categoryUpdate.label = ctx.update.message.text.toLowerCase().replace(' ', '_').replace('/', '_');
 
                 message += `You will Update: *${ctx.categoryUpdate.oldLabel}* for:`
                 message += `\n\n*New Value:* ${ctx.categoryUpdate.value}`
@@ -106,22 +119,27 @@ module.exports = categories = (bot) => {
         switch (ctx.action.type) {
             case CATEGORY_UPDATE:
                 ctx.action.status = NEW_CATEGORY_VALUE
-                ctx.categoryUpdate.oldLabel = ctx.update.callback_query.data.replace('CATEGORY_', '').toLowerCase()
+                const [id, value] = ctx.update.callback_query.data.replace('CATEGORY_', '').split('_');
+                ctx.categoryUpdate._id = id;
+                ctx.categoryUpdate.oldLabel = value;
                 ctx.reply('What is the new name?', forceReplyQuestion);
                 break;
             case CATEGORY_DELETE:
-
                 if (ctx.action.status === NEW_CATEGORY_VALUE) {
-                    ctx.categoryUpdate.newLabel = ctx.update.callback_query.data.replace('CATEGORY_', '').toLowerCase()
-                    message += `You will delete *${ctx.categoryUpdate.value}*`
-                    message += `\n\nPayments with old category will took: *${ctx.categoryUpdate.newLabel}*`
+                    const [id, value] = ctx.update.callback_query.data.replace('CATEGORY_', '').split('_');
+                    ctx.categoryDelete.replace._id = id;
+                    ctx.categoryDelete.replace.value = value;
+                    message += `You will delete *${ctx.categoryDelete.delete.value}*`
+                    message += `\n\nPayments with old category will took: *${ctx.categoryDelete.replace.value}*`
 
                     message += '\n\n*What do you want to do?*'
                     ctx.replyWithMarkdown(message, menuOptions)
                 } else {
                     ctx.action.status = NEW_CATEGORY_VALUE
-                    ctx.categoryUpdate.value = ctx.update.callback_query.data.replace('CATEGORY_', '').toLowerCase()
-                    const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category.label.toUpperCase()}`))
+                    const [id, value] = ctx.update.callback_query.data.replace('CATEGORY_', '').split('_');
+                    ctx.categoryDelete.delete._id = id;
+                    ctx.categoryDelete.delete.value = value;
+                    const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category._id}_${category.label}`))
                     ctx.reply('Which category will took the payment with this one?', Markup.inlineKeyboard(categoriesOptions, { columns: 3 }))
                 }
                 break;
@@ -153,19 +171,24 @@ module.exports = categories = (bot) => {
         ctx.replyWithMarkdown(message, menuOptions)
     })
 
-    addScene.action(SAVE_OPERATION, (ctx) => {
+    addScene.action(SAVE_OPERATION, async (ctx) => {
         let message = ''
         switch (ctx.action.type) {
             case CATEGORY_UPDATE:
                 //Update Category and payments
-                ctx.reply(CATEGORY_UPDATE)
+                await updateCategory({ user: ctx.userInfo._id, _id: ctx.categoryUpdate._id, value: ctx.categoryUpdate.value, label: ctx.categoryUpdate.label })
+                message = `*${ctx.categoryUpdate.oldLabel}* Updated ✅`
                 break;
             case CATEGORY_DELETE:
                 // Delete Category and update payments
-                ctx.reply(CATEGORY_DELETE)
+                await deleteCategory({ user: ctx.userInfo._id, _idCategoryOld: ctx.categoryDelete.delete._id, _idCategoryNew: ctx.categoryDelete.replace._id, })
+                message = `*${ctx.categoryDelete.delete.value}* Deleted ✅`
                 break;
             case CATEGORY_ADD:
-                addCategory({ _id: ctx.userInfo._id }, ctx.category)
+                await addCategory({
+                    user: ctx.userInfo._id,
+                    ...ctx.category
+                })
                 message = `*${ctx.category.value}* Saved ✅`
                 break;
             default:
@@ -177,15 +200,27 @@ module.exports = categories = (bot) => {
             value: '',
             label: ''
         })
+
         Object.assign(ctx.categoryUpdate, {
+            _id: null,
             oldLabel: '',
-            newLabel: '',
             value: '',
             label: ''
         })
 
-        ctx.replyWithMarkdown(message)
-        ctx.scene.leave('CategoryUpdate')
+        Object.assign(ctx.categoryDelete, {
+            delete: {
+                _id: null,
+                value: ''
+            },
+            replace: {
+                _id: null,
+                value: ''
+            }
+        })
+
+        await ctx.replyWithMarkdown(message)
+        await ctx.scene.leave('CategoryManagement')
     })
 
     addScene.action(CATEGORY_ADD, (ctx) => {
@@ -200,7 +235,7 @@ module.exports = categories = (bot) => {
         ctx.editMessageText('I\'m deleting a category')
         ctx.action.type = CATEGORY_DELETE
         ctx.action.status = SELECT_CATEGORY
-        const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category.label.toUpperCase()}`))
+        const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category._id}_${category.label}`))
         ctx.reply('What is the category?', Markup.inlineKeyboard(categoriesOptions, { columns: 3 }))
     })
 
@@ -208,12 +243,12 @@ module.exports = categories = (bot) => {
         ctx.editMessageText('I\'m updating a category')
         ctx.action.type = CATEGORY_UPDATE
         ctx.action.status = SELECT_CATEGORY
-        const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category.label.toUpperCase()}`))
+        const categoriesOptions = ctx.userInfo.categories.map(category => Markup.button.callback(category.value, `CATEGORY_${category._id}_${category.label}`))
         ctx.reply('What is the category?', Markup.inlineKeyboard(categoriesOptions, { columns: 3 }))
     })
 
     addScene.action(CANCEL_OPERATION, (ctx) => {
-        ctx.scene.leave('CategoryUpdate')
+        ctx.scene.leave('CategoryManagement')
     })
 
     const addStage = new Scenes.Stage([addScene])
@@ -224,11 +259,10 @@ module.exports = categories = (bot) => {
 
 
     bot.command('categories', async (ctx) => {
-
         const { categories, name, _id } = await getUserInfo(ctx.from.id)
         Object.assign(ctx.userInfo, { categories, name, _id })
 
-        ctx.scene.enter('CategoryUpdate');
+        ctx.scene.enter('CategoryManagement');
     })
 
 

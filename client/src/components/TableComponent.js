@@ -19,7 +19,7 @@ export default (props) => {
           {content.map(({ description, amount, category, createdAt }, index) => (
             <tr key={`content-key-${index}`}>
               <td>{description}</td>
-              <td>{category}</td>
+              <td>{category.value}</td>
               <td>{formatCash(amount)}</td>
             </tr>
           ))}

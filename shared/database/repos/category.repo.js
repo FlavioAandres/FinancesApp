@@ -5,7 +5,7 @@ const { connect, destroy, isConnected } = require("../mongo");
 module.exports.create = async (categoryBody) => {
     try {
         await connect();
-        await categoryModel.create(categoryBody);
+        return await categoryModel.create(categoryBody);
     } catch (error) {
         console.error(error)
     } finally {
@@ -24,4 +24,10 @@ module.exports.updateCategory = async (searchCriteria = {}, categoryValues) => {
     const result = await categoryModel.updateOne(searchCriteria, categoryValues)
 
     return result
+}
+
+module.exports.delete = async (searchCriteria) => {
+    if (!searchCriteria) throw new Error('Criteria to delete a category is not given')
+    await connect();
+    return await categoryModel.deleteOne(searchCriteria)
 }

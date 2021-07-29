@@ -72,8 +72,10 @@ module.exports.addNewCategory = async (event) => {
 
     if (![undefined, null].includes(userInfo)) {
       const result = await CategoryRepo.create(
-        { label: body.label, value: body.value, type: body.type, user: userInfo[0]._id }
+        { label: body.label, value: body.value, type: body.type, user: userInfo._id }
       );
+
+      await UserRepo.createCategory({ _id: userInfo._id }, { _id: result._id })
 
       return {
         statusCode: result ? 200 : 409,

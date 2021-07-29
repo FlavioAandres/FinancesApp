@@ -52,7 +52,7 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
       }
     })
     return {
-      category,
+      category: category.value,
       monthly: parsed.sort((a, b) => {
         if (a.month > b.month) return 1
         if (a.month < b.month) return -1
@@ -66,6 +66,7 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
       category,
       incomes
     } = item
+
     const group = _.groupBy(incomes, i => {
       if (i.date) {
         const date = `${i.date.toISOString()}`
@@ -82,7 +83,7 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
       }
     })
     return {
-      category,
+      category: category.value,
       monthly: parsed.sort((a, b) => {
         if (a.month > b.month) return 1
         if (a.month < b.month) return -1
@@ -90,6 +91,7 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
       })
     }
   })
+  
   return { payments, "incomes": incomesData }
 }
 
@@ -100,11 +102,7 @@ const processHomeMetrics = async (userId, date) => {
 
   let latestPayments = [], expensivePayments = [], totalByCategory = [], acceptedPayments = [], prepayments = [], latestIncomes = []
   //Split types
-
   payments = payments.filter(payment => payment.isAccepted);
-
-  //prepayments 
-  prepayments = prepayments.slice(0, 10)
 
   //Latest payments 
   latestPayments = payments.slice(0, 10)
@@ -113,7 +111,7 @@ const processHomeMetrics = async (userId, date) => {
   expensivePayments = _.orderBy(payments, 'amount', ['desc']).slice(0, 10)
 
   // Group by category
-  totalByCategory = _.groupBy(payments, 'category')
+  totalByCategory = _.groupBy(payments, (payment) => payment.category.value)
 
   //Latests Incomes
   latestIncomes = incomes.slice(0, 10);
@@ -122,7 +120,6 @@ const processHomeMetrics = async (userId, date) => {
     latestPayments,
     expensivePayments,
     totalByCategory,
-    prepayments,
     latestIncomes
   }
 }

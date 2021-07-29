@@ -4,15 +4,13 @@ const categorySchema = mongoose.Schema(
     {
         label: {
             type: String,
-            unique: true,
-            index: false,
+            index: true,
             required: true,
             trim: true
         },
         value: {
             type: String,
-            unique: true,
-            index: false,
+            index: true,
             required: true,
             trim: true
         },
