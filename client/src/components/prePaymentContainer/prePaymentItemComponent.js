@@ -83,7 +83,7 @@ const PrePaymentItemComponent = (props = { item: {} }) => {
                   <option defaultValue>Categoria...</option>
                   {
                     props.categories && props.categories.map(item=>(
-                      <option value={item.value} key={`${item.label}-${text}`}>{item.label}</option>
+                      <option value={item._id} key={`${item.label}-${text}`}>{item.label}</option>
                     ))
                   }
                 </select>

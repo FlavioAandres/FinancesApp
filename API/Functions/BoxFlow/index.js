@@ -51,8 +51,9 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
         total: group[month].reduce((prev, curr) => prev + curr.amount, 0)
       }
     })
+
     return {
-      category: category.value,
+      category: category,
       monthly: parsed.sort((a, b) => {
         if (a.month > b.month) return 1
         if (a.month < b.month) return -1
@@ -83,7 +84,7 @@ const processCategoryMetrics = async (userId, date, groupBy = 'month') => {
       }
     })
     return {
-      category: category.value,
+      category: category,
       monthly: parsed.sort((a, b) => {
         if (a.month > b.month) return 1
         if (a.month < b.month) return -1

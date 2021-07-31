@@ -110,19 +110,19 @@ module.exports.updatePayment = async (Payment) => {
 
     const { categories, sub } = await getUser({ _id: Payment.user })
 
-    const results = categories.filter(category => category.value === Payment.category)
-    let category = results[0]
+    // const results = categories.filter(category => category.value === Payment.category)
+    // let category = results[0]
 
-    const current = category.budget.current + amount
+    // const current = category && category.budget && category.budget.current + amount
 
-    await updateBudget(
-      {
-        sub,
-        'categories': { $elemMatch: { value: category.value } }
-      },
-      {
-        'categories.$.budget': { current }
-      })
+    // await updateBudget(
+    //   {
+    //     sub,
+    //     'categories': { $elemMatch: { value: category.value } }
+    //   },
+    //   {
+    //     'categories.$.budget': { current }
+    //   })
 
   }
 
