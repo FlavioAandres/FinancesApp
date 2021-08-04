@@ -1,4 +1,5 @@
 const UserRepo = require("./../../../shared/database/repos/user.repo");
+const CategoryRepo = require("./../../../shared/database/repos/category.repo");
 const { encrypt, decrypt } = require('../../../shared/utils/crypto');
 
 module.exports.getUserInformation = async (event) => {
@@ -60,18 +61,31 @@ module.exports.addNewCategory = async (event) => {
   } = cognitoPoolClaims
 
   try {
-    const result = await UserRepo.createCategory(
+
+    const userInfo = await UserRepo.getUser(
       {
         sub
-      },
-      { label: body.label, value: body.value, type: body.type }
-    );
-    return {
-      statusCode: result ? 200 : 409,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
+      }, {
+      _id: 1
     }
+    );
+
+    if (![undefined, null].includes(userInfo)) {
+      const result = await CategoryRepo.create(
+        { label: body.label, value: body.value, type: body.type, user: userInfo._id }
+      );
+
+      await UserRepo.createCategory({ _id: userInfo._id }, { _id: result._id })
+
+      return {
+        statusCode: result ? 200 : 409,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    }
+
+
   } catch (error) {
     console.error(error);
     return {

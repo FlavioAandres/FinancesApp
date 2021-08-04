@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const BankModel = require('./bank.model')
-const PaymentModel = require('./payment.model')
+const CategoryModel = require('./category.model')
 const { encrypt } = require('../utils/crypto')
 
 const userSchema = mongoose.Schema(
@@ -36,29 +36,9 @@ const userSchema = mongoose.Schema(
             }
         ],
         categories: [{
-            label: String, 
-            budget: {
-                value: {
-                    type: Number,
-                    default: 0
-                },
-                current: {
-                    type: Number,
-                    default: 0
-                },
-                progress: {
-                    type: Number,
-                    default: 0
-                }
-            }, 
-            value: String,
-            type: {
-                type: String,
-                index: false,
-                required: true,
-                trim: true,
-                enum: ['INCOME', 'EXPENSE']
-            }
+            type: mongoose.Types.ObjectId,
+            ref: CategoryModel,
+            autopopulate: true
         }],
         emails: [
             {
