@@ -1,0 +1,32 @@
+{
+  "prod": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-financies-prod-132948-authRole",
+      "UnauthRoleArn": "arn:aws:iam::676238986725:role/amplify-financies-prod-132948-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::676238986725:role/amplify-financies-prod-132948-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-financies-prod-132948-deployment",
+      "UnauthRoleName": "amplify-financies-prod-132948-unauthRole",
+      "StackName": "amplify-financies-prod-132948",
+      "StackId": "arn:aws:cloudformation:us-east-1:676238986725:stack/amplify-financies-prod-132948/f5c0ee30-f551-11eb-bdee-12f57c3150d7",
+      "AmplifyAppId": "d36zs9su0rb0p6"
+    },
+    "categories": {
+      "auth": {
+        "financies49159a40": {
+          "userPoolId": "us-east-1_8Vb6THScy",
+          "userPoolName": "clientbec096a1_userpool_bec096a1-dev",
+          "webClientId": "e2ed3psdhfhgs7aaon9c8olm9",
+          "nativeClientId": "3oi5mgjchk6iucegn7cbif8dvb",
+          "identityPoolId": "us-east-1:63e00bea-5e0a-4317-8c32-b4ea3e7d4a1b",
+          "identityPoolName": "clientbec096a1_identitypool_bec096a1__dev",
+          "allowUnauthenticatedIdentities": false,
+          "authRoleArn": "arn:aws:iam::676238986725:role/amplify-client-dev-212211-authRole",
+          "authRoleName": "amplify-client-dev-212211-authRole",
+          "unauthRoleArn": "arn:aws:iam::676238986725:role/amplify-client-dev-212211-unauthRole",
+          "unauthRoleName": "amplify-client-dev-212211-unauthRole"
+        }
+      }
+    }
+  }
+}
