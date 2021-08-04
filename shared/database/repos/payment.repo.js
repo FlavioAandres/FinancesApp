@@ -129,6 +129,7 @@ module.exports.updatePayment = async (Payment) => {
   const result = await Payments.updateOne(
     { _id: Payment.id, user: Payment.user },
     {
+      amount: Payment.amount,
       isAccepted: Payment.isAccepted,
       isHidden: Payment.isHidden,
       description: Payment.description,

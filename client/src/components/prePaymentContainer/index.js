@@ -1,17 +1,13 @@
 import React from "react";
 import PrepaymentItem from "./prePaymentItemComponent";
-import { ExpansionTableRowGroup, TableHeader } from "emerald-ui/lib/";
+import { Container, CardGrid, } from "emerald-ui/lib/";
 
 
 const PrepaymentComponent = ({ onSavePrepayment, categories, payments = [] }) => {
 
   return (
-    <ExpansionTableRowGroup>
-      <TableHeader checkboxAriaLabel="Name">
-        <th>Total</th>
-        <th>Concepto</th>
-        <th>Fecha</th>
-      </TableHeader>
+
+    <CardGrid>
       {payments.map((item, i) => (
         <PrepaymentItem
           categories={categories.filter(category => category.type === 'EXPENSE')}
@@ -20,7 +16,7 @@ const PrepaymentComponent = ({ onSavePrepayment, categories, payments = [] }) =>
           key={"prepayment-item-" + i + "-" + item.amount}
         />
       ))}
-    </ExpansionTableRowGroup>
+    </CardGrid>
   );
 }
 
