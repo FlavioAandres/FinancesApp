@@ -32,6 +32,7 @@ module.exports.put = async (event, context, callback) => {
   const { body: bodyString, cognitoPoolClaims } = event
   const {
     id,
+    amount,
     description,
     category,
     hide = false,
@@ -43,10 +44,11 @@ module.exports.put = async (event, context, callback) => {
   } = cognitoPoolClaims
 
   try {
-    if (!id || !description || !category) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
+    if (!id || !description || !amount) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
     const user = await getUser({ sub })
     const data = await PaymentRepo.updatePayment({
       id,
+      amount,
       user: user._id,
       isHidden: hide,
       isAccepted: accepted,
