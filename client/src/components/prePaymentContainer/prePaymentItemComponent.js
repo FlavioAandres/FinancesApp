@@ -100,7 +100,7 @@ const PrePaymentItemComponent = ({ item, onSubmitPrepayment, categories }) => {
                   >
                     {
                       categories
-                        .map(category => <option value={category.value} key={`category-${category.label}`}> {category.label}</option>)
+                        .map(category => <option value={category._id} key={`category-${category.label}`}> {category.label}</option>)
                     }
                   </SingleSelect>
                 </td>
