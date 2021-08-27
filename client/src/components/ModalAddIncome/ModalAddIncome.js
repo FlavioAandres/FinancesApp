@@ -89,7 +89,7 @@ const NewIncomeModal = ({ save, categories, close, loading, show }) => {
                                 {
                                     categories
                                         .filter(category => category.type === 'INCOME')
-                                        .map(category => <option value={category.value} key={`category-${category.label}`}> {category.label}</option>)
+                                        .map(category => <option value={category._id} key={`category-${category.label}`}> {category.label}</option>)
                                 }
                             </SingleSelect>
                         )} />
