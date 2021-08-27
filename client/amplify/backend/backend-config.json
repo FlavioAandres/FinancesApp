@@ -1,0 +1,11 @@
+{
+  "auth": {
+    "financies49159a40": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}

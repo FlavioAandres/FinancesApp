@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const CategoryModel = require('./category.model')
 
 const PaymentSchema = mongoose.Schema(
     {
@@ -19,7 +20,11 @@ const PaymentSchema = mongoose.Schema(
         isAccepted: { type: Boolean, default: false },
         isHidden: { type: Boolean, default: false },
         createdAt: { type: Date, },
-        category: { type: String, default: null },
+        category: {
+            type: mongoose.Types.ObjectId,
+            ref: CategoryModel,
+            autopopulate: true
+        },
         secondCategory: { type: String, default: null },
         user: { type: mongoose.Types.ObjectId, required: true }
     },
@@ -28,7 +33,11 @@ const PaymentSchema = mongoose.Schema(
     }
 )
 
+/**
+ * Plugins
+ */
 
+PaymentSchema.plugin(require('mongoose-autopopulate'));
 
 /**
  * @typedef Payments

@@ -43,6 +43,15 @@ module.exports.updateIncome = async (income) => {
   await destroy();
 };
 
+
+module.exports.udpateCategoryMultiple = async (_idCategoryOld, _idCategoryNew) => {
+  await connect()
+  const result = await Income.updateMany({ category: _idCategoryOld }, { $set: { category: _idCategoryNew } });
+  await destroy()
+  return result;
+}
+
+
 module.exports.getByCategories = async (userId) => {
   await connect()
   const result = await Income.aggregate([
@@ -50,6 +59,22 @@ module.exports.getByCategories = async (userId) => {
       $match: {
         user: userId,
       },
+    },
+    {
+      '$lookup': {
+        'from': 'categories',
+        'localField': 'category',
+        'foreignField': '_id',
+        'as': 'category'
+      }
+    }, {
+      '$project': {
+        'createdAt': 1,
+        'amount': 1,
+        'category': {
+          '$first': '$category.value'
+        }
+      }
     },
     {
       $group: {

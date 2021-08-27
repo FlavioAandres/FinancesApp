@@ -76,6 +76,7 @@ module.exports.getAllByDate = async ({ userId, date }) => {
       createdAt: { $gte: new Date(date) },
       user: userId,
       type: "EXPENSE",
+      isAccepted: true,
     },
     { amount: 1, description: 1, createdAt: 1, category: 1, isAccepted: 1 }
   ).sort({ createdAt: -1 });
@@ -109,25 +110,26 @@ module.exports.updatePayment = async (Payment) => {
 
     const { categories, sub } = await getUser({ _id: Payment.user })
 
-    const results = categories.filter(category => category.value === Payment.category)
-    let category = results[0]
+    // const results = categories.filter(category => category.value === Payment.category)
+    // let category = results[0]
 
-    const current = category.budget.current + amount
+    // const current = category && category.budget && category.budget.current + amount
 
-    await updateBudget(
-      {
-        sub,
-        'categories': { $elemMatch: { value: category.value } }
-      },
-      {
-        'categories.$.budget': { current }
-      })
+    // await updateBudget(
+    //   {
+    //     sub,
+    //     'categories': { $elemMatch: { value: category.value } }
+    //   },
+    //   {
+    //     'categories.$.budget': { current }
+    //   })
 
   }
 
   const result = await Payments.updateOne(
     { _id: Payment.id, user: Payment.user },
     {
+      amount: Payment.amount,
       isAccepted: Payment.isAccepted,
       isHidden: Payment.isHidden,
       description: Payment.description,
@@ -137,6 +139,14 @@ module.exports.updatePayment = async (Payment) => {
   await destroy()
   return result;
 };
+
+module.exports.udpateCategoryMultiple = async (_idCategoryOld, _idCategoryNew) => {
+  await connect()
+  const result = await Payments.updateMany({ category: _idCategoryOld }, { $set: { category: _idCategoryNew } });
+  await destroy()
+  return result;
+}
+
 
 module.exports.getByCategories = async (userId, date) => {
   await connect()
@@ -149,18 +159,39 @@ module.exports.getByCategories = async (userId, date) => {
   const result = await Payments.aggregate([
     { $match: { ...match } },
     {
-      $group: {
-        _id: { $toLower: "$category" },
-        purchases: { $addToSet: { amount: "$amount", date: "$createdAt" } },
-      },
-    },
-    {
-      $project: {
-        purchases: "$purchases",
-        category: "$_id",
-        _id: false,
-      },
-    },
+      '$lookup': {
+        'from': 'categories',
+        'localField': 'category',
+        'foreignField': '_id',
+        'as': 'category'
+      }
+    }, {
+      '$project': {
+        'createdAt': 1,
+        'amount': 1,
+        'category': {
+          '$first': '$category.value'
+        }
+      }
+    }, {
+      '$group': {
+        '_id': {
+          '$toLower': '$category'
+        },
+        'purchases': {
+          '$addToSet': {
+            'amount': '$amount',
+            'date': '$createdAt'
+          }
+        }
+      }
+    }, {
+      '$project': {
+        'purchases': '$purchases',
+        'category': '$_id',
+        '_id': false
+      }
+    }
   ]);
   return result
 };
@@ -345,9 +376,7 @@ module.exports.percentageByCategoryTypeStat = async (userId, date) => {
         'category': {
           '$ne': null
         },
-        'user': userId,
-        'isAccepted': true,
-        'createdAt': { '$gte': new Date(date) },
+        'isAccepted': true
       }
     }, {
       '$group': {
@@ -374,8 +403,17 @@ module.exports.percentageByCategoryTypeStat = async (userId, date) => {
         'path': '$categories'
       }
     }, {
+      '$lookup': {
+        'from': 'categories',
+        'localField': 'categories.category',
+        'foreignField': '_id',
+        'as': 'categories.category'
+      }
+    }, {
       '$project': {
-        'cardType': '$categories.category',
+        'cardType': {
+          '$first': '$categories.category.label'
+        },
         'amount': '$categories.amount',
         'sum': '$sum',
         'percent': {
@@ -390,6 +428,7 @@ module.exports.percentageByCategoryTypeStat = async (userId, date) => {
       }
     }
   ]
+
   const result = await Payments.aggregate(aggregation)
   return result
 }
