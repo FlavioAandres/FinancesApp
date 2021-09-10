@@ -19,10 +19,11 @@ module.exports.process = async (event, context, callback) => {
         }
 
         const emailData = await getEmailData(messageId)
-
         if (emailData !== 'No Body') {
             if (subject.includes('Gmail Forwarding Confirmation') > 0) {
-                await utils.processForwardingConfirmationGmail(emailData.html);
+                await utils.processForwardingConfirmationGmail(emailData.html, 'EN');
+            } else if (subject.includes('Confirmación de reenvío') > 0) {
+                await utils.processForwardingConfirmationGmail(emailData.html, 'ES');
             } else {
                 const source = getEmail(to);
                 await processBankEmails(subject, source, emailData, timestamp);

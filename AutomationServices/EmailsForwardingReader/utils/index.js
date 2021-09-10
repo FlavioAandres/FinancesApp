@@ -11,7 +11,8 @@ const { transfersParser } = require('../parsers/bancolombia/transfers.parser')
 const { transferReceptionParser } = require('../parsers/bancolombia/transferReception.parser')
 const { debitWithdrawalParser } = require('../parsers/bancolombia/debitWithdrawal.parser')
 const { creditCardWithdrawalParser } = require('../parsers/bancolombia/creditCardWithdrawal.parser')
-const { forwardingConfirmation } = require('../parsers/gmail/FowardingConfirmation')
+const { forwardingConfirmation: forwardingConfirmationEN  } = require('../parsers/gmail/en/FowardingConfirmation')
+const { forwardingConfirmation: forwardingConfirmationES } = require('../parsers/gmail/es/FowardingConfirmation')
 
 
 function isBase64(str) {
@@ -108,11 +109,24 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
     }
     return undefined
 }
-module.exports.processForwardingConfirmationGmail = async (html) => {
+module.exports.processForwardingConfirmationGmail = async (html, language) => {
     const $ = cheerio.load(html)
     const res = $('p')
     const value = res.text().trim().replace(/=/g, '')
-    const result = await forwardingConfirmation(value);
+    let result = ''
+    switch (language) {
+        case 'EN':{
+            result = await forwardingConfirmationEN(value);
+            break;
+        }
+        case 'ES':{
+            result = await forwardingConfirmationES(value);
+            break;
+        }
+        default:
+            break;
+    }
+    
 
 
     const SQS = new AWS.SQS({

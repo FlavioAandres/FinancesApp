@@ -6,7 +6,10 @@
   "scripts": {
     "debug": "node --inspect node_modules/serverless/bin/serverless offline -s dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:bot": "nodemon AutomationServices/TelegramBot/dev.js"
+    "start:bot": "nodemon AutomationServices/TelegramBot/dev.js",
+    "deploy:prod" : "sls deploy --stage prod",
+    "deploy:test" : "sls deploy --stage test",
+    "deploy:dev" : "sls deploy --stage dev"
   },
   "keywords": [],
   "author": "",
