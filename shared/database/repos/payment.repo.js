@@ -376,7 +376,9 @@ module.exports.percentageByCategoryTypeStat = async (userId, date) => {
         'category': {
           '$ne': null
         },
-        'isAccepted': true
+        'user': userId,
+        'isAccepted': true,
+        'createdAt': { '$gte': new Date(date) }
       }
     }, {
       '$group': {

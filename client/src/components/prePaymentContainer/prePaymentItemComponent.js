@@ -5,9 +5,9 @@ import moment from "moment";
 import Editable from '../commons/editable'
 
 const PrePaymentItemComponent = ({ item, onSubmitPrepayment, categories }) => {
-  const { _id: id, amount, text, createdAt, type } = item;
+  const { _id: id, amount, text, createdAt, type, description } = item;
   const parsedDate = moment(createdAt).utc().format("DD MMMM YYYY");
-  const [_text, setText] = useState(text);
+  const [_text, setText] = useState(description || text);
   const [_amount, setAmount] = useState(amount);
   const [_category, setCategory] = useState('');
 
@@ -100,7 +100,7 @@ const PrePaymentItemComponent = ({ item, onSubmitPrepayment, categories }) => {
                   >
                     {
                       categories
-                        .map(category => <option value={category._id} key={`category-${category.label}`}> {category.label}</option>)
+                        .map(category => <option value={category._id} key={`category-${category._id}`}> {category.label}</option>)
                     }
                   </SingleSelect>
                 </td>

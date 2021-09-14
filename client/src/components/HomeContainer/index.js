@@ -156,8 +156,8 @@ const HomeComponent = ({ user }) => {
             }
 
             return (
-              <div style={{ paddingRight: '5px' }}>
-                <button onClick={(evt) => showCategoriesContainer(evt, item.name)} className="category-item" key={`item-${index}`}>
+              <div style={{ paddingRight: '5px' }} key={`container-item-${item.name}`}>
+                <button onClick={(evt) => showCategoriesContainer(evt, item.name)} className="category-item" key={`item-${item.name}`}>
                   <p>
                     {item.name}: <span>{formatCash(item.total)}</span>
                   </p>

@@ -1,6 +1,6 @@
 import React from "react";
 import PrepaymentItem from "./prePaymentItemComponent";
-import { Container, CardGrid, } from "emerald-ui/lib/";
+import { CardGrid } from "emerald-ui/lib/";
 
 
 const PrepaymentComponent = ({ onSavePrepayment, categories, payments = [] }) => {
