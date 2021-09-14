@@ -98,7 +98,7 @@ const NewPaymentModal = ({ save, categories, close, loading, show }) => {
                     <Button onClick={close} shape="flat" color="info">
                         Cancelar
                     </Button>
-                    <Button loading={loading} color="info" type="submit">Crear Ingreso</Button>
+                    <Button loading={loading} color="info" type="submit">Crear Egreso</Button>
                 </form>
             </Modal.Body>
             <Modal.Footer>
