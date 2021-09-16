@@ -5,7 +5,7 @@ const navbar = ({ updateNav }) => {
   return (
     <Navbar breakAt="md" theme="dark" className="navbar-custom">
       <Navbar.Brand>
-        <a>
+        <a href="/">
           <img
             className="brand-logo-img"
             src="./imgs/logo.png"
@@ -16,14 +16,12 @@ const navbar = ({ updateNav }) => {
       </Navbar.Brand>
       <Nav>
         <DropdownButton title="Sitios">
-          <DropdownItem onClick={(evt) => updateNav(evt, "datacredit")} eventKey="1">Data Credito</DropdownItem>
-          <DropdownItem onClick={(evt) => updateNav(evt, "prepayment")} eventKey="2">Pagos pre-procesados</DropdownItem>
-          <DropdownItem onClick={(evt) => updateNav(evt, "graph")} eventKey="3">Graficas</DropdownItem>
+          <DropdownItem href="/datacredit" eventKey="1">Data Credito</DropdownItem>
+          <DropdownItem href="/prepayment" eventKey="2">Pagos pre-procesados</DropdownItem>
+          <DropdownItem href="/graphs" eventKey="3">Graficas</DropdownItem>
           <DropdownItem separator />
         </DropdownButton>
-        <a onClick={(evt) => updateNav(evt, "profile")} href="#">
-          Perfil
-        </a>
+        <a href="/profile">Perfil</a>
       </Nav>
     </Navbar>
   );
