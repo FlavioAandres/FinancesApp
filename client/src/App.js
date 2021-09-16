@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import Navbar from "./components/navbar";
-import PrepaymentContainer from "./components/prePaymentContainer/";
-import GraphContainer from "./components/GraphsContainer/";
-import HomeContainer from "./components/HomeContainer/";
-import DataCreditContainer from "./components/DataCreditContainer";
-import ProfileContainer from "./components/ProfileContainer/";
 import constants from "./constants";
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
 import "emerald-ui/lib/styles.css";
 import "./App.css";
+
+const PrepaymentContainer = lazy(() => import("./components/prePaymentContainer/"));
+const GraphContainer = lazy(() => import("./components/GraphsContainer/"));
+const HomeContainer = lazy(() => import("./components/HomeContainer/"));
+const DataCreditContainer = lazy(() => import("./components/DataCreditContainer/"));
+const ProfileContainer = lazy(() => import("./components/ProfileContainer/"));
+
+
 Amplify.configure({
   ...awsconfig,
   API: {
@@ -32,7 +36,6 @@ const App = () => {
   const [user, setUser] = useState({ categories: [] })
   const [banks, setBanks] = useState([])
   const [prepayments, setPrepayments] = useState([])
-  const [navbarActive, setNavbarActive] = useState('home')
 
 
   const getPrePayments = () => {
@@ -79,27 +82,31 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <Navbar
-        updateNav={(evt, nav) => {
-          evt.preventDefault();
-          setNavbarActive(nav)
-        }}
-      />
+      <Navbar />
       <AmplifySignOut />
+      
       <div className="full-container">
-        {navbarActive === "prepayment" && (
-          <PrepaymentContainer
-            categories={user.categories || []}
-            onSavePrepayment={onSavePrepayment}
-            payments={prepayments}
-          />
-        )}
-        {navbarActive === "graph" && <GraphContainer />}
-        {navbarActive === "home" && <HomeContainer user={user} />}
-        {navbarActive === "datacredit" && <DataCreditContainer />}
-        {navbarActive === "profile" && (
-          <ProfileContainer getUserInformation={getUserInformation} user={user} banks={banks} saveCategory={addCategoryToState} />
-        )}
+      <Router>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Switch>
+            <Route exact path="/" component={() => <HomeContainer user={user} />}/>
+            <Route exact path="/graphs" component={GraphContainer}/>
+            <Route exact path="/prepayment" component={() =>  
+              <PrepaymentContainer
+                categories={user.categories || []}
+                onSavePrepayment={onSavePrepayment}
+                payments={prepayments}
+              />} />
+            <Route exact path="/profile" component={() => 
+              <ProfileContainer 
+                getUserInformation={getUserInformation} 
+                user={user} 
+                banks={banks} 
+                saveCategory={addCategoryToState} 
+              />} />
+          </Switch>
+        </Suspense>
+      </Router>
       </div>
     </React.Fragment>
   );

@@ -7,9 +7,9 @@
     "debug": "node --inspect node_modules/serverless/bin/serverless offline -s dev",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:bot": "nodemon AutomationServices/TelegramBot/dev.js",
-    "deploy:prod" : "sls deploy --stage prod",
-    "deploy:test" : "sls deploy --stage test",
-    "deploy:dev" : "sls deploy --stage dev"
+    "deploy:prod": "sls deploy --stage prod",
+    "deploy:test": "sls deploy --stage test",
+    "deploy:dev": "sls deploy --stage dev"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
     "mongoose": "^5.9.25",
     "mongoose-autopopulate": "^0.14.0",
     "puppeteer-core": "^5.5.0",
+    "react-router-dom": "^5.3.0",
     "telegraf": "^4.3.0",
     "twilio": "^3.39.1"
   },
