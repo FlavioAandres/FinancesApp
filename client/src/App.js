@@ -11,7 +11,6 @@ import "./App.css";
 const PrepaymentContainer = lazy(() => import("./components/prePaymentContainer/"));
 const GraphContainer = lazy(() => import("./components/GraphsContainer/"));
 const HomeContainer = lazy(() => import("./components/HomeContainer/"));
-const DataCreditContainer = lazy(() => import("./components/DataCreditContainer/"));
 const ProfileContainer = lazy(() => import("./components/ProfileContainer/"));
 
 

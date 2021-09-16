@@ -27,7 +27,6 @@
     "mongoose": "^5.9.25",
     "mongoose-autopopulate": "^0.14.0",
     "puppeteer-core": "^5.5.0",
-    "react-router-dom": "^5.3.0",
     "telegraf": "^4.3.0",
     "twilio": "^3.39.1"
   },

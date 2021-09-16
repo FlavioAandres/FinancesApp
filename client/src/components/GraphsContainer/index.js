@@ -167,7 +167,8 @@ const GraphContainer = () => {
       );
     });
 
-  const getMonthlyCategories = (date, period = 'month') =>
+  const getMonthlyCategories = (date, period = 'month') => {
+    
     API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'category', date, groupBy: period } })
       .then((res) => {
         const { payments, incomes } = JSON.parse(res.body);
@@ -273,6 +274,7 @@ const GraphContainer = () => {
         );
       })
       .catch((err) => console.error(err));
+  }
 
   const getStats = (date) => {
     API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'stats', date } })
