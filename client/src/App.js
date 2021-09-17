@@ -60,7 +60,7 @@ const App = () => {
   useEffect(() => {
     getPrePayments();
     getUserInformation();
-  },[])
+  }, [])
 
 
   const onSavePrepayment = (data) => {
@@ -82,33 +82,32 @@ const App = () => {
 
   return (
     <React.Fragment>
-      <Navbar />
-      <AmplifySignOut />
-      
-      <div className="full-container">
       <Router>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Switch>
-            <Route exact path="/" component={() => <HomeContainer user={user} />}/>
-            <Route exact path="/accounts" component={AccountsContainer}/>
-            <Route exact path="/graphs" component={GraphContainer}/>
-            <Route exact path="/prepayment" component={() =>  
-              <PrepaymentContainer
-                categories={user.categories || []}
-                onSavePrepayment={onSavePrepayment}
-                payments={prepayments}
-              />} />
-            <Route exact path="/profile" component={() => 
-              <ProfileContainer 
-                getUserInformation={getUserInformation} 
-                user={user} 
-                banks={banks} 
-                saveCategory={addCategoryToState} 
-              />} />
-          </Switch>
-        </Suspense>
+        <Navbar />
+        <AmplifySignOut />
+        <div className="full-container">
+          <Suspense fallback={<div>Loading...</div>}>
+            <Switch>
+              <Route exact path="/" component={() => <HomeContainer user={user} />} />
+              <Route exact path="/accounts" component={AccountsContainer} />
+              <Route exact path="/graphs" component={GraphContainer} />
+              <Route exact path="/prepayment" component={() =>
+                <PrepaymentContainer
+                  categories={user.categories || []}
+                  onSavePrepayment={onSavePrepayment}
+                  payments={prepayments}
+                />} />
+              <Route exact path="/profile" component={() =>
+                <ProfileContainer
+                  getUserInformation={getUserInformation}
+                  user={user}
+                  banks={banks}
+                  saveCategory={addCategoryToState}
+                />} />
+            </Switch>
+          </Suspense>
+        </div>
       </Router>
-      </div>
     </React.Fragment>
   );
 }

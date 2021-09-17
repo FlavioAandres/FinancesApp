@@ -9,7 +9,7 @@ const PrePaymentItemComponent = ({ item, onSubmitPrepayment, categories }) => {
   const parsedDate = moment(createdAt).utc().format("DD MMMM YYYY");
   const [_text, setText] = useState(description || text);
   const [_amount, setAmount] = useState(amount);
-  const [_category, setCategory] = useState('');
+  const [_category, setCategory] = useState(null);
 
   const descriptionRef = useRef();
 
