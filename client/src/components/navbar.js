@@ -16,7 +16,7 @@ const navbar = ({ updateNav }) => {
       </Navbar.Brand>
       <Nav>
         <DropdownButton title="Sitios">
-          <DropdownItem href="/datacredit" eventKey="1">Data Credito</DropdownItem>
+          <DropdownItem href="/accounts" eventKey="1">Cuentas</DropdownItem>
           <DropdownItem href="/prepayment" eventKey="2">Pagos pre-procesados</DropdownItem>
           <DropdownItem href="/graphs" eventKey="3">Graficas</DropdownItem>
           <DropdownItem separator />
