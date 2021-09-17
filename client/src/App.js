@@ -12,6 +12,7 @@ const PrepaymentContainer = lazy(() => import("./components/prePaymentContainer/
 const GraphContainer = lazy(() => import("./components/GraphsContainer/"));
 const HomeContainer = lazy(() => import("./components/HomeContainer/"));
 const ProfileContainer = lazy(() => import("./components/ProfileContainer/"));
+const AccountsContainer = lazy(() => import("./components/AccountsContainer/"));
 
 
 Amplify.configure({
@@ -89,6 +90,7 @@ const App = () => {
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
             <Route exact path="/" component={() => <HomeContainer user={user} />}/>
+            <Route exact path="/accounts" component={AccountsContainer}/>
             <Route exact path="/graphs" component={GraphContainer}/>
             <Route exact path="/prepayment" component={() =>  
               <PrepaymentContainer

@@ -50,6 +50,13 @@ provider:
         - "*"
 
 functions:
+
+  #############################################
+  ###                                       ###
+  ###             API ENDPOINTS             ###
+  ###                                       ###
+  #############################################
+
   TwilioIncommingMessage:
     handler: AutomationServices/WhatsAppBot/handlerIncommingMessage.handler
     name: TwilioIncommingMessage-lambda-${opt:stage}
@@ -384,6 +391,118 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+  
+  GetAccounts:
+    handler: API/Functions/accounts.getAccounts
+    name: Accounts-GET-${opt:stage}
+    events:
+      - http:
+          path: /accounts
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  GetAccount:
+    handler: API/Functions/accounts.getAccount
+    name: Account-GET-${opt:stage}
+    events:
+      - http:
+          path: /accounts/{account}
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+  PostAccounts:
+    handler: API/Functions/accounts.createAccount
+    name: Accounts-POST-${opt:stage}
+    events:
+      - http:
+          path: /accounts
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+  
+  GetTransactions:
+    handler: API/Functions/accounts.getTransactions
+    name: AccountsTransactions-GET-${opt:stage}
+    events:
+      - http:
+          path: /accounts/{account}/transactions
+          method: GET
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+  
+  PostTransactions:
+    handler: API/Functions/accounts.addTransaction
+    name: AccountsTransactions-POST-${opt:stage}
+    events:
+      - http:
+          path: /accounts/{account}/transactions
+          method: POST
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+
+
+  #############################################
+  ###                                       ###
+  ###              AUTOMATIONS              ###
+  ###                                       ###
+  #############################################
 
   #Telegram Bot
   TelegramBotSetWebhook:
@@ -408,7 +527,6 @@ functions:
     environment:
       BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
 
-  #AUTOMATIONS
   EmailForwardingAcceptation:
     handler: AutomationServices/EmailFowardingAccept/scraper.start
     name: EmailForwardingAcceptation-${opt:stage}
@@ -534,7 +652,12 @@ functions:
   #   environment:
   #     USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
-# Resources
+
+  #############################################
+  ###                                       ###
+  ###               RESOURCES               ###
+  ###                                       ###
+  #############################################
 resources:
   Resources:
     # EmailUsersQueue:
