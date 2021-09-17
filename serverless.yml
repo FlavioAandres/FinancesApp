@@ -393,7 +393,7 @@ functions:
               - sub
   
   GetAccounts:
-    handler: API/Functions/accounts.getAccounts
+    handler: API/Functions/Accounts.getAccounts
     name: Accounts-GET-${opt:stage}
     events:
       - http:
@@ -414,7 +414,7 @@ functions:
               - sub
 
   GetAccount:
-    handler: API/Functions/accounts.getAccount
+    handler: API/Functions/Accounts.getAccount
     name: Account-GET-${opt:stage}
     events:
       - http:
@@ -435,7 +435,7 @@ functions:
               - sub
 
   PostAccounts:
-    handler: API/Functions/accounts.createAccount
+    handler: API/Functions/Accounts.createAccount
     name: Accounts-POST-${opt:stage}
     events:
       - http:
@@ -456,7 +456,7 @@ functions:
               - sub
   
   GetTransactions:
-    handler: API/Functions/accounts.getTransactions
+    handler: API/Functions/Accounts.getTransactions
     name: AccountsTransactions-GET-${opt:stage}
     events:
       - http:
@@ -477,7 +477,7 @@ functions:
               - sub
   
   PostTransactions:
-    handler: API/Functions/accounts.addTransaction
+    handler: API/Functions/Accounts.addTransaction
     name: AccountsTransactions-POST-${opt:stage}
     events:
       - http:
