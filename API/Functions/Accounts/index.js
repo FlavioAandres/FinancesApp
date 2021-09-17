@@ -8,15 +8,14 @@ module.exports.getAccounts = async (event, context, callback) => {
 
     const result = await accountRepo.getAccounts({ sub });
 
-    callback(null, {
-        statusCode: "200",
+    return {
+        statusCode: 200,
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ accounts: result }),
-    });
-
+    }
 }
 
 module.exports.getAccount = async (event, context, callback) => {
@@ -26,14 +25,14 @@ module.exports.getAccount = async (event, context, callback) => {
 
     const result = await accountRepo.getAccount({ sub, _id: account });
 
-    callback(null, {
-        statusCode: "200",
+    return {
+        statusCode: 200,
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ account: result }),
-    });
+    }
 
 }
 
@@ -45,14 +44,14 @@ module.exports.getTransactions = async (event, context, callback) => {
 
     const result = await accountTransactionRepo.getTransactions({ sub, account });
 
-    callback(null, {
-        statusCode: "200",
+    return {
+        statusCode: 200,
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ transactions: result }),
-    });
+    }
 
 }
 
@@ -145,13 +144,13 @@ module.exports.addTransaction = async (event, context, callback) => {
         await accountRepo.updateAccount({ _id: account, sub }, { value: preciseAdd(_account.value, difference) })
 
 
-        callback(null, {
+        return {
             statusCode: 200,
             headers: {
                 'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({ account: _account }),
-        });
+        }
 
     } catch (error) {
         console.error(error)
