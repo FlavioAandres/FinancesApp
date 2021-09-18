@@ -40,12 +40,10 @@ const TransactionsContainer = ({ transactions, name }) => {
                             color
                         }
 
-                        console.log(textStyle);
-
                         return (<tr key={`transaction-key-${_id}`}>
-                            <td>{createdAt}</td>
+                            <td>{createdAt.substring(0, 10)}</td>
                             <td>{description}</td>
-                            <td><p style={textStyle}>{formatCash(difference)}</p></td>
+                            <td style={textStyle}>{formatCash(difference)}</td>
                         </tr>)
                     })}
                 </tbody>

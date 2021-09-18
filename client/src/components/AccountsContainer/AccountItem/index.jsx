@@ -2,11 +2,34 @@ import React from 'react'
 import { Card, Button } from 'emerald-ui/lib'
 import formatCash from '../../../utils/formatCash';
 
+const getColor = (type) => {
+    let color = ''
+    switch (type) {
+        case 'DEBT_ACCOUNT': {
+            color = 'danger'
+            break;
+        }
+        case 'CREDIT_ACCOUNT': {
+            color = 'warning'
+            break;
+        }
+        case 'FIDUCUENTA':
+        case 'DEBIT_ACCOUNT': {
+            color = 'info'
+            break;
+        }
+        default:
+            break;
+    }
+
+    return color;
+}
+
 const AccountItem = ({ account, getTransactions, handleCreateTransaction, handleSelectedAccount }) => {
 
     return (
         <Card key={account._id}>
-            <Card.Header color="success">
+            <Card.Header color={getColor(account.type)}>
                 <div>
                     <h3 className="eui-card-header-title">{account.name}</h3>
                 </div>
