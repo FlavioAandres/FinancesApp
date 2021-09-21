@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Button } from 'emerald-ui/lib'
+import { Card, Button, Progressbar } from 'emerald-ui/lib'
 import formatCash from '../../../utils/formatCash';
 
 const getColor = (type) => {
@@ -18,6 +18,10 @@ const getColor = (type) => {
             color = 'info'
             break;
         }
+        case 'GOAL': {
+            color = 'success'
+            break;
+        }
         default:
             break;
     }
@@ -33,6 +37,7 @@ const AccountItem = ({ account, getTransactions, handleCreateTransaction, handle
                 <div>
                     <h3 className="eui-card-header-title">{account.name}</h3>
                 </div>
+                {account.type === 'GOAL' ? <Progressbar progress={(account.value / account.goal) * 100} circle backgroundColor="transparent" /> : null}
             </Card.Header>
             <div className="eui-card-body">
                 <div className="eui-card-content">
