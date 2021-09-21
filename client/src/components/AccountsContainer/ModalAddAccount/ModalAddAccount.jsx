@@ -6,12 +6,13 @@ const NewAccountModal = ({ save, close, loading, show }) => {
     const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
 
-    const onCreateAccount = ({ name, number, value, type }) => {
+    const onCreateAccount = ({ name, number, value, type, goal }) => {
         save({
             name,
             number,
             value,
-            type
+            type,
+            goal
         })
         reset();
     }
@@ -59,7 +60,7 @@ const NewAccountModal = ({ save, close, loading, show }) => {
                         name="value"
                         control={control}
                         defaultValue=""
-                        rules={{ required: "This is required", min: 1 }}
+                        rules={{ required: "This is required", min: 0 }}
                         render={({ field }) => (
 
                             <TextField label="Value: "
@@ -89,10 +90,27 @@ const NewAccountModal = ({ save, close, loading, show }) => {
                                 <option value='CREDIT_ACCOUNT' key={`category-CREDIT_ACCOUNT`}> CREDITO</option>
                                 <option value='DEBT_ACCOUNT' key={`category-DEBT_ACCOUNT`}> DEUDA</option>
                                 <option value='DEBIT_ACCOUNT' key={`category-DEBIT_ACCOUNT`}> DEBITO </option>
+                                <option value='GOAL' key={`category-DEBIT_ACCOUNT`}> META </option>
 
                             </SingleSelect>
                         )} />
 
+                    <Controller
+                        name="goal"
+                        control={control}
+                        defaultValue={0}
+                        rules={{ min: 0 }}
+                        render={({ field }) => (
+
+                            <TextField label="Goal: "
+                                onChange={field.onChange}
+                                value={field.value}
+                                type='number'
+                                step="0.01"
+                                errorMessage={errors.value && errors.value.message}
+                            />
+                        )}
+                    />
 
                     <br />
                     <Button onClick={close} shape="flat" color="info">

@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Modal, TextField, Button, SingleSelect } from "emerald-ui/lib/";
+import { Modal, TextField, Button } from "emerald-ui/lib/";
 
 const NewTransactionModal = ({ save, close, loading, show }) => {
     const { handleSubmit, formState: { errors }, control, reset } = useForm();
@@ -58,7 +58,7 @@ const NewTransactionModal = ({ save, close, loading, show }) => {
                     <Button onClick={close} shape="flat" color="info">
                         Cancelar
                     </Button>
-                    <Button loading={loading} color="info" type="submit">Crear Cuenta</Button>
+                    <Button loading={loading} color="info" type="submit">Crear Transacción</Button>
                 </form>
             </Modal.Body>
             <Modal.Footer>

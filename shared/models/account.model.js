@@ -26,7 +26,12 @@ const AccountSchema = mongoose.Schema(
             index: true,
             required: true,
             trim: true,
-            enum: ['FIDUCUENTA', 'CREDIT_ACCOUNT', 'DEBT_ACCOUNT', 'DEBIT_ACCOUNT']
+            enum: ['FIDUCUENTA', 'CREDIT_ACCOUNT', 'DEBT_ACCOUNT', 'DEBIT_ACCOUNT', 'GOAL']
+        },
+        goal: {
+            type: Number,
+            default: 0,
+            required: false
         }
     },
     {

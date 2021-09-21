@@ -62,7 +62,8 @@ module.exports.createAccount = async (event, context, callback) => {
         name,
         value,
         number,
-        type
+        type, 
+        goal
     } = bodyString
 
     const {
@@ -77,7 +78,8 @@ module.exports.createAccount = async (event, context, callback) => {
             name,
             value,
             number,
-            type
+            type,
+            goal
         })
 
         return {

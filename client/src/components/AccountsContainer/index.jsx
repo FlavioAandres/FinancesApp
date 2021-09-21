@@ -120,6 +120,7 @@ const AccountContainer = () => {
             <CardGrid>
                 {accounts && accounts.map(account =>
                     <AccountItem
+                        key={account._id}
                         account={account}
                         getTransactions={getTransactions}
                         handleCreateTransaction={onCreateTransactionClick}
