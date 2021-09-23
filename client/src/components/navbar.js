@@ -17,9 +17,9 @@ const navbar = () => {
       <Nav>
 
         <DropdownButton title="Sitios">
-          <NavLink aria-hidden="false" className="eui-dropdown-item" eventKey="1" to="/accounts">Cuentas y metas.</NavLink>
-          <NavLink aria-hidden="false" className="eui-dropdown-item" eventKey="2" to="/prepayment">Pagos pre-procesados</NavLink>
-          <NavLink aria-hidden="false" className="eui-dropdown-item" eventKey="3" to="/graphs">Graficas</NavLink>
+          <NavLink aria-hidden="false" className="eui-dropdown-item" to="/accounts">Cuentas y metas.</NavLink>
+          <NavLink aria-hidden="false" className="eui-dropdown-item" to="/prepayment">Pagos pre-procesados</NavLink>
+          <NavLink aria-hidden="false" className="eui-dropdown-item" to="/graphs">Graficas</NavLink>
           <DropdownItem separator />
         </DropdownButton>
         <NavLink to="/profile">Perfil</NavLink>

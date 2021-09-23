@@ -15,7 +15,7 @@ module.exports.create = async (accountTransactionBody) => {
 
 module.exports.getTransactions = async (searchCriteria = {}) => {
     await connect();
-    const transactions = await accountTransactionModel.find(searchCriteria)
+    const transactions = await accountTransactionModel.find(searchCriteria).sort({'createdAt': 1}).limit(10);
     return transactions;
 }
 

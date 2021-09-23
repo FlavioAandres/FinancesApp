@@ -1,77 +1,27 @@
 import React, { useEffect, useState } from "react";
-import ApexCharts from "apexcharts";
 import { API } from 'aws-amplify'
 import SelectorTimming from '../SelectorTiming'
 import moment from 'moment'
 import './GraphContainer.css'
+import Graph from '../commons/graphs'
 import formatCash from '../../utils/formatCash';
 
 const GraphContainer = () => {
   const [timeAgo, setTimeAgo] = useState('year');
-  const ChartsRendered = {}
+  const [cardStatsSeries, setCardStatsSeries] = useState([])
+  const [cardStatsOptions, setCardStatsOptions] = useState({});
+  const [categoryStatsSeries, setCategoryStatsSeries] = useState([])
+  const [categoryStatsOptions, setCategoryStatsOptions] = useState({});
+  const [incomesvspaymentsSeries, setIncomesVSPaymentsSeries] = useState([])
+  const [incomesvspaymentsOptions, setIncomesVSPaymentsOptions] = useState({});
+  const [paymentsMontlySeries, setPaymentsMontlySeries] = useState([])
+  const [paymentsMontlyOptions, setPaymentsMontlyOptions] = useState({});
+  const [categoriesMontlySeries, setCategoriesMontlySeries] = useState([])
+  const [categoriesMontlyOptions, setCategoriesMontlyOptions] = useState({});
+  const [incomesMontlySeries, setIncomesMontlySeries] = useState([])
+  const [incomesMontlyOptions, setIncomesMontlyOptions] = useState({});
 
-  const renderGraph = ({ type = "bar", series, categories = [], xaxis = {}, dataLabels = {}, plotOptions = {}, chartOptions = {} }, id) => {
-    const basics = {
-      chart: {
-        type,
-        ...chartOptions
-      },
-    };
-    if (!ChartsRendered[id]) {
-      let chart;
-      switch (type) {
-        case 'donut':
-          chart = new ApexCharts(document.getElementById(id), {
-            ...basics,
-            series,
-            enabled: true,
-            formatter: function (val) {
-              return val + "%"
-            },
-            labels: dataLabels,
-            plotOptions
-          });
-          break;
 
-        default:
-          chart = new ApexCharts(document.getElementById(id), {
-            ...basics,
-            series,
-            xaxis: {
-              categories,
-              axisBorder: {
-                show: false
-              },
-              ...xaxis
-            },
-            yaxis: {
-              formatter: formatCash
-            },
-            dataLabels,
-            plotOptions,
-            stroke: {
-              curve: "smooth",
-              width: 3
-            },
-          });
-          break;
-      }
-      chart.render();
-      ChartsRendered[id] = chart;
-    } else {
-      ChartsRendered[id].updateSeries(series)
-      switch (type) {
-        case 'donut':
-          ChartsRendered[id].updateOptions({
-            labels: dataLabels
-          })
-          break;
-        default:
-          break;
-      }
-    }
-
-  }
 
   const getMonthlyMetrics = () =>
     API.get("finances", '/boxflow/stats').then(response => {
@@ -87,37 +37,47 @@ const GraphContainer = () => {
         [[], []]
       );
 
-      renderGraph(
+      setPaymentsMontlySeries([
         {
-          categories: paymentsMonths,
-          series: [
-            {
-              name: "Gastos",
-              data: paymentsAmount,
-            },
-          ],
-          plotOptions: {
-            bar: {
-              borderRadius: 10,
-              dataLabels: {
-                position: 'top',
-              },
-            }
+          name: "Gastos",
+          data: paymentsAmount,
+        },
+      ])
+
+      setPaymentsMontlyOptions({
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return formatCash(val).replace(',00', '')
           },
-          dataLabels: {
-            enabled: true,
-            formatter: function (val) {
-              return formatCash(val).replace(',00', '')
+          offsetY: -20,
+          style: {
+            fontSize: '12px',
+            colors: ["#054b80"]
+          }
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 10,
+            dataLabels: {
+              position: 'top',
             },
-            offsetY: -20,
-            style: {
-              fontSize: '12px',
-              colors: ["#054b80"]
-            }
+          }
+        },
+        xaxis: {
+          categories: paymentsMonths,
+          axisBorder: {
+            show: false
           },
         },
-        "graph-montly"
-      );
+        yaxis: {
+          formatter: formatCash
+        },
+        stroke: {
+          curve: "smooth",
+          width: 3
+        }
+      })
 
       // Incomes vs Payments
       const [incomesAmounts, incomesMonths] = incomes.reduce(
@@ -129,46 +89,67 @@ const GraphContainer = () => {
         [[], []]
       );
 
-      renderGraph(
+      setIncomesVSPaymentsSeries([
         {
-          categories: incomesMonths,
-          series: [
-            {
-              name: "Ingresos",
-              data: incomesAmounts,
-            },
-            {
-              name: "Gastos",
-              data: paymentsAmount.slice(paymentsMonths.indexOf(incomesMonths[0])),
-            },
-          ],
-          plotOptions: {
-            bar: {
-              borderRadius: 10,
-              dataLabels: {
-                position: 'top',
-              },
-            }
-          },
-          chartOptions: {
-            stacked: true,
-            stackType: '100%'
-          },
-          dataLabels: {
-            enabled: true,
-            offsetY: -20,
-            style: {
-              fontSize: '12px',
-              colors: ["#054b80"]
+          name: "Ingresos",
+          data: incomesAmounts,
+        },
+        {
+          name: "Gastos",
+          data: paymentsAmount.slice(paymentsMonths.indexOf(incomesMonths[0])),
+        },
+      ])
+
+      setIncomesVSPaymentsOptions({
+        chart: {
+          stacked: true,
+          stackType: '100%',
+
+        },
+        responsive: [{
+          breakpoint: 480,
+        }],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            borderRadius: 10,
+            dataLabels: {
+              position: 'top',
             }
           },
         },
-        "graph-montly-incomes-vs-payemnts"
-      );
+        xaxis: {
+          categories: incomesMonths,
+        },
+        legend: {
+          position: 'right',
+          offsetY: 40
+        },
+        fill: {
+          opacity: 1
+        },
+
+        stroke: {
+          curve: "smooth",
+          width: 3
+        },
+
+        dataLabels: {
+          enabled: true,
+          offsetY: -20,
+          style: {
+            fontSize: '12px',
+            colors: ["#054b80"]
+          },
+          formatter: (val, opts) => {
+            return `${val.toFixed(2)}%`
+          }
+        },
+      })
     });
 
   const getMonthlyCategories = (date, period = 'month') => {
-    
+
     API.get('finances', '/boxflow/stats', { queryStringParameters: { metricType: 'category', date, groupBy: period } })
       .then((res) => {
         const { payments, incomes } = JSON.parse(res.body);
@@ -214,14 +195,22 @@ const GraphContainer = () => {
           };
         });
 
-        renderGraph(
-          {
+        setCategoriesMontlySeries(fillPayments);
+        setCategoriesMontlyOptions({
+          xaxis: {
             categories: uniqueMonthsPayments,
-            type: "line",
-            series: fillPayments,
+            axisBorder: {
+              show: false
+            },
           },
-          "graph-category-monthly"
-        );
+          yaxis: {
+            formatter: formatCash
+          },
+          stroke: {
+            curve: "smooth",
+            width: 3
+          },
+        })
 
         // Incomes
         const monthsArrayIncomes = [];
@@ -264,14 +253,23 @@ const GraphContainer = () => {
           };
         });
 
-        renderGraph(
-          {
+        setIncomesMontlySeries(fillIncomes);
+        setIncomesMontlyOptions({
+          xaxis: {
             categories: uniqueMonthsIncomes,
-            type: "line",
-            series: fillIncomes,
+            axisBorder: {
+              show: false
+            },
           },
-          "graph-category-monthly-incomes"
-        );
+          yaxis: {
+            formatter: formatCash
+          },
+          stroke: {
+            curve: "smooth",
+            width: 3
+          },
+        })
+
       })
       .catch((err) => console.error(err));
   }
@@ -291,15 +289,18 @@ const GraphContainer = () => {
         }, { cardTypesNamesSeries: [], cardTypeStatsSeries: [] })
 
 
-        renderGraph(
-          {
-            dataLabels: cardTypesNamesSeries,
-            type: "donut",
-            series: cardTypeStatsSeries,
-            chartOptions: { width: 400 }
+        setCardStatsSeries(cardTypeStatsSeries);
+        setCardStatsOptions({
+          chart: {
+            width: 400
           },
-          "graph-card-stats"
-        );
+          labels: cardTypesNamesSeries,
+          enabled: true,
+          formatter: function (val) {
+            return val + "%"
+          }
+        })
+
 
         // CategoryTypeStats
         const { categoriesTypeNamesSeries, categoryTypeSeries } = categoryTypeStats.reduce((prev, item) => {
@@ -309,25 +310,27 @@ const GraphContainer = () => {
           return prev
         }, { categoriesTypeNamesSeries: [], categoryTypeSeries: [] })
 
-        renderGraph(
-          {
-            dataLabels: categoriesTypeNamesSeries,
-            type: "donut",
-            series: categoryTypeSeries,
-            chartOptions: { width: 500 }
+        setCategoryStatsSeries(categoryTypeSeries);
+        setCategoryStatsOptions({
+          chart: {
+            width: 400
           },
-          "graph-category-stats"
-        );
+          labels: categoriesTypeNamesSeries,
+          enabled: true,
+          formatter: function (val) {
+            return val + "%"
+          }
+        })
       })
       .catch((err) => console.error(err));
   }
 
   const onChangeDate = (e, period) => {
     const date = moment().subtract(1, period).toISOString()
-    const grpupBy = period === 'year'
+    const groupby = period === 'year'
       ? 'month'
       : 'day';
-    getMonthlyCategories(date, grpupBy)
+    getMonthlyCategories(date, groupby)
     getStats(date);
     setTimeAgo(period)
   }
@@ -347,33 +350,33 @@ const GraphContainer = () => {
       <div className="container-graphs-general">
         <div className="graph-monthly-container">
           <h2>Total monthly payemnts</h2>
-          <div id="graph-montly"></div>
+          <Graph series={paymentsMontlySeries} options={paymentsMontlyOptions} width="100%" />
         </div>
         <div className="graph-category-monthly-container">
           <h2>Payments Categories by month</h2>
-          <div id="graph-category-monthly"></div>
+          <Graph series={categoriesMontlySeries} options={categoriesMontlyOptions} width="100%" type='line' />
         </div>
       </div>
 
       <div className="container-graphs-general">
         <div className="graph-monthly-container">
           <h2>Total Incomes vs Payments monthly</h2>
-          <div id="graph-montly-incomes-vs-payemnts"></div>
+          <Graph series={incomesvspaymentsSeries} options={incomesvspaymentsOptions} width="100%" />
         </div>
         <div className="graph-category-monthly-container">
           <h2>Incomes Categories by month</h2>
-          <div id="graph-category-monthly-incomes"></div>
+          <Graph series={incomesMontlySeries} options={incomesMontlyOptions} width="100%" type='line' />
         </div>
       </div>
 
       <div className="container-graphs-general">
         <div className="ggraph-monthly-container">
           <h2>Percentage By Card Type</h2>
-          <div id="graph-card-stats"></div>
+          <Graph series={cardStatsSeries} options={cardStatsOptions} type='donut' />
         </div>
         <div className="graph-category-monthly-container">
           <h2>Percentage by Category</h2>
-          <div id="graph-category-stats"></div>
+          <Graph series={categoryStatsSeries} options={categoryStatsOptions} type='donut' />
         </div>
       </div>
     </div>
