@@ -5,6 +5,8 @@ import AccountItem from "./AccountItem";
 import { Label, CardGrid } from 'emerald-ui/lib'
 import { API } from 'aws-amplify'
 import TransactionsContainer from "./Transactions";
+import Graph from '../commons/graphs'
+import Card from "emerald-ui/lib/Card";
 
 
 
@@ -15,6 +17,8 @@ const AccountContainer = () => {
     const [showAddTransactionModal, setShowAddTransactionModal] = useState(false)
     const [showSpinningTransactionModal, setShowSpinningTransactionModal] = useState(false)
     const [transactions, setTransactions] = useState([]);
+    const [transactionSeries, setTransactionSeries] = useState([]);
+    const [transactionOptions, setTransactionOptions] = useState({})
     const [selected, setSelected] = useState('')
     const [selectedAccountID, setSelectedAccountID] = useState()
 
@@ -42,6 +46,83 @@ const AccountContainer = () => {
                 const data = JSON.parse(response.body);
                 setTransactions(data.transactions);
                 setSelected(name);
+                const values = data.transactions.map(({ difference, createdAt }) => {
+                    return {
+                        x: createdAt.substring(0, 10),
+                        y: difference
+                    }
+                })
+
+                setTransactionSeries([
+                    {
+                        name: 'Transactions',
+                        data: values
+                    }
+                ])
+
+                setTransactionOptions({
+                    dataLabels: {
+                        enabled: false
+                    },
+                   
+
+                    title: {
+                        text: 'Transactions over the time',
+                        align: 'left',
+                        style: {
+                            fontSize: '14px'
+                        }
+                    },
+                    xaxis: {
+                        type: 'datetime',
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        }
+                    },
+                    yaxis: {
+                        tickAmount: 4,
+                        floating: false,
+
+                        labels: {
+                            style: {
+                                colors: '#8e8da4',
+                            },
+                            offsetY: -7,
+                            offsetX: 0,
+                        },
+                        axisBorder: {
+                            show: false,
+                        },
+                        axisTicks: {
+                            show: false
+                        }
+                    },
+                    fill: {
+                        opacity: 0.5
+                    },
+                    tooltip: {
+                        x: {
+                            format: "yyyy",
+                        },
+                        fixed: {
+                            enabled: false,
+                            position: 'topRight'
+                        }
+                    },
+                    grid: {
+                        yaxis: {
+                            lines: {
+                                offsetX: -30
+                            }
+                        },
+                        padding: {
+                            left: 20
+                        }
+                    }
+                })
             })
             .then(err => console.error(err))
     }
@@ -130,7 +211,14 @@ const AccountContainer = () => {
 
             <br />
 
-            <TransactionsContainer transactions={transactions} name={selected} />
+            <CardGrid>
+                <Card>
+                    <TransactionsContainer transactions={transactions} name={selected} />
+                </Card>
+                <Card>
+                    <Graph series={transactionSeries} options={transactionOptions} type='area' />
+                </Card>
+            </CardGrid>
         </div>
     )
 
