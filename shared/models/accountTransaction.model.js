@@ -30,6 +30,11 @@ const AccountTransactionSchema = mongoose.Schema(
         account: {
             type: mongoose.Types.ObjectId,
             required: true
+        },
+        fee: {
+            type: Number,
+            required: false,
+            default: 0
         }
     },
     {

@@ -59,7 +59,7 @@ const NewAccountModal = ({ save, close, loading, show }) => {
                     <Controller
                         name="value"
                         control={control}
-                        defaultValue=""
+                        defaultValue={0}
                         rules={{ required: "This is required", min: 0 }}
                         render={({ field }) => (
 
@@ -107,7 +107,7 @@ const NewAccountModal = ({ save, close, loading, show }) => {
                                 value={field.value}
                                 type='number'
                                 step="0.01"
-                                errorMessage={errors.value && errors.value.message}
+                                errorMessage={errors.goal && errors.goal.message}
                             />
                         )}
                     />

@@ -6,10 +6,11 @@ const NewTransactionModal = ({ save, close, loading, show }) => {
     const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
 
-    const onCreateTransaction = ({ value, description }) => {
+    const onCreateTransaction = ({ value, description, fee }) => {
         save({
-            value, 
-            description
+            value,
+            description,
+            fee
         })
         reset();
     }
@@ -26,8 +27,8 @@ const NewTransactionModal = ({ save, close, loading, show }) => {
                     <Controller
                         name="value"
                         control={control}
-                        defaultValue=""
-                        rules={{ required: "This is required", min: 0.01 }}
+                        defaultValue={0}
+                        rules={{ required: "This is required", min: 0 }}
                         render={({ field }) => (
 
                             <TextField label="Valor: "
@@ -36,6 +37,23 @@ const NewTransactionModal = ({ save, close, loading, show }) => {
                                 type='number'
                                 step="0.01"
                                 errorMessage={errors.value && errors.value.message}
+                            />
+                        )}
+                    />
+
+                    <Controller
+                        name="fee"
+                        control={control}
+                        defaultValue={0}
+                        rules={{ min: 0 }}
+                        render={({ field }) => (
+
+                            <TextField label="Intereses: "
+                                onChange={field.onChange}
+                                value={field.value}
+                                type='number'
+                                step="0.01"
+                                errorMessage={errors.fee && errors.fee.message}
                             />
                         )}
                     />

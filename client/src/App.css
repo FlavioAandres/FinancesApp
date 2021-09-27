@@ -465,7 +465,12 @@ a {
   flex-basis: 33% !important;
 }
 
+.eui-card-flex-container .flex-basis-31 {
+  flex-basis: 31% !important;
+}
+
 .editable,
 .editable:hover {
   cursor: pointer;
 }
+
