@@ -106,7 +106,8 @@ module.exports.addTransaction = async (event, context, callback) => {
 
     const {
         value,
-        description
+        description,
+        fee
     } = bodyString
 
 
@@ -140,7 +141,8 @@ module.exports.addTransaction = async (event, context, callback) => {
             description,
             value,
             difference,
-            type
+            type,
+            fee
         })
 
         await accountRepo.updateAccount({ _id: account, sub }, { value: preciseAdd(_account.value, difference) })

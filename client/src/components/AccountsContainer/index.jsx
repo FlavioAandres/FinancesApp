@@ -19,6 +19,8 @@ const AccountContainer = () => {
     const [transactions, setTransactions] = useState([]);
     const [transactionSeries, setTransactionSeries] = useState([]);
     const [transactionOptions, setTransactionOptions] = useState({})
+    const [feesSeries, setFeesSeries] = useState([]);
+    const [feesOptions, setFeesOptions] = useState({})
     const [selected, setSelected] = useState('')
     const [selectedAccountID, setSelectedAccountID] = useState()
 
@@ -46,17 +48,33 @@ const AccountContainer = () => {
                 const data = JSON.parse(response.body);
                 setTransactions(data.transactions);
                 setSelected(name);
-                const values = data.transactions.map(({ difference, createdAt }) => {
+                const transactionsValues = data.transactions.map(({ difference, createdAt }) => {
                     return {
                         x: createdAt.substring(0, 10),
                         y: difference
                     }
                 })
 
+                const feeValues = data.transactions.map(({ fee, createdAt }) => {
+                    return {
+                        x: createdAt.substring(0, 10),
+                        y: fee
+                    }
+                })
+
                 setTransactionSeries([
                     {
                         name: 'Transactions',
-                        data: values
+                        data: transactionsValues
+                    }
+                ])
+
+                setFeesSeries([
+                    {
+
+                        name: 'bak fees',
+                        data: feeValues
+
                     }
                 ])
 
@@ -64,8 +82,6 @@ const AccountContainer = () => {
                     dataLabels: {
                         enabled: false
                     },
-                   
-
                     title: {
                         text: 'Transactions over the time',
                         align: 'left',
@@ -86,6 +102,67 @@ const AccountContainer = () => {
                         tickAmount: 4,
                         floating: false,
 
+                        labels: {
+                            style: {
+                                colors: '#8e8da4',
+                            },
+                            offsetY: -7,
+                            offsetX: 0,
+                        },
+                        axisBorder: {
+                            show: false,
+                        },
+                        axisTicks: {
+                            show: false
+                        }
+                    },
+                    fill: {
+                        opacity: 0.5
+                    },
+                    tooltip: {
+                        x: {
+                            format: "yyyy",
+                        },
+                        fixed: {
+                            enabled: false,
+                            position: 'topRight'
+                        }
+                    },
+                    grid: {
+                        yaxis: {
+                            lines: {
+                                offsetX: -30
+                            }
+                        },
+                        padding: {
+                            left: 20
+                        }
+                    }
+                })
+
+                setFeesOptions({
+                    dataLabels: {
+                        enabled: false
+                    },
+                    title: {
+                        text: 'Bank fees over the time',
+                        align: 'left',
+                        style: {
+                            fontSize: '14px'
+                        }
+                    },
+                    xaxis: {
+                        type: 'datetime',
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        }
+                    },
+                    yaxis: {
+                        tickAmount: 4,
+                        floating: false,
                         labels: {
                             style: {
                                 colors: '#8e8da4',
@@ -211,14 +288,20 @@ const AccountContainer = () => {
 
             <br />
 
-            <CardGrid>
-                <Card>
-                    <TransactionsContainer transactions={transactions} name={selected} />
-                </Card>
-                <Card>
-                    <Graph series={transactionSeries} options={transactionOptions} type='area' />
-                </Card>
-            </CardGrid>
+            {
+
+                transactions && transactions.length > 0 ? (<CardGrid >
+                    <Card className="flex-basis-31">
+                        <TransactionsContainer transactions={transactions} name={selected} />
+                    </Card>
+                    <Card className="flex-basis-31">
+                        <Graph series={transactionSeries} options={transactionOptions} type='area' />
+                    </Card>
+                    <Card className="flex-basis-31">
+                        <Graph series={feesSeries} options={feesOptions} type='area' />
+                    </Card>
+                </CardGrid>) : null
+            }
         </div>
     )
 
