@@ -62,7 +62,7 @@ module.exports.createAccount = async (event, context, callback) => {
         name,
         value,
         number,
-        type, 
+        type,
         goal
     } = bodyString
 
@@ -154,6 +154,41 @@ module.exports.addTransaction = async (event, context, callback) => {
                 'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({ account: _account }),
+        }
+
+    } catch (error) {
+        console.error(error)
+        return context.done(error, 'Something goes wrong')
+    }
+}
+
+module.exports.deleteAccount = async (event, context, callback) => {
+    const { cognitoPoolClaims, path } = event
+
+    const {
+        sub
+    } = cognitoPoolClaims
+
+    const { account } = path
+
+
+    try {
+        if (!account) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
+       
+        await accountTransactionRepo.delete({
+            sub,
+            account
+        })
+
+        await accountRepo.delete({ _id: account, sub })
+
+
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({ success: true }),
         }
 
     } catch (error) {

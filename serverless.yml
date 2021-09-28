@@ -454,6 +454,27 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+
+  DeleteAccounts:
+    handler: API/Functions/Accounts.deleteAccount
+    name: Accounts-DELETE-${opt:stage}
+    events:
+      - http:
+          path: /accounts/{account}
+          method: DELETE
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
   
   GetTransactions:
     handler: API/Functions/Accounts.getTransactions

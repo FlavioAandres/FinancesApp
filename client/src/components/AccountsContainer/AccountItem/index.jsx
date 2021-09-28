@@ -29,7 +29,7 @@ const getColor = (type) => {
     return color;
 }
 
-const AccountItem = ({ account, getTransactions, handleCreateTransaction, handleSelectedAccount }) => {
+const AccountItem = ({ account, getTransactions, handleCreateTransaction, handleSelectedAccount, handleDeleteAccount }) => {
 
     return (
         <Card key={account._id}>
@@ -69,7 +69,7 @@ const AccountItem = ({ account, getTransactions, handleCreateTransaction, handle
                     handleSelectedAccount(account._id);
                     handleCreateTransaction();
                 }}>Aggregar Movimiento</Button>
-                <Button color="danger" onClick={() => { alert('Delete') }}>Eliminar</Button>
+                <Button color="danger" onClick={() => { handleDeleteAccount(account._id) }}>Eliminar</Button>
             </div>
         </Card >
     )
