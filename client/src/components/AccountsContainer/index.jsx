@@ -218,6 +218,17 @@ const AccountContainer = () => {
     }
 
 
+    const onDeleteAccount = (account) => {
+        API.del('finances', `/accounts/${account}`)
+            .then(res => {
+                const data = JSON.parse(res.body);
+
+                if (data.success) {
+                    const newAccounts = accounts.filter(_account => _account._id !== account);
+                    setAccounts(newAccounts)
+                }
+            }).catch(err => console.error(err))
+    }
 
     const getAccounts = () => {
         API.get('finances', '/accounts')
@@ -283,6 +294,7 @@ const AccountContainer = () => {
                         getTransactions={getTransactions}
                         handleCreateTransaction={onCreateTransactionClick}
                         handleSelectedAccount={setSelectedAccountID}
+                        handleDeleteAccount={onDeleteAccount}
                     />)}
             </CardGrid>
 
