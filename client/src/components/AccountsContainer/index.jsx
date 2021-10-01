@@ -25,6 +25,11 @@ const AccountContainer = () => {
     const [selectedAccountID, setSelectedAccountID] = useState()
 
 
+    const sortTransactions = (transactionOne, transactionTwo) => {
+        const dateOne = new Date(transactionOne.createdAt), dateTwo = new Date(transactionTwo.createdAt)
+        return dateOne - dateTwo
+    }
+
     const getAccount = () => {
         API.get('finances', `/accounts/${selectedAccountID}`)
             .then(response => {
@@ -46,7 +51,8 @@ const AccountContainer = () => {
         API.get('finances', `/accounts/${account}/transactions`)
             .then(response => {
                 const data = JSON.parse(response.body);
-                setTransactions(data.transactions);
+                const transactionSorted = data.transactions.sort(sortTransactions)
+                setTransactions(transactionSorted);
                 setSelected(name);
                 const transactionsValues = data.transactions.map(({ difference, createdAt }) => {
                     return {
