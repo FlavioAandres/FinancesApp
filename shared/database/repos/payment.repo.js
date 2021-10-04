@@ -136,6 +136,7 @@ module.exports.updatePayment = async (Payment) => {
       isHidden: Payment.isHidden,
       description: Payment.description,
       category: Payment.category,
+      amount: Payment.amount
     }
   );
   await destroy()

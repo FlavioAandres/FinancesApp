@@ -35,7 +35,8 @@ module.exports.put = async (event, context, callback) => {
     description,
     category,
     hide = false,
-    accepted = true
+    accepted = true, 
+    amount 
   } = bodyString
 
   const {
@@ -51,7 +52,8 @@ module.exports.put = async (event, context, callback) => {
       isHidden: hide,
       isAccepted: accepted,
       description: description,
-      category: category
+      category: category, 
+      amount
     })
     const statusCode = (data.nModified > 0) ? 204 : 400
     await detroyMongoConnection()
