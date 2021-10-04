@@ -35,17 +35,21 @@ module.exports.createMultiple = async (PaymentBodies = []) => {
       const { categories, sub } = await getUser({ _id: PaymentBody.user })
       const results = categories.filter(category => category.value === PaymentBody.category)
       let category = results[0]
+      let current = 0
+      if(category && category.budget){
+        current = category.budget.current + PaymentBody.amount
+      }else{
+        category = {}
+      }
 
-      const current = category.budget.current + PaymentBody.amount
-
-      await updateBudget(
-        {
-          sub,
-          'categories': { $elemMatch: { value: category.value } }
-        },
-        {
-          'categories.$.budget': { current }
-        })
+      // await updateBudget(
+      //   {
+      //     sub,
+      //     'categories': { $elemMatch: { value: category.value } }
+      //   },
+      //   {
+      //     'categories.$.budget': { current }
+      //   })
 
       await Payments.create(PaymentBody);
     }

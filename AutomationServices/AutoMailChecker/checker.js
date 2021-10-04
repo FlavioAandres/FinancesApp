@@ -12,14 +12,15 @@ String.prototype.splice = function (idx, rem, str) {
 };
 
 const {
-    MINUTES_AGO_SEARCH = '360'
+    MINUTES_AGO_SEARCH = '42300'
 } = process.env
 
 const start = async (event, context) => {
-    if(process.env.NODE_ENV === 'dev')
-        event = { 
-            Records:[{ body: JSON.stringify({"createdAt":"2021-05-20T00:59:08.811Z","data":{"userId":"60a725161d8bbb000909c69c","checkAllDates":false}}) }] 
-        }
+    // // if(process.env.NODE_ENV === 'dev')
+    // //     event = { 
+    // //     }
+    // event.Records = [{ body: JSON.stringify({"createdAt":"2021-05-20T00:59:08.811Z","data":{"userId":"612adeee427e7a0008078b67","checkAllDates":true}}) }] 
+    // console.log(event.Records)
     try {
         console.info('Getting User Config')
         const [{ data }, ...rest] = event.Records.map(sqsMessage => { //Just 1 event per execution
@@ -30,7 +31,10 @@ const start = async (event, context) => {
             }
         });
         // This function open the mongo connection
-        const [ user ] = await getUser({ _id: data.userId },  {banks: true})
+        // const data = { userId: '612adeee427e7a0008078b67', checkAllDates: true }
+        console.log(data)
+        const user = await getUser({ _id: data.userId },  {banks: false})
+     
         if (!user) return "No user found"
 
         const { settings } = user
@@ -96,7 +100,7 @@ const start = async (event, context) => {
                             source: res.TRANSACTION_SOURCE,
                             destination: res.TRANSACTION_DESTINATION,
                             amount: res.TRANSACTION_VALUE,
-                            cardType: res.TRANSACTION_CARD_TYPE,
+                            cardType: res.TRANSACTION_CARD_TYPE || 't.debito',
                             account: res.TRANSACTION_ACCOUNT,
                             category: res.TRANSACTION_TYPE,
                             text: res.description,
@@ -120,7 +124,7 @@ const start = async (event, context) => {
         }
     } catch (e) {
         e.event = event
-        console.error(e)
+        console.error({e})
     }
 
     return context.done(null);

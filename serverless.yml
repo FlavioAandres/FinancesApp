@@ -9,7 +9,6 @@ package:
     - node_modules/puppeteer/.local-chromium/**
     - node_modules/chrome-aws-lambda/** # The function is provided by the layer
     - devutils/**
-    - AutomationServices/AutoMailChecker/**
 
 custom:
   ArnSQSForwardingConfirmation:
@@ -450,20 +449,20 @@ functions:
       BUCKETNAME: finance-emails-${opt:stage}
       EMAIL_FORWARDING_CONFIRMATION_SQS: ${self:custom.ArnSQSForwardingConfirmation.${opt:stage, self:provider.stage}}
 
-  # EmailChecker:
-  #   handler: AutomationServices/AutoMailChecker/checker.start
-  #   name: AutomationServices-EmailChecker-${opt:stage}
-  #   timeout: 120
-  #   events:
-  #     - sqs:
-  #         arn:
-  #           Fn::GetAtt:
-  #             - EmailUsersQueue
-  #             - Arn
-  #         batchSize: 1
-  #   environment:
-  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-  #     EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
+  EmailChecker:
+    handler: AutomationServices/AutoMailChecker/checker.start
+    name: AutomationServices-EmailChecker-${opt:stage}
+    timeout: 120
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - EmailUsersQueue
+              - Arn
+          batchSize: 1
+    environment:
+      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
 
   PaymentsAnalizer:
     handler: AutomationServices/AnalizerTask/analizer.start
@@ -513,34 +512,34 @@ functions:
           rate: rate(1 day)
           enabled: true
 
-  # ScheduleUsersToCheckEmails:
-  #   handler: AutomationServices/AutoMailChecker/schedule.start
-  #   name: AutomationServices-ScheduleUsers-${opt:stage}
-  #   iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
-  #   iamRoleStatements:
-  #     - Effect: 'Allow'
-  #       Action:
-  #         - 'sqs:SendMessage'
-  #         - 'sqs:SendMessageBatch'
-  #       Resource:
-  #         Fn::GetAtt:
-  #           - EmailUsersQueue
-  #           - Arn
-  #   events:
-  #     - schedule:
-  #         enabled: true
-  #         rate: rate(20 minutes)
-  #   environment:
-  #     USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
+  ScheduleUsersToCheckEmails:
+    handler: AutomationServices/AutoMailChecker/schedule.start
+    name: AutomationServices-ScheduleUsers-${opt:stage}
+    iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - 'sqs:SendMessage'
+          - 'sqs:SendMessageBatch'
+        Resource:
+          Fn::GetAtt:
+            - EmailUsersQueue
+            - Arn
+    events:
+      - schedule:
+          enabled: true
+          rate: rate(20 minutes)
+    environment:
+      USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
 
 # Resources
 resources:
   Resources:
-    # EmailUsersQueue:
-    #   Type: "AWS::SQS::Queue"
-    #   Properties:
-    #     QueueName: "email-users-checker"
-    #     VisibilityTimeout: 300
+    EmailUsersQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "email-users-checker"
+        VisibilityTimeout: 300
 
     EmailForwardingAceptationQueue:
       Type: "AWS::SQS::Queue"
