@@ -67,7 +67,7 @@ module.exports.addChat = async (userCriteria, chat) => {
     if (!chat.id) return null;
 
     await connect()
-    const result = await userModel.updateOne({ ...userCriteria }, {
+    return await userModel.updateOne({ ...userCriteria }, {
         $push: {
             "settings.bots.chats": { ...chat }
         }
