@@ -11,14 +11,14 @@ module.exports.create = async (PaymentBody) => {
 
     const current = category.budget.current + PaymentBody.amount
 
-    await updateBudget(
-      {
-        sub,
-        'categories.value': category.value
-      },
-      {
-        'categories.$.budget': { current }
-      })
+    // await updateBudget(
+    //   {
+    //     sub,
+    //     'categories.value': category.value
+    //   },
+    //   {
+    //     'categories.$.budget': { current }
+    //   })
 
     await Payments.create(PaymentBody);
   } catch (error) {
