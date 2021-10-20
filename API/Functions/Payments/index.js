@@ -85,7 +85,7 @@ module.exports.post = async (event, context, callback) => {
     if (!description || !category || !amount || !source) return { statusCode: 400, body: JSON.stringify({ message: 'Bad request' }) }
     const user = await getUser({ sub })
 
-    await PaymentRepo.create({
+    const result = await PaymentRepo.create({
       user: user._id,
       isHidden: false,
       isAccepted: true,
@@ -97,13 +97,13 @@ module.exports.post = async (event, context, callback) => {
       text: `${description} by ${amount}`,
       type: 'EXPENSE'
     })
-
+    console.log(result); 
     return {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ success: 'Payment Created' })
+      body: JSON.stringify({ success: 'Payment Created', result })
     }
   } catch (error) {
     console.error(error)
