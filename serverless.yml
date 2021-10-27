@@ -441,5 +441,5 @@ resources:
     EmailUsersQueue:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: "email-users-checker"
+        QueueName: "email-users-checker-${opt:stage}"
         VisibilityTimeout: 300
