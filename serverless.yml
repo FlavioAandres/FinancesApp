@@ -418,8 +418,7 @@ functions:
     iamRoleStatements:
       - Effect: 'Allow'
         Action:
-          - 'sqs:SendMessage'
-          - 'sqs:SendMessageBatch'
+          - "*"
         Resource:
           Fn::GetAtt:
             - EmailUsersQueue
@@ -430,9 +429,7 @@ functions:
           rate: rate(20 minutes)
     environment:
       USER_SCHEDULE_SQS_URL: 
-        Fn::GetAtt:
-          - EmailUsersQueue
-          - Arn
+        Ref: EmailUsersQueue
       
 
 # Resources
