@@ -18,13 +18,6 @@ custom:
     prod:
       Ref: EmailForwardingAceptationQueue
 
-#   ArnSQSEmails:
-#     dev: ${file(./config/dev.json):USER_SCHEDULE_SQS_URL}
-#     test:
-#       Ref: EmailUsersQueue
-#     prod:
-#       Ref: EmailUsersQueue
-
 provider:
   name: aws
   runtime: nodejs12.x
@@ -48,19 +41,6 @@ provider:
         - "*"
 
 functions:
-  TwilioIncommingMessage:
-    handler: AutomationServices/WhatsAppBot/handlerIncommingMessage.handler
-    name: TwilioIncommingMessage-lambda-${opt:stage}
-    events:
-      - http:
-          path: "/whatsapp/webhook/"
-          method: "post"
-          cors:
-            - enabled: true
-            - origin: "*"
-            - headers:
-                - Content-Type
-                - Transfer-encoding
 
   GetPrepayments:
     handler: API/Functions/Payments.get
@@ -292,27 +272,6 @@ functions:
             claims:
               - sub
 
-  GetDataCredit:
-    handler: API/Functions/DataCredit.get
-    name: DataCredit-get-${opt:stage}
-    events:
-      - http:
-          path: /datacredit
-          method: GET
-          integration: lambda
-          cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
-          response:
-            headers:
-              Access-Control-Allow-Origin: "'*'"
-          authorizer:
-            name: authorizer
-            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
-            claims:
-              - sub
-
   # Create the user on the MongoDB database
   PostConfirmationUser:
     handler: API/Functions/Users.postConfirmation
@@ -407,48 +366,6 @@ functions:
       BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
 
   #AUTOMATIONS
-  EmailForwardingAcceptation:
-    handler: AutomationServices/EmailFowardingAccept/scraper.start
-    name: EmailForwardingAcceptation-${opt:stage}
-    timeout: 120
-    memorySize: 2048
-    layers:
-      - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - EmailForwardingAceptationQueue
-              - Arn
-          batchSize: 1
-
-  ProcessEmails:
-    handler: AutomationServices/EmailsForwardingReader.process
-    name: ProcessEmail-${opt:stage}
-    iamRoleStatementsName: write-sqs-finances-email-forwarding-confirmation-${opt:stage}-role
-    iamRoleStatements:
-      - Effect: "Allow"
-        Action:
-          - "sqs:SendMessage"
-          - "sqs:SendMessageBatch"
-        Resource:
-          Fn::GetAtt:
-            - EmailForwardingAceptationQueue
-            - Arn
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-          - s3:GetObject
-          - s3:DeleteObject
-        Resource:
-          - Fn::Join:
-              - ""
-              - - Fn::GetAtt: [EmailsBucket, Arn]
-                - "/*"
-    environment:
-      BUCKETNAME: finance-emails-${opt:stage}
-      EMAIL_FORWARDING_CONFIRMATION_SQS: ${self:custom.ArnSQSForwardingConfirmation.${opt:stage, self:provider.stage}}
-
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
     name: AutomationServices-EmailChecker-${opt:stage}
@@ -484,24 +401,6 @@ functions:
       TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
       TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
 
-  # Deprecated function since DataCredito updates the backend
-  # DataCreditoScraper:
-  #   handler: AutomationServices/DataCreditoScraper/scraper.start
-  #   name: AutomationServices-DataCreditoScraper-${opt:stage}
-  #   memorySize: 2048 # Recomended, in MB, default is 1024
-  #   timeout: 60 # Recomended, in seconds, default is 6
-  #   events:
-  #     - schedule:
-  #         name: "cw-start-datacredito-scraper"
-  #         description: "Function to scraper datacredito data"
-  #         rate: cron(0 0 15,30 * ? *) # Every Fifteen days, some entities take a time to report updates
-  #         enabled: false
-  #   layers:
-  #     - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
-  #   environment:
-  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-  #     SECRET_KEY: ${file(./config/${opt:stage}.json):SECRET_KEY}
-
   HideNoAcceptedPayments:
     handler: AutomationServices/AutoHidePayments/handler.start
     description: "Function to hide payments not accepted after 30 days"
@@ -519,8 +418,7 @@ functions:
     iamRoleStatements:
       - Effect: 'Allow'
         Action:
-          - 'sqs:SendMessage'
-          - 'sqs:SendMessageBatch'
+          - "*"
         Resource:
           Fn::GetAtt:
             - EmailUsersQueue
@@ -530,7 +428,9 @@ functions:
           enabled: true
           rate: rate(20 minutes)
     environment:
-      USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
+      USER_SCHEDULE_SQS_URL: 
+        Ref: EmailUsersQueue
+      
 
 # Resources
 resources:
@@ -538,63 +438,5 @@ resources:
     EmailUsersQueue:
       Type: "AWS::SQS::Queue"
       Properties:
-        QueueName: "email-users-checker"
+        QueueName: "email-users-checker-${opt:stage}"
         VisibilityTimeout: 300
-
-    EmailForwardingAceptationQueue:
-      Type: "AWS::SQS::Queue"
-      Properties:
-        QueueName: "email-forwarding-aceptation"
-        VisibilityTimeout: 300
-
-    GiveSESPermissionToInvokeProcessEmailLambdaFunction:
-      Type: AWS::Lambda::Permission
-      Properties:
-        FunctionName: { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
-        Principal: ses.amazonaws.com
-        Action: "lambda:InvokeFunction"
-        SourceAccount: { Ref: AWS::AccountId }
-
-    EmailsBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: finance-emails-${opt:stage}
-
-    EmailsBucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket: { Ref: EmailsBucket }
-        PolicyDocument:
-          Statement:
-            - Action:
-                - s3:PutObject
-              Effect: Allow
-              Resource:
-                Fn::Join:
-                  - ""
-                  - - { "Fn::GetAtt": ["EmailsBucket", "Arn"] }
-                    - "/*"
-              Principal:
-                Service: ses.amazonaws.com
-              Condition:
-                StringEquals:
-                  aws:Referer: { Ref: AWS::AccountId }
-
-    SesLambdaRule:
-      Type: AWS::SES::ReceiptRule
-      DependsOn:
-        - GiveSESPermissionToInvokeProcessEmailLambdaFunction
-        - EmailsBucketPolicy
-      Properties:
-        Rule:
-          Enabled: true
-          ScanEnabled: true
-          Name: finance-email-rule-${opt:stage}
-          Recipients: ${file(./config/${opt:stage}.json):EMAIL_RECIPIENTS}
-          Actions:
-            - LambdaAction:
-                FunctionArn:
-                  { "Fn::GetAtt": ["ProcessEmailsLambdaFunction", "Arn"] }
-            - S3Action:
-                BucketName: finance-emails-${opt:stage}
-        RuleSetName: default-rule-set
