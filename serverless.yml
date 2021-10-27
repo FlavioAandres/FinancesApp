@@ -429,7 +429,11 @@ functions:
           enabled: true
           rate: rate(20 minutes)
     environment:
-      USER_SCHEDULE_SQS_URL: ${self:custom.ArnSQSEmails.${opt:stage, self:provider.stage}}
+      USER_SCHEDULE_SQS_URL: 
+        Fn::GetAtt:
+          - EmailUsersQueue
+          - Arn
+      
 
 # Resources
 resources:
