@@ -68,8 +68,18 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
       }
     })
       .then(response => {
+        const newBudgetCategory = [...categoriesWithBudgets, {
+          value: category, 
+          label: category,
+          budget: {
+            value: budget, 
+            current: 0, 
+            progress: 0, 
+          }
+        }]
         setShowNewBudgetModal(false)
         setShowSpinningBudgetModal(false)
+        setCategoriesWithBudgets(newBudgetCategory)
       })
       .catch(err => console.error(err))
   }
@@ -149,7 +159,7 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
         </div>
       </div>
       <NewCategoryModal save={onSaveCategory} loading={showSpinningCategoryModal} show={showCategoryModal} close={onCloseCategoryModal} />
-      <NewBudgetModal save={onSaveBudget} loading={showSpinningBudgetModal} categories={user.categories} close={() => setShowNewBudgetModal(false)} show={showNewBudgetModal} />
+      <NewBudgetModal save={onSaveBudget} loading={showSpinningBudgetModal} categoryWithBudgets={categoriesWithBudgets} categories={user.categories} close={() => setShowNewBudgetModal(false)} show={showNewBudgetModal} />
       <NewBankModal onBankAdded={onBankAdded} close={() => setShowAddBankModal(false)} show={showAddBankModal} />
       <UpdateEmailCredentials close={() => setShowConfigEmailModal(false)} show={showConfigEmailModal} />
     </div>
