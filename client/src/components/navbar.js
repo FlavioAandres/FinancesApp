@@ -1,5 +1,5 @@
 import React from "react";
-import { Navbar, Nav, DropdownButton, DropdownItem } from "emerald-ui/lib";
+import { Navbar, Nav, DropdownButton, DropdownItem, Icon } from "emerald-ui/lib";
 
 const navbar = ({ updateNav }) => {
   return (
@@ -15,14 +15,14 @@ const navbar = ({ updateNav }) => {
         </a>
       </Navbar.Brand>
       <Nav>
-        <DropdownButton title="Sitios">
-          <DropdownItem onClick={(evt) => updateNav(evt, "datacredit")} eventKey="1">Data Credito</DropdownItem>
-          <DropdownItem onClick={(evt) => updateNav(evt, "prepayment")} eventKey="2">Pagos pre-procesados</DropdownItem>
-          <DropdownItem onClick={(evt) => updateNav(evt, "graph")} eventKey="3">Graficas</DropdownItem>
+        <DropdownButton title="Sites">
+          <DropdownItem onClick={(evt) => updateNav(evt, "prepayment")} eventKey="2">Pending Purchases</DropdownItem>
           <DropdownItem separator />
+          <DropdownItem onClick={null} eventKey="1">Budget Dashboard</DropdownItem>
+          <DropdownItem onClick={(evt) => updateNav(evt, "graph")} eventKey="3">Statistics Dashboard</DropdownItem>
         </DropdownButton>
         <a onClick={(evt) => updateNav(evt, "profile")} href="#">
-          Perfil
+          <Icon name="face" style={{ fontSize: '24px', marginRight: '10px'}}/>  Me
         </a>
       </Nav>
     </Navbar>
