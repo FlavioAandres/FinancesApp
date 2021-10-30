@@ -6,13 +6,14 @@ const ModalShowCategories = (props) => {
     const {
         data = []
     } = props
+    const total = data.reduce((prev, category)=>category.amount + prev, 0)
     return (
         <Modal
             onHide={props.close}
             show={props.show}
         >
             <Modal.Header closeButton={true}>
-                <Modal.Title> Category: <b> {props.category} </b></Modal.Title>
+                <Modal.Title> Category: <b> {props.category} </b>- total: {formatCash(total)}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {data.map(item => (
