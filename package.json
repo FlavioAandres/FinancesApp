@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "debug": "node --inspect node_modules/serverless/bin/serverless offline -s dev",
+    "debug": "node --inspect node_modules/serverless/bin/serverless offline -s test",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:bot": "nodemon AutomationServices/TelegramBot/dev.js"
   },

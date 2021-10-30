@@ -271,6 +271,29 @@ functions:
             arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
             claims:
               - sub
+  putBudgetCategory:
+    handler: API/Functions/Users.putBudgetCategory
+    name: UserRepo-Categories-budget-PUT-${opt:stage}
+    events:
+      - http:
+          path: /user/categories/budget/{categoryValue}
+          method: PUT
+          integration: lambda
+          cors:
+            - enabled: true
+            - origin: "*"
+            - headers: "Access-Control-Allow-Origin"
+          request: 
+            paths: 
+              categoryValue: true
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
 
   # Create the user on the MongoDB database
   PostConfirmationUser:
@@ -407,7 +430,7 @@ functions:
     name: AutomationServices-HideNoAcceptedPayments-${opt:stage}
     events:
       - schedule:
-          name: "cw-hide-payments-not-accepted"
+          # name: "cw-hide-payments-not-accepted"
           rate: rate(1 day)
           enabled: true
 

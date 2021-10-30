@@ -109,7 +109,8 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
     } = searchValues
 
     const {
-        currentBudgetValue
+        currentBudgetValue,
+        BudgetValue = undefined
     } = update
 
     const query = {
@@ -128,7 +129,8 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
             }
         }
     }
-    
+    if(!isConnected())
+        await connect(); 
     const user = await userModel.findOne(query, { 'categories.$': 1 }, {lean: true});
     
     if(!user || !user.categories || !user.categories.length){
@@ -137,13 +139,19 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
     }
 
     const category = user.categories[0]
-    if(category && category.budget && category.budget.current !== currentBudgetValue){
+    const maxBudgetValue = (BudgetValue >= 0) 
+        ? BudgetValue 
+        : category.budget.value
+    if(
+        category && category.budget && 
+        (category.budget.current !== currentBudgetValue || maxBudgetValue !== category.budget.value)
+    ){
         updateDoc.$set['categories.$'] = {
             ...category, 
             budget: {
                 current: currentBudgetValue, 
-                progress: (currentBudgetValue / category.budget.value) * 100,
-                value: category.budget.value, 
+                progress: (currentBudgetValue / (maxBudgetValue || 1)) * 100,
+                value: maxBudgetValue, 
             }
         }
         const result = await userModel.updateOne(query, updateDoc)
