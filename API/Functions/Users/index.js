@@ -84,6 +84,36 @@ module.exports.addNewCategory = async (event) => {
   }
 };
 
+module.exports.putBudgetCategory = async (event, context, callback)=>{
+  const {
+    cognitoPoolClaims
+  } = event
+  
+  const {
+    sub
+  } = cognitoPoolClaims
+  
+  const { body, path } = event;
+  const categoryValue = path.categoryValue
+  
+  try {
+    await UserRepo.updateBudgetFromVars({
+      sub, 
+      categoryValue
+    }, {
+      currentBudgetValue: 0,
+      BudgetValue: 0 
+    })
+  } catch (error) {
+    console.error(error)
+    return callback(error)
+  }
+
+  return {
+    statusCode: 201
+  } 
+}
+
 module.exports.addBudgetCategory = async (event) => {
   const { body } = event;
   const { category, budget } = body;

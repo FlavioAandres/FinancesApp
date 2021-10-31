@@ -27,9 +27,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "deploy": "npm run build && aws s3 sync build/ s3://finance.andresmorelos.dev --acl public-read",
+    "deploy:test": "npm run build && aws s3 sync build/ s3://finances.test.flavioaandres.com --acl public-read",
+    "deploy:prod": "npm run build && aws s3 sync build/ s3://finances.flavioaandres.com --acl public-read",
     "eject": "react-scripts eject",
-    "deploy:distribution": "aws cloudfront create-invalidation --paths \"/*\" --distribution-id"
+    "deploy:distribution:prod": "aws cloudfront create-invalidation --paths \"/*\" --distribution-id E1W2VAZ22NHMJS"
   },
   "eslintConfig": {
     "extends": "react-app"

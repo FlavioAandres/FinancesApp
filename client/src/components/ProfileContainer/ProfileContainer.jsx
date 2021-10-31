@@ -7,6 +7,7 @@ import NewBankModal from './AddNewBankModal'
 import NewBudgetModal from './NewBudgetModal'
 import { API } from 'aws-amplify'
 import formatCash from "../../utils/formatCash";
+import swal from "sweetalert2"
 
 
 const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { categories: [] } }) => {
@@ -23,9 +24,7 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
   }
 
   const onCreateCategoryClick = () => setShowCategoryModal(true)
-
   const onCloseCategoryModal = (evt) => setShowCategoryModal(false)
-
   const onSaveCategory = (category) => {
     setShowSpinningCategoryModal(true)
     API.post('finances', '/user/categories', {
@@ -38,6 +37,26 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
       saveCategory(category)
     }).catch(err => console.error(err))
   }
+  const handleRemoveBudgetButton = (category) =>{
+    swal.fire({
+      title: `Are you sure of removing ${category.label} budget?`, 
+      text: "The history of this budget will keep in yout Budget Dashboard, but the budge wont be longer calculated.",
+      icon: "warning", 
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Remove budget',
+      denyButtonText: `Cancel`,
+    }).then((result)=>{
+      if(!result.isConfirmed) return null; 
+      API.put('finances', `/user/categories/budget/${category.value}`, { body: {} })
+      .then(item=>{
+        setCategoriesWithBudgets(
+          categoriesWithBudgets.filter(cat=>cat.value !== category.value)
+        )
+      })
+      .catch(console.error)
+    })
+  }
 
   const onSaveBudget = ({ category, budget }) => {
     setShowSpinningBudgetModal(true)
@@ -49,8 +68,18 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
       }
     })
       .then(response => {
+        const newBudgetCategory = [...categoriesWithBudgets, {
+          value: category, 
+          label: category,
+          budget: {
+            value: budget, 
+            current: 0, 
+            progress: 0, 
+          }
+        }]
         setShowNewBudgetModal(false)
         setShowSpinningBudgetModal(false)
+        setCategoriesWithBudgets(newBudgetCategory)
       })
       .catch(err => console.error(err))
   }
@@ -95,14 +124,21 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
             categories,
             every new payment is processed,
             we'll let you know if you've exceded
-            your budget to the category. Use wisely. <b>We will use the entire month to calculate the budget status, since day 1 to 31 of the month. </b>
+            your budget to the category. Use wisely. 
+            <b>We will use the entire month to calculate the budget status, 
+            since day 1 to 31 of the month. </b>
             <Label onClick={() => setShowNewBudgetModal(true)} className="add-new-budget" color="warning">
               <span role="img" aria-label="add budget">➕</span> Create Budget
             </Label>
           </p>
           <br />
           {categoriesWithBudgets && categoriesWithBudgets.map((category) => (
-            <Label color="default" className="budget-label">{category.label} - {formatCash(category.budget.value)}</Label>
+            <div className="budget-labels-container">
+              <Label color="default" className="budget-label">{category.label} - {formatCash(category.budget.value)}</Label>
+              <Button shape="flat" className="delete-budget" onClick={()=>handleRemoveBudgetButton(category)} >
+                <Icon  name="remove_circle" className="text-danger"/>
+              </Button>
+            </div>
           ))}
         </div>
       </div>
@@ -123,7 +159,7 @@ const ProfileContainer = ({ getUserInformation, saveCategory, banks, user = { ca
         </div>
       </div>
       <NewCategoryModal save={onSaveCategory} loading={showSpinningCategoryModal} show={showCategoryModal} close={onCloseCategoryModal} />
-      <NewBudgetModal save={onSaveBudget} loading={showSpinningBudgetModal} categories={user.categories} close={() => setShowNewBudgetModal(false)} show={showNewBudgetModal} />
+      <NewBudgetModal save={onSaveBudget} loading={showSpinningBudgetModal} categoryWithBudgets={categoriesWithBudgets} categories={user.categories} close={() => setShowNewBudgetModal(false)} show={showNewBudgetModal} />
       <NewBankModal onBankAdded={onBankAdded} close={() => setShowAddBankModal(false)} show={showAddBankModal} />
       <UpdateEmailCredentials close={() => setShowConfigEmailModal(false)} show={showConfigEmailModal} />
     </div>

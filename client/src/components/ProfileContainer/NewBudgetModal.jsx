@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 // import { DevTool } from "@hookform/devtools";
 import { Modal, Button, SingleSelect, TextField } from "emerald-ui/lib/";
 
-const NewBudgetModal = ({ categories = [], close, show, loading, save }) => {
+const NewBudgetModal = ({ categories = [], close, show, loading, save, categoryWithBudgets = [] }) => {
   const { handleSubmit, formState: { errors }, control, reset } = useForm();
 
   const onCreateBudget = ({ category, budget }) => {
@@ -18,7 +18,9 @@ const NewBudgetModal = ({ categories = [], close, show, loading, save }) => {
     reset();
 
   }
-
+  const categoriesToRender = categories 
+    ? categories.filter(cat=>!categoryWithBudgets.find(catBudget => catBudget.value === cat.value))
+    : []
 
   return (
     <Modal onHide={close} show={show}>
@@ -40,7 +42,7 @@ const NewBudgetModal = ({ categories = [], close, show, loading, save }) => {
                 onSelect={field.onChange}
                 value={field.value}
               >
-                {categories && categories.map((category) => (
+                {categoriesToRender && categoriesToRender.map((category) => (
                   <option
                     value={category.value}
                     key={`category-${category.label}`}

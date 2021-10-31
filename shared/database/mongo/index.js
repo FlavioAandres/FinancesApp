@@ -44,7 +44,7 @@ const destroy = () => {
 };
 
 const isConnected = () => {
-  return mongoose.isConnected();
+  return mongoose.connection.readyState;
 };
 
 module.exports = {
