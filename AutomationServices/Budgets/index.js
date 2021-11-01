@@ -44,7 +44,7 @@ module.exports.clean = async (event, _, callback) => {
                 user: user._id, 
                 sub: user.sub,
                 categories: categoriesParsed,
-                type: constants.ARCHIVE_TYPES.CATEGORY_BUDGETS_HISTORY, 
+                archiveType: constants.ARCHIVE_TYPES.CATEGORY_BUDGETS_HISTORY, 
                 ...dates
             })
     })
