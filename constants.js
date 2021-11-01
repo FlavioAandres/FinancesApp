@@ -1,0 +1,5 @@
+module.exports = {
+    ARCHIVE_TYPES: {
+        BUDGET_MONTHLY_ARCHIVED: 'CATEGORY_BUDGETS_HISTORY'
+    }
+}
