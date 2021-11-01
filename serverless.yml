@@ -434,6 +434,14 @@ functions:
           rate: rate(1 day)
           enabled: true
 
+  BudgetMonthlyCleaner:
+    handler: AutomationServices/Budgets.clean
+    name: AutomationServices-BudgetsCleaner-${opt:stage}
+    events:
+      - schedule:
+          enabled: true
+          rate: cron(0 0 1 * ? *)
+
   ScheduleUsersToCheckEmails:
     handler: AutomationServices/AutoMailChecker/schedule.start
     name: AutomationServices-ScheduleUsers-${opt:stage}
