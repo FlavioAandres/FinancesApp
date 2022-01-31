@@ -94,7 +94,9 @@ const start = async (event, context) => {
 
                         const res = utils.search(message.html, filter.phrase, filter.parser, bank.ignore_phrase, bank.name)
                         if (!res) continue;
-
+                        if(res.TRANSACTION_VALUE > 5_000_000){
+                            console.info(message.html)
+                        }
                         const prePaymentObj = {
                             bank: bank.name,
                             source: res.TRANSACTION_SOURCE,
