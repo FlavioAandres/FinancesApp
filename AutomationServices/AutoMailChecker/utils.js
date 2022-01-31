@@ -47,22 +47,23 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
     if ([null, undefined].includes(parser)) return undefined; //If we don't have a parser, just return null to continue with the next message
     const $ = cheerio.load(html)
     const res = $('p')
-    // console.log(res)
     const value = res.text().trim().toLowerCase().replace(/=/g, '')
+    html = html.trim().toLowerCase(); 
     filter = filter.toLocaleLowerCase()
-    if (value.includes(filter)) {
+    if (html.includes(filter)) {
+        console.log('found')
         if (skipped_phrase === null || skipped_phrase === undefined || !value.includes(skipped_phrase.toLocaleLowerCase())) { // If the phrase do not includes the skipped phrase
             let description, parserResult;
 
             // The fisrt coincidence for the filter phrase
-            const first = value.indexOf(filter)
-
+            const first = html.indexOf(filter)
+            console.log(first)
 
             switch (bank_name) {
                 case "BANCOLOMBIA": {
-                    const end = value.indexOf('00931987', first + 1) + 12
+                    const end = html.indexOf('00931987', first + 1) + 12
                     
-                    description = value.substring(first, end)
+                    description = html.substring(first, end)
                     switch (parser) {
                         case 'payments': {
                             parserResult = paymentsBancolombiaParser(description)

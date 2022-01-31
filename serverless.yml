@@ -51,9 +51,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -462,6 +462,21 @@ functions:
       USER_SCHEDULE_SQS_URL: 
         Ref: EmailUsersQueue
       
+  IncomingEmailWebhook:
+    handler: API/Functions/Webhook/incoming.run
+    name: Webhook-incoming-POST-${opt:stage}
+    events:
+      - http:
+          path: /webhook/incoming
+          method: POST
+          integration: lambda
+          cors:
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
 
 # Resources
 resources:
