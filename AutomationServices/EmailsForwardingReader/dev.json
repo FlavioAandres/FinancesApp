@@ -1,0 +1,97 @@
+{
+  "Records": [{"body": {
+    "email": "flavioaandres24@gmail.com",
+    "type": "USER_PAYMENT_EVENT",
+    "user": {
+      "settings": {
+        "datacredito": {
+          "user": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "cb89fa5ae8c22a30de11"
+          },
+          "password": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "bbcaa70bb4957d3ada106d"
+          },
+          "secondpass": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "97d7b803a38f7d7a"
+          }
+        },
+        "email": {
+          "user": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "0479fbf5604e41eb1994588206fe286358b68a4bc390c3763c"
+          },
+          "key": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "1473fbfb704f4efb129450841aa9664b"
+          },
+          "checkedEvent": true
+        },
+        "bots": {
+          "chats": [
+            {
+              "_id": "60d15c84ffbcb57e75153df7",
+              "type": "TELEGRAM",
+              "id": 1895902206
+            }
+          ]
+        }
+      },
+      "verified": false,
+      "phones": ["+573022939843", "+573007292403"],
+      "emails": ["flavioaandres24@gmail.com"],
+      "_id": "5fd625470e1f299d3a6c73ad",
+      "name": "Flavio Andres",
+      "sub": "fde85008-207e-4b34-8abf-c63c325ffbb5",
+      "email": "flavioaandres24@gmail.com",
+      "secretKey": {
+        "iv": "f961077474ebc52f27226f3f750a585f",
+        "content": "2c282e804a32b15d1f1472"
+      },
+      "updatedAt": "2022-02-05T17:16:30.295Z"
+    },
+    "data": {
+      "bank": {
+        "ignore_phrase": "Bancolombia le informa que su factura inscrita",
+        "_id": "5fd625d50e1f299d3a6c9521",
+        "filters": [
+          {
+            "phrase": "Bancolombia te informa recepción transferencia",
+            "type": "INCOME",
+            "parser": "transferReception"
+          },
+          {
+            "phrase": "Bancolombia le informa Compra",
+            "type": "EXPENSE",
+            "parser": "shopping"
+          },
+          {
+            "phrase": "Bancolombia le informa Retiro",
+            "type": "EXPENSE",
+            "parser": "debitWithdrawal"
+          },
+          {
+            "phrase": "Bancolombia le informa Transferencia",
+            "type": "EXPENSE",
+            "parser": "transfer"
+          },
+          {
+            "phrase": "Bancolombia le informa Pago",
+            "type": "EXPENSE",
+            "parser": "payments"
+          }
+        ],
+        "name": "BANCOLOMBIA",
+        "subject": "Servicio de Alertas y Notificaciones Bancolombia",
+        "folder": "INBOX",
+        "createdAt": "2020-11-26T19:32:15.925Z",
+        "updatedAt": "2020-11-26T19:32:15.925Z",
+        "__v": 0,
+        "index_value": 0
+      },
+      "text": "Bancolombia le informa Compra por $72.900,00 en MERCADOPAGO COLOMBIA 17:39.20/05/2021 \nT.Cred *8232. Inquietudes al 0345109095/018000931987."
+    }
+  }}]
+}

@@ -385,6 +385,20 @@ functions:
 
   #AUTOMATIONS
 
+
+  ProcessEmailsFromUsers:
+    handler: AutomationServices/EmailsForwardingReader/index.process
+    name: ProcessEmailsFromUsers-${opt:stage}
+    timeout: 120
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - PostReceiveEmailMessage
+              - Arn
+          batchSize: 1
+          filterPatterns: 
+            - ReceiveEmailType: ["USER_PAYMENT_EVENT"]
   EmailForwardingAcceptation:
     handler: AutomationServices/EmailFowardingAccept/scraper.start
     name: EmailForwardingAcceptation-${opt:stage}
@@ -399,6 +413,8 @@ functions:
               - PostReceiveEmailMessage
               - Arn
           batchSize: 1
+          filterPatterns: 
+            - ReceiveEmailType: ["EMAIL_ACCEPT_INVITATION"]
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
     name: AutomationServices-EmailChecker-${opt:stage}
