@@ -34,11 +34,6 @@ provider:
     MONGO_SET: ${file(./config/${opt:stage}.json):MONGO_SET}
     MONGO_USER: ${file(./config/${opt:stage}.json):MONGO_USER}
     MONGO_SSL: true
-  iamRoleStatements:
-    - Effect: Allow
-      Action: ses:SendRawEmail
-      Resource:
-        - "*"
 
 functions:
 
@@ -399,7 +394,10 @@ functions:
       - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
     events:
       - sqs:
-          arn: ${self:custom.PostReceiveEmailMessage}
+          arn:
+            Fn::GetAtt:
+              - PostReceiveEmailMessage
+              - Arn
           batchSize: 1
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
@@ -490,7 +488,7 @@ functions:
             headers:
               Access-Control-Allow-Origin: "'*'"
     environment:
-      POST_INCOMING_WEBHOOK_QUEUE: ${self:custom.PostReceiveEmailMessage}
+      POST_INCOMING_WEBHOOK_QUEUE: ${self:custom.PostReceiveEmailMessage.${opt:stage}}
 # Resources
 resources:
   Resources:
