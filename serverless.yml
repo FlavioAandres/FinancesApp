@@ -475,6 +475,15 @@ functions:
   IncomingEmailWebhook:
     handler: API/Functions/Webhook/incoming.run
     name: Webhook-incoming-POST-${opt:stage}
+    iamRoleStatementsName: write-sqs-postemail-${opt:stage}-role
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - "*"
+        Resource:
+          Fn::GetAtt:
+            - PostReceiveEmailMessage
+            - Arn
     events:
       - http:
           path: /webhook/incoming

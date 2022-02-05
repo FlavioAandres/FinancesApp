@@ -87,7 +87,7 @@ module.exports.run = async (event)=>{
         
 
         
-        await scheduleMessages([{MessageBody: JSON.stringify(queueEvent), Id: Date.now() }], process.env.POST_INCOMING_WEBHOOK_QUEUE); 
+        await scheduleMessages([{MessageBody: JSON.stringify(queueEvent), Id: Date.now().toString() }], process.env.POST_INCOMING_WEBHOOK_QUEUE); 
         
     } catch (error) {
         console.error(error)
