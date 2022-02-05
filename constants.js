@@ -9,7 +9,8 @@ module.exports = {
         values: {
             gmail: {
                 text: "Código de confirmación:", 
-                url: "https://mail.google.com/mail/vf" 
+                url: "https://mail.google.com/mail/vf" , 
+                domain: '@gmail.com'
             }
         }
     }

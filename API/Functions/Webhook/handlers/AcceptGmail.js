@@ -1,23 +1,20 @@
 const { ConfirmationEmailValues } = require("../../../../constants")
 const axios = require('axios')
 
+function extractEmails ( text ){
+    return text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi)[0];
+}
 
-module.exports = async (text)=>{
-    const {url} = ConfirmationEmailValues.values.gmail; 
+module.exports =  (text)=>{
+    const { url, domain } = ConfirmationEmailValues.values.gmail; 
     const textArray = text.split("\n"); 
-    const urlToAccept = textArray.find(item=> item === url)
+    const urlToAccept = textArray.find(item=> item.indexOf(url) >= 0)
+    let ownerEmail = textArray.find(item => item.indexOf(domain) > 0)
+    ownerEmail = extractEmails(ownerEmail)
     if(!urlToAccept){
-        console.error({type: "unable to accept invitation", "type": "gmail", text})
+        console.error({type: "unable to accept invitation", "host": "gmail", text})
+        return null; 
     }
 
-    try {
-        await axios.get(urlToAccept); 
-    } catch (error) {
-        console.error({
-            error: error.message, 
-            data: error.data, 
-            config: error.config,  
-        })
-    }
-
+    return {urlToAccept, ownerEmail}; 
 }

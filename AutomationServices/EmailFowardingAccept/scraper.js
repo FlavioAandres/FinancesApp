@@ -4,9 +4,9 @@ const { acceptInvitation } = require('./utils/acceptInvitation')
 
 const start = async (event, context) => {
     try {
-        const [{ destination, url }] = event.Records.map(sqsMessage => {
+        const [{ user, data }] = event.Records.map(sqsMessage => {
             try {
-                return JSON.parse(sqsMessage.body);
+                return sqsMessage.body; //JSON.parse(sqsMessage.body);
             } catch (e) {
                 console.error(e);
             }
@@ -14,12 +14,12 @@ const start = async (event, context) => {
 
         console.info('Starting Function')
 
-        console.info('Accepting Invitation', url)
+        console.info('Accepting Invitation', data.email)
 
-        const result = await acceptInvitation(url)
+        const result = await acceptInvitation(data.url)
 
         if (result === 'accepted') {
-            console.info(`Invitation Acepted for ${destination}`)
+            console.info(`Invitation Acepted for ${data.email}`)
         } else {
             console.error(result)
         }

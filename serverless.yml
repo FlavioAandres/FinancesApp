@@ -11,12 +11,12 @@ package:
     - devutils/**
 
 custom:
-  ArnSQSForwardingConfirmation:
+  PostReceiveEmailMessage:
     dev: ${file(./config/dev.json):EMAIL_FORWARDING_CONFIRMATION_SQS}
     test:
-      Ref: EmailForwardingAceptationQueue
+      Ref: PostReceiveEmailMessage
     prod:
-      Ref: EmailForwardingAceptationQueue
+      Ref: PostReceiveEmailMessage
 
 provider:
   name: aws
@@ -389,6 +389,18 @@ functions:
       BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
 
   #AUTOMATIONS
+
+  EmailForwardingAcceptation:
+    handler: AutomationServices/EmailFowardingAccept/scraper.start
+    name: EmailForwardingAcceptation-${opt:stage}
+    timeout: 120
+    memorySize: 2048
+    layers:
+      - arn:aws:lambda:${self:provider.region}:764866452798:layer:chrome-aws-lambda:22
+    events:
+      - sqs:
+          arn: ${self:custom.PostReceiveEmailMessage}
+          batchSize: 1
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
     name: AutomationServices-EmailChecker-${opt:stage}
@@ -477,7 +489,8 @@ functions:
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
-
+    environment:
+      POST_INCOMING_WEBHOOK_QUEUE: ${self:custom.PostReceiveEmailMessage}
 # Resources
 resources:
   Resources:
@@ -485,4 +498,9 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "email-users-checker-${opt:stage}"
+        VisibilityTimeout: 300
+    PostReceiveEmailMessage:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "post-receive-email-${opt:stage}"
         VisibilityTimeout: 300

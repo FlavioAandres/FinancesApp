@@ -2,17 +2,17 @@ const chromium = require('chrome-aws-lambda');
 const puppeteer = require("puppeteer-core")
 
 const acceptInvitation = async (url) => {
-
     return new Promise(async (resolve, reject) => {
+        let browser; 
         try {
-            const browser = await chromium.puppeteer.launch({
+            browser = await chromium.puppeteer.launch({
                 executablePath: await chromium.executablePath,
                 args: [...chromium.args, '--enable-features=NetworkService'],
                 defaultViewport: chromium.defaultViewport,
                 headless: chromium.headless,
             });
 
-            const page = await browser.newPage();
+            const [page] = await browser.pages();
 
             await page.goto(url, {
                 waitUntil: ["networkidle0", "load", "domcontentloaded"]
@@ -28,6 +28,9 @@ const acceptInvitation = async (url) => {
 
             resolve('accepted')
         } catch (error) {
+            if(browser){
+                await browser.close(); 
+            }
             reject(error)
         }
     });
