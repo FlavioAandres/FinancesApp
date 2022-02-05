@@ -1,0 +1,230 @@
+{
+  "queueEvent": {
+    "email": "flavioaandres24@gmail.com",
+    "type": "USER_PAYMENT_EVENT",
+    "user": {
+      "settings": {
+        "datacredito": {
+          "user": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "cb89fa5ae8c22a30de11"
+          },
+          "password": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "bbcaa70bb4957d3ada106d"
+          },
+          "secondpass": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "97d7b803a38f7d7a"
+          }
+        },
+        "email": {
+          "user": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "0479fbf5604e41eb1994588206fe286358b68a4bc390c3763c"
+          },
+          "key": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "1473fbfb704f4efb129450841aa9664b"
+          },
+          "checkedEvent": true
+        },
+        "bots": {
+          "chats": [
+            {
+              "_id": "60d15c84ffbcb57e75153df7",
+              "type": "TELEGRAM",
+              "id": 1895902206
+            }
+          ]
+        }
+      },
+      "verified": false,
+      "phones": ["+573022939843", "+573007292403"],
+      "emails": ["flavioaandres24@gmail.com"],
+      "_id": "5fd625470e1f299d3a6c73ad",
+      "name": "Flavio Andres",
+      "sub": "fde85008-207e-4b34-8abf-c63c325ffbb5",
+      "email": "flavioaandres24@gmail.com",
+      "secretKey": {
+        "iv": "f961077474ebc52f27226f3f750a585f",
+        "content": "2c282e804a32b15d1f1472"
+      },
+      "updatedAt": "2022-02-05T17:16:30.295Z",
+      "categories": [
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617da93131c8da2929974487",
+          "value": "apartment",
+          "label": "Rent Apartment",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 120000, "current": 0, "progress": 0 },
+          "_id": "617dab7a31c8da2929974488",
+          "value": "food",
+          "label": "Comida",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 350000, "current": 0, "progress": 0 },
+          "_id": "617cdd44fbe5929ccbf4e498",
+          "value": "education",
+          "label": "Educación",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617dabc131c8da292997448d",
+          "value": "services",
+          "label": "Servicios publicos",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617ce77f1bf554000887de85",
+          "value": "health",
+          "label": "Salud",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617dabe831c8da292997448f",
+          "value": "lunch",
+          "label": "Almuerzo",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617dab7d31c8da292997448a",
+          "value": "weed",
+          "label": "Weed",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617dab7f31c8da292997448b",
+          "value": "technology",
+          "label": "Tech",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "value": "ingresos",
+          "label": "Ingresos",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "value": "deliveries",
+          "label": "Domicilios",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 12000, "current": 0, "progress": 0 },
+          "_id": "5ffc77dc9fce0e0008b0af48",
+          "label": "Dulces",
+          "value": "candy",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "6017f5305e806500088690ba",
+          "label": "Music",
+          "value": "music",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "6056e7dc257b020008191407",
+          "label": "Ropa",
+          "value": "clothes",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "6075c0b47a71c00008be5399",
+          "label": "Mascotas",
+          "value": "pets",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "60a7cdced20a5000097ba5b0",
+          "label": "Suscripciones",
+          "value": "subscriptions",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "60c4241e4597ab00092b6199",
+          "label": "Vacaciones",
+          "value": "vacations",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "60de12741e4c7100082161bf",
+          "label": "Préstamo ",
+          "value": "préstamo",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 0, "current": 0, "progress": 0 },
+          "_id": "617ce278fe92c1a041af1628",
+          "label": "Nueva1",
+          "value": "new1",
+          "type": "EXPENSE"
+        },
+        {
+          "budget": { "value": 150000, "current": 0, "progress": 0 },
+          "_id": "61803bc6aa4b110008ea44a4",
+          "label": "fastfood",
+          "value": "fastfood",
+          "type": "EXPENSE"
+        }
+      ]
+    },
+    "data": {
+      "bank": {
+        "ignore_phrase": "Bancolombia le informa que su factura inscrita",
+        "_id": "5fd625d50e1f299d3a6c9521",
+        "filters": [
+          {
+            "phrase": "Bancolombia te informa recepción transferencia",
+            "type": "INCOME",
+            "parser": "transferReception"
+          },
+          {
+            "phrase": "Bancolombia le informa Compra",
+            "type": "EXPENSE",
+            "parser": "shopping"
+          },
+          {
+            "phrase": "Bancolombia le informa Retiro",
+            "type": "EXPENSE",
+            "parser": "debitWithdrawal"
+          },
+          {
+            "phrase": "Bancolombia le informa Transferencia",
+            "type": "EXPENSE",
+            "parser": "transfer"
+          },
+          {
+            "phrase": "Bancolombia le informa Pago",
+            "type": "EXPENSE",
+            "parser": "payments"
+          }
+        ],
+        "name": "BANCOLOMBIA",
+        "subject": "Servicio de Alertas y Notificaciones Bancolombia",
+        "folder": "INBOX",
+        "createdAt": "2020-11-26T19:32:15.925Z",
+        "updatedAt": "2020-11-26T19:32:15.925Z",
+        "__v": 0,
+        "index_value": 0
+      },
+      "text": "Bancolombia le informa Compra por $72.900,00 en MERCADOPAGO COLOMBIA 17:39.20/05/2021 T.Cred *8232. Inquietudes al 0345109095/018000931987."
+    }
+  }
+}
