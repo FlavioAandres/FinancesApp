@@ -113,9 +113,10 @@ module.exports.run = async (event) => {
     }
 
     console.log(JSON.stringify({ queueEvent }));
+    const queueUrl = hostToAccept ? process.env.EMAIL_FORWARDING_ACCEPT_SQS : process.env.POST_INCOMING_WEBHOOK_QUEUE
     await scheduleMessages(
       [{ MessageBody: JSON.stringify(queueEvent), Id: Date.now().toString() }],
-      process.env.POST_INCOMING_WEBHOOK_QUEUE
+      queueUrl
     );
   } catch (error) {
     console.error(error);

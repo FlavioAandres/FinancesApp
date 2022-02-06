@@ -13,9 +13,10 @@ module.exports.process = async (event, context, callback) => {
   try {
     const [{ user, data, email }] = event.Records.map((sqsMessage) => {
       try {
-        return sqsMessage.body; //JSON.parse(sqsMessage.body);
+        return JSON.parse(sqsMessage.body);
       } catch (e) {
         console.error(e);
+        return {}
       }
     });
     const emailData = {
@@ -67,7 +68,7 @@ const processBankEmails = async (bank, user, emailData, timestamp) => {
         description: res.DESCRIPTION,
         isAccepted: res.TRANSACTION_TYPE === "withdrawal" ? true : false,
       };
-
+      console.log({prePaymentObj})
       await createMultiplesPayments([prePaymentObj]);
       break;
     }

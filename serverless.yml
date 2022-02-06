@@ -17,6 +17,12 @@ custom:
       Ref: PostReceiveEmailMessage
     prod:
       Ref: PostReceiveEmailMessage
+  AcceptationEmailQueue:
+    dev: ${file(./config/dev.json):EMAIL_FORWARDING_ACCEPT_SQS}
+    test:
+      Ref: AcceptationEmailQueue
+    prod:
+      Ref: AcceptationEmailQueue
 
 provider:
   name: aws
@@ -397,8 +403,6 @@ functions:
               - PostReceiveEmailMessage
               - Arn
           batchSize: 1
-          filterPatterns: 
-            - ReceiveEmailType: ["USER_PAYMENT_EVENT"]
   EmailForwardingAcceptation:
     handler: AutomationServices/EmailFowardingAccept/scraper.start
     name: EmailForwardingAcceptation-${opt:stage}
@@ -410,11 +414,10 @@ functions:
       - sqs:
           arn:
             Fn::GetAtt:
-              - PostReceiveEmailMessage
+              - AcceptationEmailQueue
               - Arn
           batchSize: 1
-          filterPatterns: 
-            - ReceiveEmailType: ["EMAIL_ACCEPT_INVITATION"]
+
   EmailChecker:
     handler: AutomationServices/AutoMailChecker/checker.start
     name: AutomationServices-EmailChecker-${opt:stage}
@@ -482,7 +485,7 @@ functions:
             - Arn
     events:
       - schedule:
-          enabled: true
+          enabled: false
           rate: rate(20 minutes)
     environment:
       USER_SCHEDULE_SQS_URL: 
@@ -500,6 +503,13 @@ functions:
           Fn::GetAtt:
             - PostReceiveEmailMessage
             - Arn
+      - Effect: 'Allow'
+        Action:
+          - "*"
+        Resource:
+          Fn::GetAtt:
+            - AcceptationEmailQueue
+            - Arn
     events:
       - http:
           path: /webhook/incoming
@@ -514,6 +524,7 @@ functions:
               Access-Control-Allow-Origin: "'*'"
     environment:
       POST_INCOMING_WEBHOOK_QUEUE: ${self:custom.PostReceiveEmailMessage.${opt:stage}}
+      EMAIL_FORWARDING_ACCEPT_SQS: ${self:custom.AcceptationEmailQueue.${opt:stage}}
 # Resources
 resources:
   Resources:
@@ -526,4 +537,9 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "post-receive-email-${opt:stage}"
+        VisibilityTimeout: 300
+    AcceptationEmailQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "post-acceptation-email-${opt:stage}"
         VisibilityTimeout: 300
