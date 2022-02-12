@@ -15,6 +15,35 @@ const {
     MINUTES_AGO_SEARCH = '42300'
 } = process.env
 
+const searchMultipleEmail = async(connection, data = { })=>{
+    const results = []
+    const subjects = data.allSubjects
+    
+    for (const subject of subjects) {
+        const searchValues = [];
+        if (!data.checkAllDates) 
+            searchValues.push('UNSEEN');
+    
+        searchValues.push(
+            ['SINCE', data.date],
+            ['SUBJECT', subject]
+        );
+        try {
+            const response = await connection.search(searchValues, {
+                bodies: ['HEADER', 'TEXT'],
+                markSeen: true
+            })
+            results.push(response)
+        } catch (error) {
+            console.error(error)
+            console.error(subject, data)
+        }
+    }
+
+
+    return results
+}
+
 const start = async (event, context) => {
     // // if(process.env.NODE_ENV === 'dev')
     // //     event = { 
@@ -68,21 +97,22 @@ const start = async (event, context) => {
                 user: data.userId
             })
             const GranularData = []
-
-            const searchValues = [];
-
-            if (!data.checkAllDates) searchValues.push('UNSEEN');
-            searchValues.push(
-                ['SINCE', date],
-                ['SUBJECT', bank.subject]
-                );
-            const results = await connection.search(searchValues, {
-                bodies: ['HEADER', 'TEXT'],
-                markSeen: true
-            })
-
+            if(!bank.subjects){
+                console.error({type: "NO_SUBJECTS_FOUND", bank})
+            }
+            const allSubjects = bank.subjects.map(subject=>subject)
+            const searchConfig = {
+                checkAllDates: data.checkAllDates,
+                allSubjects, 
+                date
+            }
+            
+            const results = await searchMultipleEmail(connection, searchConfig)
+        
             // Close Box
             connection.closeBox()
+
+
             if (results.length) {
                 const messages = await utils.readRawEmail(results)
                 console.log('==== START ' + bank.name + ' with ' + messages.length + ' Messages');

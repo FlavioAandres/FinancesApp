@@ -51,9 +51,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -72,9 +72,9 @@ functions:
           method: PUT
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -93,9 +93,9 @@ functions:
           method: POST
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -114,9 +114,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -135,9 +135,9 @@ functions:
           method: PUT
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -156,9 +156,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -177,9 +177,9 @@ functions:
           method: patch
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -197,9 +197,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -218,9 +218,9 @@ functions:
           method: POST
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -239,9 +239,9 @@ functions:
           method: POST
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -260,9 +260,9 @@ functions:
           method: POST
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -280,9 +280,9 @@ functions:
           method: PUT
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           request: 
             paths: 
               categoryValue: true
@@ -311,9 +311,9 @@ functions:
           method: GET
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -332,9 +332,9 @@ functions:
           method: POST
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -353,9 +353,9 @@ functions:
           method: PUT
           integration: lambda
           cors:
-            - enabled: true
-            - origin: "*"
-            - headers: "Access-Control-Allow-Origin"
+            enabled: true
+            origin: "*"
+            headers: "Access-Control-Allow-Origin"
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
