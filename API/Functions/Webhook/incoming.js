@@ -46,8 +46,15 @@ module.exports.run = async (event) => {
     return { statusCode: 400 };
   }
   const { text, headers, raw_email } = messageInfo;
+  if(!text){
+    console.warn({
+      type: "NO_TEXT_FOUND", 
+      messageInfo
+    })
+  }
   if (process.env.DEBUG) {
     console.info({
+      debug: process.env.DEBUG,
       text,
       headers,
       raw_email,
@@ -113,7 +120,9 @@ module.exports.run = async (event) => {
     }
 
     console.log(JSON.stringify({ queueEvent }));
-    const queueUrl = hostToAccept ? process.env.EMAIL_FORWARDING_ACCEPT_SQS : process.env.POST_INCOMING_WEBHOOK_QUEUE
+    const queueUrl = hostToAccept 
+      ? process.env.EMAIL_FORWARDING_ACCEPT_SQS 
+      : process.env.POST_INCOMING_WEBHOOK_QUEUE; 
     await scheduleMessages(
       [{ MessageBody: JSON.stringify(queueEvent), Id: Date.now().toString() }],
       queueUrl
