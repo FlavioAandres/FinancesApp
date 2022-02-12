@@ -1,7 +1,7 @@
 import React from "react";
 import { ExpansionPanelGroup, Avatar } from "emerald-ui/lib/";
 
-export default ({ name, subject, filters}) => {
+export default ({ name, subjects, filters}) => {
   return (
     <ExpansionPanelGroup id="g1">
       <ExpansionPanelGroup.Panel>
@@ -17,7 +17,7 @@ export default ({ name, subject, filters}) => {
               <h3 style={{ marginTop: 0, marginBottom: "3px" }}>
                 <strong>{name}</strong>
               </h3>
-              <p style={{ margin: 0 }}>{subject}</p>
+              <p style={{ margin: 0 }}><b>Subjects:</b> {subjects.join(', ')}</p>
             </div>
           </div>
         </ExpansionPanelGroup.Panel.Summary>
