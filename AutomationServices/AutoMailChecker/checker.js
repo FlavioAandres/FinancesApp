@@ -103,6 +103,7 @@ const start = async (event, context) => {
             const GranularData = []
             if(!bank.subjects){
                 console.error({type: "NO_SUBJECTS_FOUND", bank})
+                return ;
             }
             const allSubjects = bank.subjects.map(subject=>subject)
             const searchConfig = {
@@ -112,7 +113,6 @@ const start = async (event, context) => {
             }
             
             const results = await searchMultipleEmail(connection, searchConfig)
-            console.log(results)
             // Close Box
             connection.closeBox()
 
