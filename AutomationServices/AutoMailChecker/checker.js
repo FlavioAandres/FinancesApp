@@ -21,8 +21,9 @@ const searchMultipleEmail = async(connection, data = { })=>{
     
     for (const subject of subjects) {
         const searchValues = [];
-        if (!data.checkAllDates) 
+        if (!data.checkAllDates){
             searchValues.push('UNSEEN');
+        }
     
         searchValues.push(
             ['SINCE', data.date],
@@ -33,7 +34,9 @@ const searchMultipleEmail = async(connection, data = { })=>{
                 bodies: ['HEADER', 'TEXT'],
                 markSeen: true
             })
-            results.push(response)
+            if(response.length){
+                results.push(...response)
+            }
         } catch (error) {
             console.error(error)
             console.error(subject, data)
@@ -48,7 +51,8 @@ const start = async (event, context) => {
     // // if(process.env.NODE_ENV === 'dev')
     // //     event = { 
     // //     }
-    // event.Records = [{ body: JSON.stringify({"createdAt":"2021-05-20T00:59:08.811Z","data":{"userId":"612adeee427e7a0008078b67","checkAllDates":true}}) }] 
+    // event = {}
+    // event.Records = [{ body: JSON.stringify({"createdAt":"2021-05-20T00:59:08.811Z","data":{"userId":"5fd625470e1f299d3a6c73ad","checkAllDates":false}}) }] 
     // console.log(event.Records)
     try {
         console.info('Getting User Config')
@@ -108,7 +112,7 @@ const start = async (event, context) => {
             }
             
             const results = await searchMultipleEmail(connection, searchConfig)
-        
+            console.log(results)
             // Close Box
             connection.closeBox()
 
