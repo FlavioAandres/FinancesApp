@@ -51,10 +51,7 @@ functions:
           path: /prepayments
           method: GET
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -72,10 +69,7 @@ functions:
           path: /prepayments
           method: PUT
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -93,10 +87,7 @@ functions:
           path: /payments
           method: POST
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -114,10 +105,7 @@ functions:
           path: /boxflow/stats
           method: GET
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -135,10 +123,7 @@ functions:
           path: /user/settings/email
           method: PUT
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -156,10 +141,7 @@ functions:
           path: /user
           method: GET
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -177,10 +159,7 @@ functions:
           path: /user/banks
           method: patch
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -197,10 +176,7 @@ functions:
           path: /banks
           method: GET
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -218,10 +194,7 @@ functions:
           path: /user/secret
           method: POST
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -239,10 +212,7 @@ functions:
           path: /user/categories
           method: POST
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -260,10 +230,7 @@ functions:
           path: /user/categories/budget
           method: POST
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -280,10 +247,7 @@ functions:
           path: /user/categories/budget/{categoryValue}
           method: PUT
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           request: 
             paths: 
               categoryValue: true
@@ -311,10 +275,7 @@ functions:
           path: /incomes
           method: GET
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -332,10 +293,7 @@ functions:
           path: /incomes
           method: POST
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -353,10 +311,7 @@ functions:
           path: /incomes/{income}
           method: PUT
           integration: lambda
-          cors:
-            enabled: true
-            origin: "*"
-            headers: "Access-Control-Allow-Origin"
+          cors: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"
@@ -528,6 +483,15 @@ functions:
 # Resources
 resources:
   Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
     EmailUsersQueue:
       Type: "AWS::SQS::Queue"
       Properties:
