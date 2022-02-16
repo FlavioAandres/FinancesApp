@@ -17,9 +17,9 @@ const BankSchema = mongoose.Schema(
         folder: {
             type: String
         },
-        subject: {
+        subjects: [{
             type: String
-        },
+        }],
         ignore_phrase: { type: String, default: null },
         index_value: { type: Number },
     },
