@@ -151,7 +151,10 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
     const updateDoc = {
         $set: {
             'categories.$': {
-                
+                budget: {
+                    current: 0, 
+                    value: 0, 
+                }
             }
         }
     }
