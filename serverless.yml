@@ -221,6 +221,23 @@ functions:
             claims:
               - sub
 
+  AddAutofillWord:
+    handler: API/Functions/Users.addAutofillWord
+    name: UserRepo-Categories-budget-POST-${opt:stage}
+    events:
+      - http:
+          path: /user/categories/autofill
+          method: POST
+          integration: lambda
+          cors: true
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
   AddBudgetCategory:
     handler: API/Functions/Users.addBudgetCategory
     name: UserRepo-Categories-budget-POST-${opt:stage}

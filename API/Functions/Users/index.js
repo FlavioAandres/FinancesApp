@@ -282,3 +282,7 @@ module.exports.addBankToUser = async (event) => {
     statusCode: result ? 200 : 409,
   }
 }
+
+module.exports.addAutofillWord = async (event) =>{
+  
+}

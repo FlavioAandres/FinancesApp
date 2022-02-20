@@ -52,6 +52,11 @@ const userSchema = mongoose.Schema(
                 }
             }, 
             value: String,
+            matchWord: {
+                type: String, 
+                required: false, 
+                trim: true, 
+            },
             type: {
                 type: String,
                 index: false,
