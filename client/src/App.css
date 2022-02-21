@@ -173,7 +173,7 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
 
 }
 
-.add-new-payment, .add-new-income {
+.add-new-payment, .add-new-income, .add-new-autofill {
   cursor: pointer;
 }
 
@@ -405,7 +405,7 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
   margin: 0;
 }
 
-.add-new-budget{
+.add-new-budget, .add-new-autofill{
   cursor: pointer;
   display: inline-block;
 }
@@ -419,4 +419,8 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
   width: 80%;
   margin-right: 10px;
   margin-top: 5px; 
+}
+
+.budget-label span{
+  font-size: 12px;
 }

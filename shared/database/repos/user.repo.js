@@ -56,6 +56,38 @@ module.exports.createCategory = async (userCriteria, category) => {
     return result.nModified > 0
 }
 
+module.exports.createNewMatchWordCategory = async ({category, userId, word }) =>{
+    await connect(); 
+    return userModel.updateOne({
+        _id: userId, 
+        categories: {
+            $elemMatch: {
+                value: category,
+            }
+        }
+    }, {
+        $push: {
+            'categories.$.matchWords': word
+        }
+    })
+}
+
+module.exports.deleteMatchWordsCategory = async ({category, userId})=>{
+    await connect(); 
+    return userModel.updateOne({
+        _id: userId, 
+        categories: {
+            $elemMatch: {
+                value: category,
+            }
+        }
+    }, {
+        $set: {
+            'categories.$.matchWords': []
+        }
+    })
+}
+
 module.exports.addChat = async (userCriteria, chat) => {
     if (!chat.id) return null;
 
