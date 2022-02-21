@@ -47,6 +47,24 @@ const searchMultipleEmail = async(connection, data = { })=>{
     return results
 }
 
+const checkMatchUserCategory = ({categories, text})=>{
+    text = text.toLowerCase(); 
+    const filteredCategories = categories.filter(item=>item.matchWords && item.matchWords.length); 
+    const match = {}
+    filteredCategories.forEach(category=>{
+        const categoryValue = category.value; 
+        const matchWord = category.matchWords.find(word=>{
+            word = word.toLowerCase(); 
+            return text.indexOf(word) >= 0
+        })
+        if(matchWord){
+            match.category = categoryValue; 
+            match.word = matchWord
+        }
+    })
+    return match; 
+}
+
 const start = async (event, context) => {
     // // if(process.env.NODE_ENV === 'dev')
     // //     event = { 
@@ -64,7 +82,7 @@ const start = async (event, context) => {
             }
         });
         // This function open the mongo connection
-        // const data = { userId: '612adeee427e7a0008078b67', checkAllDates: true }
+        // const data = { userId: '5fd625470e1f299d3a6c73ad', checkAllDates: false }
         console.log(data)
         const user = await getUser({ _id: data.userId },  {banks: false})
      
@@ -103,6 +121,7 @@ const start = async (event, context) => {
             const GranularData = []
             if(!bank.subjects){
                 console.error({type: "NO_SUBJECTS_FOUND", bank})
+                return ;
             }
             const allSubjects = bank.subjects.map(subject=>subject)
             const searchConfig = {
@@ -112,7 +131,6 @@ const start = async (event, context) => {
             }
             
             const results = await searchMultipleEmail(connection, searchConfig)
-            console.log(results)
             // Close Box
             connection.closeBox()
 
@@ -146,6 +164,14 @@ const start = async (event, context) => {
                             user: user._id,
                             description: res.DESCRIPTION,
                             isAccepted: res.TRANSACTION_TYPE === 'withdrawal' ? true : false
+                        }
+
+                        const matchCategory = checkMatchUserCategory({categories: user.categories, text: prePaymentObj.text})
+                        
+                        if(matchCategory.category){
+                            prePaymentObj.isAccepted = true; 
+                            prePaymentObj.category = matchCategory.category; 
+                            prePaymentObj.description = `Autofilled: ${matchCategory.word} ${matchCategory.category}`
                         }
 
                         if (GranularData.indexOf(prePaymentObj) === -1) { // Do not enter duplicated values.

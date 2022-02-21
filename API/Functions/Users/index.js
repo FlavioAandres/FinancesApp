@@ -1,19 +1,15 @@
 const UserRepo = require("./../../../shared/database/repos/user.repo");
-const { encrypt, decrypt } = require('../../../shared/utils/crypto');
+const { encrypt, decrypt } = require("../../../shared/utils/crypto");
 
 module.exports.getUserInformation = async (event) => {
   try {
-    const {
-      cognitoPoolClaims
-    } = event
+    const { cognitoPoolClaims } = event;
 
-    const {
-      sub
-    } = cognitoPoolClaims
+    const { sub } = cognitoPoolClaims;
 
     const result = await UserRepo.getUser(
       {
-        sub
+        sub,
       },
       { banks: true }
     );
@@ -40,7 +36,6 @@ module.exports.getUserInformation = async (event) => {
 };
 
 module.exports.addNewCategory = async (event) => {
-
   const body = event.body ? event.body : {};
 
   if (!body.label || !body.value)
@@ -51,18 +46,14 @@ module.exports.addNewCategory = async (event) => {
       },
     };
 
-  const {
-    cognitoPoolClaims
-  } = event
+  const { cognitoPoolClaims } = event;
 
-  const {
-    sub
-  } = cognitoPoolClaims
+  const { sub } = cognitoPoolClaims;
 
   try {
     const result = await UserRepo.createCategory(
       {
-        sub
+        sub,
       },
       { label: body.label, value: body.value, type: body.type }
     );
@@ -71,7 +62,7 @@ module.exports.addNewCategory = async (event) => {
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-    }
+    };
   } catch (error) {
     console.error(error);
     return {
@@ -84,40 +75,38 @@ module.exports.addNewCategory = async (event) => {
   }
 };
 
-module.exports.putBudgetCategory = async (event, context, callback)=>{
-  const {
-    cognitoPoolClaims
-  } = event
-  
-  const {
-    sub
-  } = cognitoPoolClaims
-  
+module.exports.putBudgetCategory = async (event, context, callback) => {
+  const { cognitoPoolClaims } = event;
+
+  const { sub } = cognitoPoolClaims;
+
   const { body, path } = event;
-  const categoryValue = path.categoryValue
-  
+  const categoryValue = path.categoryValue;
+
   try {
-    await UserRepo.updateBudgetFromVars({
-      sub, 
-      categoryValue
-    }, {
-      currentBudgetValue: 0,
-      BudgetValue: 0 
-    })
+    await UserRepo.updateBudgetFromVars(
+      {
+        sub,
+        categoryValue,
+      },
+      {
+        currentBudgetValue: 0,
+        BudgetValue: 0,
+      }
+    );
   } catch (error) {
-    console.error(error)
-    return callback(error)
+    console.error(error);
+    return callback(error);
   }
 
-  return {
-    statusCode: 201
-  } 
-}
+  return {
+    statusCode: 201,
+  };
+};
 
 module.exports.addBudgetCategory = async (event) => {
   const { body } = event;
   const { category, budget } = body;
-
 
   if (!category || !budget || isNaN(budget))
     return {
@@ -127,28 +116,24 @@ module.exports.addBudgetCategory = async (event) => {
       },
     };
 
-  const {
-    cognitoPoolClaims
-  } = event
+  const { cognitoPoolClaims } = event;
 
-  const {
-    sub
-  } = cognitoPoolClaims
+  const { sub } = cognitoPoolClaims;
 
   try {
     const result = await UserRepo.updateCategory(
       {
         sub,
-        "categories.value": category
+        "categories.value": category,
       },
-      { 'categories.$.budget': { value: parseInt(budget) } }
+      { "categories.$.budget": { value: parseInt(budget) } }
     );
     return {
       statusCode: result ? 200 : 409,
       headers: {
         "Access-Control-Allow-Origin": "*",
       },
-    }
+    };
   } catch (error) {
     console.error(error);
     return {
@@ -164,121 +149,157 @@ module.exports.addBudgetCategory = async (event) => {
 module.exports.checkSecretKey = async (event) => {
   const body = event.body ? JSON.parse(event.body) : {};
 
-  if (!body.secretKey) return {
-    statusCode: 400,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    }
-  }
+  if (!body.secretKey)
+    return {
+      statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
 
-  const {
-    cognitoPoolClaims
-  } = event
+  const { cognitoPoolClaims } = event;
 
-  const {
-    sub
-  } = cognitoPoolClaims
+  const { sub } = cognitoPoolClaims;
 
   const user = await UserRepo.getUser({
-    sub
-  })
+    sub,
+  });
 
-  if (!user.secretKey) return {
-    statusCode: 409,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    }
-  }
+  if (!user.secretKey)
+    return {
+      statusCode: 409,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
 
-  const userKey = decrypt(user.secretKey)
+  const userKey = decrypt(user.secretKey);
 
-  if (userKey !== body.secretKey) return {
-    statusCode: 401,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    }
-  }
+  if (userKey !== body.secretKey)
+    return {
+      statusCode: 401,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    };
 
   return {
     statusCode: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",
-    }
-  }
-}
+    },
+  };
+};
 
 module.exports.postConfirmation = async (event, context, callback) => {
-
-  const { userName, request } = event
-  const { userAttributes } = request
-  const { sub, email_verified, phone_number, email } = userAttributes
+  const { userName, request } = event;
+  const { userAttributes } = request;
+  const { sub, email_verified, phone_number, email } = userAttributes;
   try {
     await UserRepo.create({
       name: userName,
       email,
       sub,
-      phones: [
-        phone_number
-      ],
+      phones: [phone_number],
       verified: email_verified,
-      emails: [
-        email
-      ]
-    })
-    callback(null, event)
+      emails: [email],
+    });
+    callback(null, event);
   } catch (error) {
-    callback(error, event)
+    callback(error, event);
   }
+};
 
-}
-
-const encryptBase64 = (data) => encrypt(Buffer.from(data, 'base64').toString('utf8'))
+const encryptBase64 = (data) =>
+  encrypt(Buffer.from(data, "base64").toString("utf8"));
 
 module.exports.updateEmailSourceCredentials = async (event) => {
   const { cognitoPoolClaims, body } = event;
-  const { sub } = cognitoPoolClaims
+  const { sub } = cognitoPoolClaims;
 
-  if (!body || !body.credentials || !body.credentials.user || !body.credentials.key) return {
-    statusCode: 400,
-    body: JSON.stringify({ error: 'Bad Request' })
-  }
+  if (
+    !body ||
+    !body.credentials ||
+    !body.credentials.user ||
+    !body.credentials.key
+  )
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Bad Request" }),
+    };
 
   const credentials = {
     user: encryptBase64(body.credentials.user),
     key: encryptBase64(body.credentials.key),
-  }
+  };
 
-  const response = await UserRepo.updateUser({
-    sub: sub
-  }, {
-    $set: {
-      'settings.email.user': credentials.user,
-      'settings.email.key': credentials.key
+  const response = await UserRepo.updateUser(
+    {
+      sub: sub,
+    },
+    {
+      $set: {
+        "settings.email.user": credentials.user,
+        "settings.email.key": credentials.key,
+      },
     }
-  })
+  );
 
   return {
-    statusCode: response.nModified ? 201 : 409
-  }
-
-}
+    statusCode: response.nModified ? 201 : 409,
+  };
+};
 
 module.exports.addBankToUser = async (event) => {
-  const body = event.body
-  const { bankId } = body
-  const {
-    cognitoPoolClaims
-  } = event
+  const body = event.body;
+  const { bankId } = body;
+  const { cognitoPoolClaims } = event;
 
-  const {
-    sub
-  } = cognitoPoolClaims
+  const { sub } = cognitoPoolClaims;
 
-  if (!bankId) return { statusCode: 400, body: JSON.stringify({ error: 'Missing bank to add' }) }
+  if (!bankId)
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing bank to add" }),
+    };
 
-  const result = await UserRepo.updateUser({ sub }, { $addToSet: { banks: bankId } });
+  const result = await UserRepo.updateUser(
+    { sub },
+    { $addToSet: { banks: bankId } }
+  );
 
   return {
     statusCode: result ? 200 : 409,
+  };
+};
+
+module.exports.addAutofillWord = async (event) => {
+  const body = event.body;
+  const { path: pathParameters } = event;
+
+  const { word } = body;
+  const { cognitoPoolClaims } = event;
+
+  const { sub } = cognitoPoolClaims;
+
+  const user = await UserRepo.getUser({ sub }, null, { _id: 1 });
+  await UserRepo.createNewMatchWordCategory({
+    word,
+    category: pathParameters.category,
+    userId: user._id,
+  });
+  return {
+    statusCode: 201, 
+  }
+};
+
+module.exports.removeAutofillWord = async (event)=>{
+  const { cognitoPoolClaims, path } = event;
+  console.log(event)
+  const { sub } = cognitoPoolClaims;
+  const user = await UserRepo.getUser({ sub }, null, { _id: 1 });
+  await UserRepo.deleteMatchWordsCategory({userId: user._id, category: path.category }); 
+  return {
+    statusCode: 200, 
   }
 }

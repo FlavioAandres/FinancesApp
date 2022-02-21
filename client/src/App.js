@@ -8,7 +8,7 @@ import ProfileContainer from "./components/ProfileContainer/";
 import constants from "./constants";
 import Amplify, { Auth, API } from 'aws-amplify';
 import awsconfig from './aws-exports';
-import { AmplifySignOut, withAuthenticator } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import "emerald-ui/lib/styles.css";
 import "./App.css";
 Amplify.configure({
@@ -32,7 +32,7 @@ const App = () => {
   const [user, setUser] = useState({ categories: [] })
   const [banks, setBanks] = useState([])
   const [prepayments, setPrepayments] = useState([])
-  const [navbarActive, setNavbarActive] = useState('home')
+  const [navbarActive, setNavbarActive] = useState('profile')
 
 
   const getPrePayments = () => {
@@ -85,7 +85,6 @@ const App = () => {
           setNavbarActive(nav)
         }}
       />
-      <AmplifySignOut />
       <div className="full-container">
         {navbarActive === "prepayment" && (
           <PrepaymentContainer
