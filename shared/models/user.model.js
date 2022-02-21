@@ -52,11 +52,11 @@ const userSchema = mongoose.Schema(
                 }
             }, 
             value: String,
-            matchWord: {
+            matchWords: [{
                 type: String, 
                 required: false, 
                 trim: true, 
-            },
+            }],
             type: {
                 type: String,
                 index: false,

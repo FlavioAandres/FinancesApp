@@ -223,13 +223,38 @@ functions:
 
   AddAutofillWord:
     handler: API/Functions/Users.addAutofillWord
-    name: UserRepo-Categories-budget-POST-${opt:stage}
+    name: UserRepo-Categories-autofill-POST-${opt:stage}
     events:
       - http:
-          path: /user/categories/autofill
+          path: /user/categories/{category}/autofill
           method: POST
           integration: lambda
           cors: true
+          request:
+            parameters:
+              paths:
+                category: true
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+          authorizer:
+            name: authorizer
+            arn: ${file(./config/${opt:stage}.json):USER_POOL_ARN}
+            claims:
+              - sub
+  DeleteAutofillWord:
+    handler: API/Functions/Users.removeAutofillWord
+    name: User-remove-autofill-DELETE-${opt:stage}
+    events:
+      - http:
+          path: /user/categories/{category}/autofill
+          method: DELETE
+          integration: lambda
+          cors: true
+          request: 
+            parameters:
+              paths:
+                category: true
           response:
             headers:
               Access-Control-Allow-Origin: "'*'"

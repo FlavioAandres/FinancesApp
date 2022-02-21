@@ -420,3 +420,7 @@ background: linear-gradient(to right, #414345, #232526) !important; /* W3C, IE 1
   margin-right: 10px;
   margin-top: 5px; 
 }
+
+.budget-label span{
+  font-size: 12px;
+}

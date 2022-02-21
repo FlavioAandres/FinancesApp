@@ -24,9 +24,10 @@ const ProfileContainer = ({
   const [showNewBudgetModal, setShowNewBudgetModal] = useState(false);
   const [showNewAutofillModal, setShowNewAutofillModal] = useState(false);
   const [showSpinningBudgetModal, setShowSpinningBudgetModal] = useState(false);
-  const [showSpiningAutofillModal, setShowSpiningAutofillModal] = useState(false);
+  const [showSpiningAutofillModal, setShowSpiningAutofillModal] =
+    useState(false);
   const [categoriesWithBudgets, setCategoriesWithBudgets] = useState([]);
-
+  const [categoriesWithAutofill, setCategoriesWithAutofill] = useState([]);
   const onBankAdded = () => {
     getUserInformation();
   };
@@ -74,8 +75,15 @@ const ProfileContainer = ({
       });
   };
 
+  const handleRemoveAutofillButton = ({value}) =>{
+     API.del('finances', `/user/categories/${value}/autofill`).then(response=>{
+      swal.fire("Deleted successfully")
+      getUserInformation();
+     }).catch(console.error)
+  }
+
   const onSaveBudget = ({ category, budget }) => {
-    setShowSpinningBudgetModal(true);
+    setShowSpiningAutofillModal(true);
 
     API.post("finances", "/user/categories/budget", {
       body: {
@@ -103,16 +111,37 @@ const ProfileContainer = ({
       .catch((err) => console.error(err));
   };
 
-  const onSaveAutofill = ({category, word})=>{
-    console.log(category, word)
-    setShowSpiningAutofillModal(false)
-    setShowNewAutofillModal(false)
-  }
+  const onSaveAutofill = ({ category, word }) => {
+    const path  = `/user/categories/${category}/autofill`
+    API.post("finances", path, {
+      body: {
+        categoryValue: category,
+        word,
+      },
+    })
+      .then((result) => {
+        console.log(result);
+        setShowSpiningAutofillModal(false);
+        setShowNewAutofillModal(false);
+        getUserInformation();
+      })
+      .catch((err) => {
+        console.error(err);
+        setShowSpiningAutofillModal(false);
+        setShowNewAutofillModal(false);
+        swal.fire("Something has failed");
+      });
+  };
 
   useEffect(() => {
     setCategoriesWithBudgets(
       user.categories.filter((cat) => {
         return cat.budget && cat.budget.value > 0;
+      })
+    );
+    setCategoriesWithAutofill(
+      user.categories.filter((cat) => {
+        return cat.matchWords && cat.matchWords.length;
       })
     );
   }, [user]);
@@ -154,11 +183,13 @@ const ProfileContainer = ({
         <div className="user-categories">
           <h2>Your custom categories: </h2>
           {user.categories &&
-            user.categories.filter(item=>item.label).map((category) => (
-              <Label key={`userCategory-${category.label}`}>
-                {category.label}
-              </Label>
-            ))}
+            user.categories
+              .filter((item) => item.label)
+              .map((category) => (
+                <Label key={`userCategory-${category.label}`}>
+                  {category.label}
+                </Label>
+              ))}
           <Label
             onClick={onCreateCategoryClick}
             className="add-new-category"
@@ -194,7 +225,10 @@ const ProfileContainer = ({
           <br />
           {categoriesWithBudgets &&
             categoriesWithBudgets.map((category, idx) => (
-              <div className="budget-labels-container" key={`current-category-budget-${idx}`}>
+              <div
+                className="budget-labels-container"
+                key={`current-category-budget-${idx}`}
+              >
                 <Label color="default" className="budget-label">
                   {category.label} - {formatCash(category.budget.value)}
                 </Label>
@@ -228,15 +262,14 @@ const ProfileContainer = ({
           <div className="autofill-headers">
             <h2>Autofill categories: </h2>
             <p>
-              With this feature you can set magical words to 
-              clasify your payments. If those magical words 
-              matchs with the content of your payment, 
-              this automatically will asign a category
+              With this feature you can set magical words to clasify your
+              payments. If those magical words matchs with the content of your
+              payment, this automatically will asign a category
             </p>
           </div>
           <div className="autofill-list">
-          <Label
-              onClick={()=> setShowNewAutofillModal(true)}
+            <Label
+              onClick={() => setShowNewAutofillModal(true)}
               className="add-new-autofill"
               color="warning"
             >
@@ -245,6 +278,24 @@ const ProfileContainer = ({
               </span>{" "}
               New autofill Category
             </Label>
+            {categoriesWithAutofill &&
+              categoriesWithAutofill.map((category, idx) => (
+                <div
+                  className="category-autofill-container"
+                  key={`category-autofill-${idx}`}
+                >
+                  <Label color="default" className="budget-label">
+                    {category.label}: <span>{ category.matchWords.join(' | ') }</span>
+                  </Label>
+                  <Button
+                    shape="flat"
+                    className="delete-budget"
+                    onClick={() => handleRemoveAutofillButton(category)}
+                  >
+                    <Icon name="remove_circle" className="text-danger" />
+                  </Button>
+                </div>
+              ))}
           </div>
         </div>
       </div>
