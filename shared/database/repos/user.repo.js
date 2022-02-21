@@ -156,7 +156,7 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
 
     const updateDoc = {
         $set: {
-            'categories.$.matchWord': {
+            'categories.$': {
                 
             }
         }
