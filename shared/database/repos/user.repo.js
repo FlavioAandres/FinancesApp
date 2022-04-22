@@ -134,6 +134,12 @@ module.exports.updateBudget = async (searchCriteria, update) => {
     return result.nModified > 0
 }
 
+/**
+ * This function use the current amount paid in the category
+ * If there are some payments NOT saved in the budget 
+ * they will be ignored.
+ */
+
 module.exports.updateBudgetFromVars = async (searchValues, update) => {
     const {
         categoryValue, 
@@ -172,8 +178,8 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
 
     const category = user.categories[0]
     const maxBudgetValue = (BudgetValue >= 0) 
-        ? BudgetValue 
-        : category.budget.value
+        ? BudgetValue // came from params - update the limit o max value 
+        : category.budget.value //if not, it continue using the current saved value
     if(
         category && category.budget && 
         (category.budget.current !== currentBudgetValue || maxBudgetValue !== category.budget.value)
