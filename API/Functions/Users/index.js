@@ -295,7 +295,6 @@ module.exports.addAutofillWord = async (event) => {
 
 module.exports.removeAutofillWord = async (event)=>{
   const { cognitoPoolClaims, path } = event;
-  console.log(event)
   const { sub } = cognitoPoolClaims;
   const user = await UserRepo.getUser({ sub }, null, { _id: 1 });
   await UserRepo.deleteMatchWordsCategory({userId: user._id, category: path.category }); 

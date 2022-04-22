@@ -32,7 +32,7 @@ const App = () => {
   const [user, setUser] = useState({ categories: [] })
   const [banks, setBanks] = useState([])
   const [prepayments, setPrepayments] = useState([])
-  const [navbarActive, setNavbarActive] = useState('profile')
+  const [navbarActive, setNavbarActive] = useState('home')
 
 
   const getPrePayments = () => {
