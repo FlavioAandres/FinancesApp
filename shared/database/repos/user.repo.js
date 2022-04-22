@@ -180,6 +180,9 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
     const maxBudgetValue = (BudgetValue >= 0) 
         ? BudgetValue // came from params - update the limit o max value 
         : category.budget.value //if not, it continue using the current saved value
+    
+    //check if the budget current amount or max amount were updated 
+    //against the saved value
     if(
         category && category.budget && 
         (category.budget.current !== currentBudgetValue || maxBudgetValue !== category.budget.value)
