@@ -68,7 +68,7 @@ const processBankEmails = async (bank, user, emailData, timestamp) => {
         description: res.DESCRIPTION,
         isAccepted: res.TRANSACTION_TYPE === "withdrawal" ? true : false,
       };
-      console.log({prePaymentObj})
+      
       await createMultiplesPayments([prePaymentObj]);
       break;
     }
