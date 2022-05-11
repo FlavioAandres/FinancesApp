@@ -16,8 +16,26 @@ const checkInvitationEmail = (emailSubject) => {
   });
 };
 
-const parseEmailInfo = (headers) =>
-  headers["X-Forwarded-For"] ? headers["X-Forwarded-For"].split(" ")[0] : "";
+const parseEmailInfo = (headers) => {
+  if(headers["X-Forwarded-For"]){
+    return  headers["X-Forwarded-For"].split(" ")[0] || ""
+  }else if(headers["From"]){
+    return (headers["From"].match(/<.*>/g)[0] || "").replace(/\<|\>/g, "") || "";
+  }
+  return ""; 
+}
+
+const parseHtmlWithRegex = (html)=>{
+  return html.replace(/\n/ig, '')
+  .replace(/<style[^>]*>[\s\S]*?<\/style[^>]*>/ig, '')
+  .replace(/<head[^>]*>[\s\S]*?<\/head[^>]*>/ig, '')
+  .replace(/<script[^>]*>[\s\S]*?<\/script[^>]*>/ig, '')
+  .replace(/<\/\s*(?:p|div)>/ig, '\n')
+  .replace(/<br[^>]*\/?>/ig, '\n')
+  .replace(/<[^>]*>/ig, '')
+  .replace('&nbsp;', ' ')
+  .replace(/[^\S\r\n][^\S\r\n]+/ig, ' ')
+}
 
 module.exports.run = async (event) => {
   const { body } = event;
@@ -45,19 +63,20 @@ module.exports.run = async (event) => {
     console.log("no msg received", body);
     return { statusCode: 400 };
   }
-  const { text, headers, raw_email } = messageInfo;
+  let { text, headers, raw_msg } = messageInfo;
   if(!text){
     console.warn({
       type: "NO_TEXT_FOUND", 
       messageInfo
     })
+    text = parseHtmlWithRegex(raw_msg)
   }
   if (process.env.DEBUG) {
     console.info({
       debug: process.env.DEBUG,
       text,
       headers,
-      raw_email,
+      raw_msg,
     });
   }
   const subject = headers.Subject;
@@ -78,7 +97,7 @@ module.exports.run = async (event) => {
         text,
       };
     } else {
-      queueEvent.email = parseEmailInfo(headers);
+      queueEvent.email = parseEmailInfo(headers).toLowerCase();
       queueEvent.type = "USER_PAYMENT_EVENT";
 
       [user] = await getUser(
@@ -100,7 +119,13 @@ module.exports.run = async (event) => {
     if (user && user.banks) {
         
       const selectedBank = user.banks.find(
-        (bank) => subject.indexOf(bank.subject) >= 0
+        (bank) => {
+          if (bank.subjects){
+            const filteredSubjects = bank.subjects.filter(bankSubject => subject.indexOf(bankSubject) >= 0)
+            return filteredSubjects.length; 
+          }
+          return false
+        }
       );
       if (!selectedBank) {
           console.error({

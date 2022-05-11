@@ -51,13 +51,11 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
     html = html.trim().toLowerCase(); 
     filter = filter.toLocaleLowerCase()
     if (html.includes(filter)) {
-        console.log('found')
         if (skipped_phrase === null || skipped_phrase === undefined || !value.includes(skipped_phrase.toLocaleLowerCase())) { // If the phrase do not includes the skipped phrase
             let description, parserResult;
 
             // The fisrt coincidence for the filter phrase
             const first = html.indexOf(filter)
-            console.log(first)
 
             switch (bank_name) {
                 case "BANCOLOMBIA": {
