@@ -6,7 +6,12 @@
   "scripts": {
     "debug": "node --inspect node_modules/serverless/bin/serverless offline -s test",
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< webhook-implementation
+    "build": "serverless offline --stage test",
+    "watch": "nodemon -w ./ -e '.*' -x 'npm run build'",
+=======
     "start": "nodemon --exec \"clear && serverless offline --stage test\"",
+>>>>>>> flavioaandres
     "start:bot": "nodemon AutomationServices/TelegramBot/dev.js"
   },
   "keywords": [],

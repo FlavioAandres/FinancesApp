@@ -37,9 +37,7 @@ module.exports.readRawEmail = async (body) => {
 
 module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le informa que su factura inscrita', bank_name = "BANCOLOMBIA") => {
     if ([null, undefined].includes(parser)) return undefined; //If we don't have a parser, just return null to continue with the next message
-    const $ = cheerio.load(html)
-    const res = $('p')
-    const value = res.text().trim().toLowerCase().replace(/=/g, '')
+    const value = html.trim().toLowerCase().replace(/=|\n/g, '')
     filter = filter.toLocaleLowerCase()
     if (value.includes(filter)) {
         if (skipped_phrase === null || skipped_phrase === undefined || !value.includes(skipped_phrase.toLocaleLowerCase())) { // If the phrase do not includes the skipped phrase
@@ -51,7 +49,7 @@ module.exports.search = (html, filter, parser, skipped_phrase = 'Bancolombia le 
 
             switch (bank_name) {
                 case "BANCOLOMBIA": {
-                    const end = value.indexOf('018000931987', first + 1) + 12
+                    const end = value.indexOf('00931987', first + 1) + 12
                     description = value.substring(first, end)
 
                     switch (parser) {

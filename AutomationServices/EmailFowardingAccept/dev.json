@@ -1,0 +1,15 @@
+{
+  "Records": [
+    {
+      "body": {
+        "type": "EMAIL_ACCEPT_INVITATION",
+        "email": "flavioaandres24@gmail.com",
+        "data": {
+          "host": "gmail",
+          "url": "",
+          "text": "f"
+        }
+      }
+    }
+  ]
+}
