@@ -42,7 +42,7 @@ const NewBudgetModal = ({ categories = [], close, show, loading, save, categoryW
                 onSelect={field.onChange}
                 value={field.value}
               >
-                {categoriesToRender && categoriesToRender.map((category) => (
+                {categoriesToRender && categoriesToRender.filter(item=>item.label).map((category) => (
                   <option
                     value={category.value}
                     key={`category-${category.label}`}

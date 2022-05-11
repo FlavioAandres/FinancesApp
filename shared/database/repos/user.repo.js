@@ -56,6 +56,38 @@ module.exports.createCategory = async (userCriteria, category) => {
     return result.nModified > 0
 }
 
+module.exports.createNewMatchWordCategory = async ({category, userId, word }) =>{
+    await connect(); 
+    return userModel.updateOne({
+        _id: userId, 
+        categories: {
+            $elemMatch: {
+                value: category,
+            }
+        }
+    }, {
+        $push: {
+            'categories.$.matchWords': word
+        }
+    })
+}
+
+module.exports.deleteMatchWordsCategory = async ({category, userId})=>{
+    await connect(); 
+    return userModel.updateOne({
+        _id: userId, 
+        categories: {
+            $elemMatch: {
+                value: category,
+            }
+        }
+    }, {
+        $set: {
+            'categories.$.matchWords': []
+        }
+    })
+}
+
 module.exports.addChat = async (userCriteria, chat) => {
     if (!chat.id) return null;
 
@@ -102,6 +134,12 @@ module.exports.updateBudget = async (searchCriteria, update) => {
     return result.nModified > 0
 }
 
+/**
+ * This function use the current amount paid in the category
+ * If there are some payments NOT saved in the budget 
+ * they will be ignored.
+ */
+
 module.exports.updateBudgetFromVars = async (searchValues, update) => {
     const {
         categoryValue, 
@@ -140,8 +178,11 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
 
     const category = user.categories[0]
     const maxBudgetValue = (BudgetValue >= 0) 
-        ? BudgetValue 
-        : category.budget.value
+        ? BudgetValue // came from params - update the limit o max value 
+        : category.budget.value //if not, it continue using the current saved value
+    
+    //check if the budget current amount or max amount were updated 
+    //against the saved value
     if(
         category && category.budget && 
         (category.budget.current !== currentBudgetValue || maxBudgetValue !== category.budget.value)
