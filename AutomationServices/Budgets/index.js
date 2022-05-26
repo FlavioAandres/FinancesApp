@@ -27,7 +27,7 @@ module.exports.clean = async (event, _, callback) => {
     }
     allUsers.forEach(user=>{
         const categoriesParsed = user.categories
-            .filter(item=>item.budget && item.budget.value > 0)
+            .filter(item=>item.budget)
             .map(category=>{
                 allBudgets.push({
                     user: user._id, 
@@ -52,6 +52,7 @@ module.exports.clean = async (event, _, callback) => {
     try {
         //Archiving
         const result = await ArchiveRepository.insertMany(allBudgetsByUser); 
+        // TODO: Improve this algoritm to 1 update per user
         //Restarting Budget 
         if(result){
             for (const budget of allBudgets) {

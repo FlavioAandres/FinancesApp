@@ -1,0 +1,97 @@
+{
+  "Records": [{"body": {
+    "email": "flavioaandres24@gmail.com",
+    "type": "USER_PAYMENT_EVENT",
+    "user": {
+      "settings": {
+        "datacredito": {
+          "user": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "cb89fa5ae8c22a30de11"
+          },
+          "password": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "bbcaa70bb4957d3ada106d"
+          },
+          "secondpass": {
+            "iv": "650ae331e01877a3db126e4efa8d3fa9",
+            "content": "97d7b803a38f7d7a"
+          }
+        },
+        "email": {
+          "user": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "0479fbf5604e41eb1994588206fe286358b68a4bc390c3763c"
+          },
+          "key": {
+            "iv": "773fa51cbbd3ed4f3ace3d790336b911",
+            "content": "1473fbfb704f4efb129450841aa9664b"
+          },
+          "checkedEvent": true
+        },
+        "bots": {
+          "chats": [
+            {
+              "_id": "60d15c84ffbcb57e75153df7",
+              "type": "TELEGRAM",
+              "id": 1895902206
+            }
+          ]
+        }
+      },
+      "verified": false,
+      "phones": ["+573022939843", "+573007292403"],
+      "emails": ["flavioaandres24@gmail.com"],
+      "_id": "5fd625470e1f299d3a6c73ad",
+      "name": "Flavio Andres",
+      "sub": "fde85008-207e-4b34-8abf-c63c325ffbb5",
+      "email": "flavioaandres24@gmail.com",
+      "secretKey": {
+        "iv": "f961077474ebc52f27226f3f750a585f",
+        "content": "2c282e804a32b15d1f1472"
+      },
+      "updatedAt": "2022-02-05T17:16:30.295Z"
+    },
+    "data": {
+      "bank": {
+        "ignore_phrase": "Bancolombia le informa que su factura inscrita",
+        "_id": "5fd625d50e1f299d3a6c9521",
+        "filters": [
+          {
+            "phrase": "Bancolombia te informa recepción transferencia",
+            "type": "INCOME",
+            "parser": "transferReception"
+          },
+          {
+            "phrase": "Bancolombia le informa Compra",
+            "type": "EXPENSE",
+            "parser": "shopping"
+          },
+          {
+            "phrase": "Bancolombia le informa Retiro",
+            "type": "EXPENSE",
+            "parser": "debitWithdrawal"
+          },
+          {
+            "phrase": "Bancolombia le informa Transferencia",
+            "type": "EXPENSE",
+            "parser": "transfer"
+          },
+          {
+            "phrase": "Bancolombia le informa Pago",
+            "type": "EXPENSE",
+            "parser": "payments"
+          }
+        ],
+        "name": "BANCOLOMBIA",
+        "subject": "Servicio de Alertas y Notificaciones Bancolombia",
+        "folder": "INBOX",
+        "createdAt": "2020-11-26T19:32:15.925Z",
+        "updatedAt": "2020-11-26T19:32:15.925Z",
+        "__v": 0,
+        "index_value": 0
+      },
+      "text": "---------- Forwarded message ---------\nDe: <alertasynotificaciones@bancolombia.com.co>\nDate: mié, 29 may 2019 a las 14:03\nSubject: Servicio de Alertas y Notificaciones Bancolombia\nTo: <flv.prj@gmail.com>\n\n\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\nNotificación\n\nde transacciones\nBancolombia le informa Transferencia por $90,000 desde cta *8342 a cta\n67862237789. 29/05/2019 14:03. Inquietudes al 0345109095/018000931987.\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\n\nYo te recomiendo que protejas tus datos y por eso aquí te dejo estos\nconsejos:\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\n\n* Nunca entregues tu información personal o financiera* por llamadas o\ncorreos. Ingresa siempre a la Sucursal Virtual digitando la dirección en el\nnavegador, no por enlaces en páginas web, correos electrónicos o\nbuscadores.\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\n\n*Jamás entregues datos * como: usuarios, claves, números de tarjetas de\ncrédito, fechas de vencimiento y códigos de seguridad.\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\n\n*Nunca pierdas de vista tus tarjetas.* Cuando realices compras, verifica\nque te hayan devuelto la tuya, para esto puedes marcarla y personalizarla\npara que la reconozcas fácilmente.\n[image: Seguimos aqu¿ para acompa¿arle en la realizaci¿n de sus proyectos]\n\nBancolombia nunca te solicitará tus datos financieros como usuarios,\nclaves, números de tarjetas de crédito con sus códigos de seguridad y\nfechas de vencimiento mediante vínculos de correo electrónico.\n\nSi tienes alguna inquietud puedes contactarnos en nuestras líneas de\natención telefónica:\n\nBogotá +57 (1) 343 00 00 <+5713430000> - Medellín +57 (4) 510 90 00\n<+5745109000> - Cali +57 (2) 554 05 05 <+5725540505>\n\nBarranquilla +57 (5) 361 88 88 <+5753618888> - Bucaramanga +57 (7) 697 25 25\n<+5776972525> - Cartagena +57 (5) 693 44 00 <+5756934400>\n\nResto del país 01800 09 12345\n\nSede principal Cra 48 Nro. 26-85 Torre Norte\n\nMedellín - Colombia\n\nCancelar suscripción <#m_-7213396428295914385_SPONECLICKOPTOUT>\n<https://www.facebook.com/bancolombia/?fref=ts>\n<https://twitter.com/Bancolombia?lang=es>\n<https://co.linkedin.com/company/bancolombia>\n<https://www.instagram.com/bancolombia/>\n<https://www.youtube.com/user/GrupoBancolombia>\n\nTRNUID:\nBCOL|BCOL|140346051720|150347.00595104|1559156627027!e8g1rcf1JG0ZAMsEEGZdoWARt\n\n\n\n-- \nFlavio Andres Pareja\nPhone: 301-409 7275\n\n"
+    }
+  }}]
+}
