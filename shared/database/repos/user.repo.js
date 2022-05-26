@@ -133,6 +133,32 @@ module.exports.updateBudget = async (searchCriteria, update) => {
     const result = await userModel.updateOne({ ...searchCriteria }, update)
     return result.nModified > 0
 }
+module.exports.resetBudgetVars = async (searchCriteria) =>{
+    const {
+        categoryValue, 
+        sub: userId, 
+    } = searchCriteria
+
+    const query = {
+        sub: userId, 
+        categories: {
+            $elemMatch: {
+                value: categoryValue,
+            }
+        }
+    }
+    const updateDoc = {
+        $set: {
+            'categories.$': {
+                value: 0, 
+                progress: 0
+            }
+        }
+    }
+    if(!isConnected())
+        await connect(); 
+    return userModel.updateOne(query, updateDoc);
+}
 
 /**
  * This function use the current amount paid in the category
@@ -155,7 +181,7 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
         sub: userId, 
         categories: {
             $elemMatch: {
-                value: categoryValue
+                value: categoryValue,
             }
         }
     }
@@ -163,7 +189,10 @@ module.exports.updateBudgetFromVars = async (searchValues, update) => {
     const updateDoc = {
         $set: {
             'categories.$': {
-                
+                budget: {
+                    current: 0, 
+                    value: 0, 
+                }
             }
         }
     }

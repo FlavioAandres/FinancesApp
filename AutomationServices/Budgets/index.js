@@ -21,8 +21,8 @@ module.exports.clean = async (event, _, callback) => {
     const dates = {
         day: today.getDate(),        
         month: today.getMonth() === 0 //(Month is 0-based)
-            ? 12 
-            : today.getMonth(),   
+            ? 1
+            : today.getMonth() + 1,   
         year: today.getFullYear(),  
     }
     allUsers.forEach(user=>{
@@ -56,11 +56,9 @@ module.exports.clean = async (event, _, callback) => {
         //Restarting Budget 
         if(result){
             for (const budget of allBudgets) {
-                await userRepository.updateBudgetFromVars({
+                await userRepository.resetBudgetVars({
                     sub: budget.sub, 
                     categoryValue: budget.categoryValue
-                }, {
-                    currentBudgetValue: 0,
                 })
             }
         }
