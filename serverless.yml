@@ -468,25 +468,27 @@ functions:
           enabled: true
           rate: cron(0 0 1 * ? *)
 
-  ScheduleUsersToCheckEmails:
-    handler: AutomationServices/AutoMailChecker/schedule.start
-    name: AutomationServices-ScheduleUsers-${opt:stage}
-    iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
-    iamRoleStatements:
-      - Effect: 'Allow'
-        Action:
-          - "*"
-        Resource:
-          Fn::GetAtt:
-            - EmailUsersQueue
-            - Arn
-    events:
-      - schedule:
-          enabled: false
-          rate: rate(20 minutes)
-    environment:
-      USER_SCHEDULE_SQS_URL: 
-        Ref: EmailUsersQueue
+  ## DEPRECATED
+  # ScheduleUsersToCheckEmails:
+  #   handler: AutomationServices/AutoMailChecker/schedule.start
+  #   disabled: true
+  #   name: AutomationServices-ScheduleUsers-${opt:stage}
+  #   iamRoleStatementsName: write-sqs-finances-${opt:stage}-role
+  #   iamRoleStatements:
+  #     - Effect: 'Allow'
+  #       Action:
+  #         - "*"
+  #       Resource:
+  #         Fn::GetAtt:
+  #           - EmailUsersQueue
+  #           - Arn
+  #   events:
+  #     - schedule:
+  #         enabled: false
+  #         rate: rate(20 minutes)
+  #   environment:
+  #     USER_SCHEDULE_SQS_URL: 
+  #       Ref: EmailUsersQueue
       
   IncomingEmailWebhook:
     handler: API/Functions/Webhook/incoming.run
