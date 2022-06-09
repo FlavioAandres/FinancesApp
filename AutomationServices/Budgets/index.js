@@ -58,7 +58,8 @@ module.exports.clean = async (event, _, callback) => {
             for (const budget of allBudgets) {
                 await userRepository.resetBudgetVars({
                     sub: budget.sub, 
-                    categoryValue: budget.categoryValue
+                    categoryValue: budget.categoryValue, 
+                    budgetValue: budget.value
                 })
             }
         }

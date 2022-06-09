@@ -137,6 +137,7 @@ module.exports.resetBudgetVars = async (searchCriteria) =>{
     const {
         categoryValue, 
         sub: userId, 
+        budgetValue
     } = searchCriteria
 
     const query = {
@@ -149,8 +150,8 @@ module.exports.resetBudgetVars = async (searchCriteria) =>{
     }
     const updateDoc = {
         $set: {
-            'categories.$': {
-                value: 0, 
+            'categories.$.budget': {
+                value: budgetValue, 
                 progress: 0
             }
         }
