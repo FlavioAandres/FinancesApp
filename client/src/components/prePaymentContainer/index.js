@@ -4,7 +4,16 @@ import { ExpansionTableRowGroup, TableHeader } from "emerald-ui/lib/";
 
 
 const PrepaymentComponent = ({ onSavePrepayment, categories, payments = [] }) => {
-
+  const CategoriesToRender = categories
+    .filter(category => category.type === 'EXPENSE' && category.value !== "")
+    .sort((a,b)=>{
+      if(a.value > b.value){
+        return 1
+      }else if(a.value < b.value){
+        return -1 
+      }
+      return 0
+    })
   return (
     <ExpansionTableRowGroup>
       <TableHeader checkboxAriaLabel="Name">
@@ -14,7 +23,7 @@ const PrepaymentComponent = ({ onSavePrepayment, categories, payments = [] }) =>
       </TableHeader>
       {payments.map((item, i) => (
         <PrepaymentItem
-          categories={categories.filter(category => category.type === 'EXPENSE')}
+          categories={CategoriesToRender}
           onSubmitPrepayment={onSavePrepayment}
           item={item}
           key={"prepayment-item-" + i + "-" + item.amount}
