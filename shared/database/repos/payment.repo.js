@@ -128,7 +128,7 @@ module.exports.updatePayment = async (Payment) => {
       });
     } else {
       const category = user.categories[0];
-      const current = +category.budget.current + +amount;
+      const current = (+category.budget.current || 0) + +amount;
 
       await updateBudgetFromVars(
         {

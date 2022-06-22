@@ -21,7 +21,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1"
+    "@testing-library/user-event": "^7.2.1",
+    "env-cmd": "^10.1.0"
   },
   "scripts": {
     "start": "env-cmd -f .env.dev react-scripts start",
@@ -33,7 +34,9 @@
     "deploy:prod": "npm run build:prod && aws s3 sync build/ s3://finances.flavioaandres.com --acl public-read",
     "eject": "react-scripts eject",
     "distribution:prod": "aws cloudfront create-invalidation --paths \"/*\" --distribution-id E1W2VAZ22NHMJS",
-    "distribution:test": "aws cloudfront create-invalidation --paths \"/*\" --distribution-id E2WIG36M9A71QV"
+    "distribution:test": "aws cloudfront create-invalidation --paths \"/*\" --distribution-id E2WIG36M9A71QV",
+    "deploy:test:complete": "npm run deploy:test && npm run distribution:test",
+    "deploy:prod:complete": "npm run deploy:prod && npm run distribution:prod"
   },
   "eslintConfig": {
     "extends": "react-app"
