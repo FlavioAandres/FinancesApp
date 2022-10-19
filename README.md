@@ -123,14 +123,65 @@ REACT_APP_FINANCES_API_URL="https://api.env.flavioaandres.com"
 
 ## MAIL CHIMP
 
-1. Create the Mail-chimp account y das click en Transactional Email, luego Launch App 
+1. Create the Mail-chimp account and then click on Transactional Email and Launch App
 
 ![Untitled 13](https://user-images.githubusercontent.com/42990423/196822858-c430ee5e-114d-40c9-90e4-1b0ddc6100bd.png)
 
-1. Agrega tu dominio y sigue el setup de mailchimp 
+1. Add your own domain and follow the instructions of mailchimp setup 
 
 ![Untitled 14](https://user-images.githubusercontent.com/42990423/196822860-3183966f-e4ec-4aa0-a435-13d9e4a1c20e.png)
 
-1. Crea el correo donde vas a reenviar los mensajes del banco, y testea 🙂
+1. Create the email where you will receive the messages and test it 
 
 ![Untitled 15](https://user-images.githubusercontent.com/42990423/196822865-67e9b56c-57ba-4489-b92a-f525c507d3e8.png)
+
+
+### Create the Following Document in your Bank Collection in mongo db. 
+
+```
+{
+    "_id" : ObjectId("5fd625d50e1f299d3a6c9521"),
+    "filters" : [ 
+        {
+            "phrase" : "Bancolombia te informa recepción transferencia",
+            "type" : "INCOME",
+            "parser" : "transferReception"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Compra",
+            "type" : "EXPENSE",
+            "parser" : "shopping"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Retiro",
+            "type" : "EXPENSE",
+            "parser" : "debitWithdrawal"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Transferencia",
+            "type" : "EXPENSE",
+            "parser" : "transfer"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Pago",
+            "type" : "EXPENSE",
+            "parser" : "payments"
+        }
+    ],
+    "name" : "BANCOLOMBIA",
+    "subjects" : [ 
+        "Servicio de Alertas y Notificaciones Bancolombia", 
+        "Servicio de Alertas.", 
+        "Servicio de Alertas y Notificaciones", 
+        "Alertas y Notificaciones"
+    ],
+    "folder" : "INBOX",
+    "createdAt" : ISODate("2020-11-26T19:32:15.925Z"),
+    "updatedAt" : ISODate("2020-11-26T19:32:15.925Z"),
+    "__v" : 0.0,
+    "ignore_phrase" : "Bancolombia le informa que su factura inscrita",
+    "index_value" : NumberLong(0)
+}
+
+
+```
