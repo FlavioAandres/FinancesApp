@@ -1,286 +1,187 @@
-## Deploy SES email parser
+# Finances Documentation
 
-```
-    1. Verify a domain at https://console.aws.amazon.com/ses/home?region=us-east-1#verified-senders-domain:
-    2. sls deploy --stage prod # Make sure about the config parameters
-    3. Forward your messages to the EMAIL_RECIPIENTS
-```
+Pre-requisites: 
 
-## Deploy Client
+- AWS Account
+- Mailchimp Account
+- Domain to connect Emails
+- AWS CLI
+- MongoDB Instance (You can use Free tier of MongoAtlas)
+- AWS Amplify CLI
+- Clone: [https://github.com/FlavioAandres/FinancesApp](https://github.com/FlavioAandres/FinancesApp)
 
-### Deploy Cognito Pool 
+## AWS Amplify - Authentication project
 
-####  Install Amplify CLI
+Install with `npm i @aws-amplify/cli -g`
 
-``` bash
-npm i @aws-amplify/cli -g
-```
+We’re using amplify to deploy our Cognito user pool automatically, also, the frontend (client) is working through the Cognito Authentications using Cognito API and package. 
 
-#### Go to Client folder and initialize Amplify
+1. Run `cd client/ && amplify init`
+2. Try to get something similar to this in the wizard: 
 
-``` bash
-cd ./client/
-amplify init 
-```
-
-Continue the wizzard 
-#### Initialize cognito
-
-``` bash
-cd ./client/
-amplify add auth
-```
-
-Continue the wizzard using username & password 
-
-#### Push Amplify stack
-
-``` bash
-amplify push
-```
-
-#### Install Client Modules
-
-``` bash
-npm install
-```
-
-### Update costants.js
-
-``` js
-export default {
-    apiGateway: {
-        REGION: "us-east-1",
-        URL: "https://XXXXXXX.execute-api.us-east-1.amazonaws.com/STAGE",
-    },
-}
-```
+![Untitled](https://user-images.githubusercontent.com/42990423/196822867-912fced4-f722-44b2-8a6c-eccb9a81a4ec.png)
 
 
-> Note: Log in into your aws account and grab the Conginto Manage pool ARN, you will need this for the serverless config.
+1. Add the authentication using API Key or Profiles, I'm gonna use APIKEY, this operation will create new IAM Resources to allow Amplify do stuffs 
 
-## Conection to Mongo Database 
+![Untitled 1](https://user-images.githubusercontent.com/42990423/196822833-d25181c6-d754-4b93-aeff-aed97302e482.png)
 
-#### SRV Way
+1. Once the environment is initialized, run `cd client/ && amplify add auth`, and continue the wizard according to these settings. 
 
-> Config File
 
-``` js
-    {
-        "MONGO_HOST": "mongodb+srv://USERNAME:PASSWORD@database.ixvju.mongodb.net/DATABASE?authSource=admin&replicaSet=atlas-f5kbsn-shard-0&w=majority&readPreference=primary&appname=APPNAME&retryWrites=true&ssl=true",
-        "SRV_CONFIG": true // Note the SRV CONFIG flag on
-    }
-```
+![Untitled 2](https://user-images.githubusercontent.com/42990423/196822837-fa3f531d-082f-4c10-8c77-7e5f7c84df5a.png)
 
-#### Default Way
+1. After the previous step, confirm the file `./src/aws-exports.json` is located on the root of `/client`
+2. Now, let’s deploy the authentication to AWS running `amplify push` and confirm when the CLI asks for confirmation
 
-> Config File
+![Untitled 3](https://user-images.githubusercontent.com/42990423/196822839-eccf7fff-a39a-4521-854c-4436c44d728d.png)
+1. Feel free and happy if you see the following message after deploying: 
 
-``` js
-    {
-        "MONGO_HOST": "cluster0-shard-00-02-abc123.mongodb.net:27017",
-        "MONGO_PORT": 27017,
-        "MONGO_SECRET": "password",
-        "MONGO_SET": "replicas_only",
-        "MONGO_USER": "FlavioAandres",
-        "SRV_CONFIG": false, // Note the SRV CONFIG flag off
-        "EMAIL_USERNAME": "me@andresmorelos.dev", //Only needed if you will not use the emails process with SES
-        "EMAIL_PASSWORD": "PASSWORD", //Only needed if you will not use the emails process with SES
-        "SECRET_KEY": "GENERATE_ME!",
-        "BODY_REQUEST": "",
-        "EMAIL_RECIPIENTS": ["finance_email@andresmorelos.dev"],
-        "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:ID:userpool/us-east-1_ID",
-        "TWILIO_ACCESS_TOKEN": "TOKEN",
-        "TWILIO_SECTRET_KEY" : "SECRET_TOKEN",
-        "TELEGRAM_BOT_KEY": "TELEGRAM_KEY"
-    }
-```
+![Untitled 4](https://user-images.githubusercontent.com/42990423/196822841-7851d422-f9e9-4d12-b64e-8db1f269bc27.png)
 
-```js
-    {
-        "MONGO_HOST": "mongodb+srv://USER:PASSWORD@clustername.ixvju.mongodb.net/DATABASE?authSource=admin&replicaSet=REPLICASET&w=majority&readPreference=primary&appname=Personal%20Finances&retryWrites=true&ssl=true",
-        "MONGO_PORT": 27017,
-        "MONGO_SECRET": "",
-        "MONGO_SET": "",
-        "MONGO_USER": "",
-        "MONGO_DATABASE": "",
-        "SRV_CONFIG": true, //Note SRV CONFIG flag on
-        "EMAIL_USERNAME": "me@andresmorelos.dev", //Only needed if you will not use the emails process with SES
-        "EMAIL_PASSWORD": "PASSWORD", //Only needed if you will not use the emails process with SES
-        "SECRET_KEY": "GENERATE_ME!",
-        "BODY_REQUEST": "",
-        "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:ID:userpool/us-east-1_ID",
-        "EMAIL_RECIPIENTS": ["finance_email@andresmorelos.dev"],
-        "TWILIO_ACCESS_TOKEN": "TOKEN",
-        "TWILIO_SECTRET_KEY" : "SECRET_TOKEN",
-        "TELEGRAM_BOT_KEY": "TELEGRAM_KEY"
-    }
-```
+I recommend you go to AWS Console (web dashboard) and check the new Cognito User Pull is successfully deployed as this: 
 
-## Deploy 
+![Untitled 5](https://user-images.githubusercontent.com/42990423/196822843-c92a57f9-d669-41bf-9b6f-e3c0b266a611.png)
 
-``` bash
-sls deploy --stage [DEV/TEST/PROD]
-```
+## Initializing the UI in local to connect with the current user pool (testing everything goes properly)
 
-## Mongo Collections
+1. run `npm install` ,then `npm run start` you must see no error in the React Client 
 
-    - users
-    - payments 
-    - banks 
-    - datacreditos
+![Untitled 6](https://user-images.githubusercontent.com/42990423/196822844-0fda3f62-8f1d-44d2-8281-bb1a59bb412c.png)
 
-### Mongo Documents (Examples):
+## Deploy Backend API and Configure with Cognito Pool.
 
-## User
+To create an account, for the first time, we need to continue deploying and configuring the API to save the users created by Cognito, so, let’s deploy the API. 
 
-``` json
-[
-    {
-        "_id": {
-            "$oid": "XXXXXXXXX"
-        },
-        "name": "Andres Morelos",
-        "emails": ["me@andresmorelos.dev"],
-        "phones": ["+57300300300", "+57300300300"],
-        "email": "me@andresmorelos.dev",
-        "settings": {
-            datacredito: {
-                user: {}, // Encrypted data
-                password: {},// Encrypted data
-                secondpass: {}// Encrypted data
-            }
-        }
-    },
-     {
-        "_id": {
-            "$oid": "XXXXXXXXX"
-        },
-        "name": "Flavio Andres",
-        "emails": ["me@flavioaandres.com"],
-        "phones": ["+57300300300", "+57300300300"],
-        "email": "me@flavioaandres.com",
-        "settings": {
-            datacredito: {
-                user: {}, // Encrypted data
-                password: {},// Encrypted data
-                secondpass: {}// Encrypted data
-            }
-        }
-    }
-]
+1. **IMPORTANT!!! - Run `aws configure` *and set your credentials.** thanks Oswaldo to deploy everything in the Business account and realized this.* 
+2. Go to the root of the Project and create a new filed called: `config/{environment}.json` with the following fields: 
 
-```
-
-### Bank
-
-#### Bancolombia
-
-``` js
-[
-    // Bancolombia
-    {
-        "_id": {
-            "$oid": "5fc002bfe604fe349ea1257c"
-        },
-        "filters": [{
-            "phrase": "Bancolombia te informa recepción transferencia",
-            "type": "INCOME",
-            "parser": "transferReception"
-        }, {
-            "phrase": "Bancolombia le informa Compra",
-            "type": "EXPENSE",
-            "parser": "shopping"
-        }, {
-            "phrase": "Bancolombia le informa Retiro",
-            "type": "EXPENSE",
-            "parser": "debitWithdrawal"
-        }, {
-            "phrase": "Bancolombia le informa Transferencia",
-            "type": "EXPENSE"
-            "parser": "transfer"
-        }],
-        "name": "BANCOLOMBIA",
-        "subject": "Servicio de Alertas y Notificaciones Bancolombia",
-        "folder": "Cosas Personales/Bancolombia",
-        "createdAt": {
-            "$date": "2020-11-26T19:32:15.925Z"
-        },
-        "updatedAt": {
-            "$date": "2020-11-26T19:32:15.925Z"
-        },
-        "__v": 0,
-        "ignore_phrase": "Bancolombia le informa que su factura inscrita",
-        "index_value": {
-            "$numberLong": "0"
-        }
-    }
-    // PSE
-    {
-        "_id": {
-            "$oid": "5fc10af82af06f08b5c49b22"
-        },
-        "filters": [{
-            "phrase": "Empresa:",
-            "type": "EXPENSE"
-        }],
-        "name": "PSE",
-        "subject": "Confirmación Transacción PSE",
-        "folder": "Cosas Personales/PSE",
-        "ignore_phrase": "Estado de la transacción: Rechazada",
-        "index_value": {
-            "$numberLong": "0"
-        }
-    }
-]
-```
-
-## Filters Types: 
-
-  + Payments: "Bancolombia le informa Pago"
-  + Shopping: "Bancolombia le informa Compra"
-  + Transfer: "Bancolombia le informa Transferencia"
-  + TransferReception: "Bancolombia le informa tecepción de Transferencia"
-  + DebitWithdrawal: "Bancolombia le informa Retiro"
-
-## Data Credito
-
-``` json
-
+```jsx
+-- ./config/test.json
 {
-    "_id": {
-        "$oid": "XXXXXXXXXXX"
-    },
-    "comportamiento": "volatil",
-    "score": 727,
-    "amountOfProducts": 4,
-    "arrears30daysLastYear": null,
-    "arrears60daysLast2Year": null,
-    "arrearsAmount": 0,
-    "date": {
-        "month": "11",
-        "year": "2020"
-    },
-    "user": {
-        "$oid": "XXXXXXXXXXXX"
-    },
-    "createdAt": {
-        "$date": "2020-12-14T05:40:10.075Z"
-    },
-    "updatedAt": {
-        "$date": "2020-12-14T06:06:21.336Z"
-    },
-    "__v": 0
+    "MONGO_HOST": "YourMongoDB_Host",
+    "MONGO_PORT": 27017,
+    "MONGO_SECRET": "MongoPass",
+    "MONGO_SET": "replica-set-Cluster0-shard-0",
+    "MONGO_USER": "MongoUSER",
+    "MONGO_DATABASE":"DatabaseName",
+    "SRV_CONFIG": false,
+    "USER_POOL_ARN": "arn:aws:cognito-idp:us-east-1:9999999999:userpool/us-west-1_632zAiS9C"
 }
 ```
 
-# Data Credito Scraper DICLAIMER
+The fields above show all the environment vars needed by the API, basically the MONGO and COGNITO credentials. 
 
-``` 
+1. run `cd ../` `npm install`
+2. run `serverless deploy --stage {environment} --region={same_as_cognito_region}`
 
-THIS SCRAPER IS A RESEARCH BASED PROJECT, WE DON'T ENCOURAGE THE MISUSE OF THIS TOOL FOR BAD INTENTIONS.
+![Untitled 7](https://user-images.githubusercontent.com/42990423/196822847-d9619ac8-fa90-4654-bff8-2f623ff98f6e.png)
 
-WE ALSO RECOMMEND USERS TO ACQUIRE A PLAN AT www.midatacredito.com TO MAKE USE OF THIS TOOL.
+If everything is successfully deployed, you must see something similar to the logs above. 
 
-THE DEVELOPERS ARE NOT RESPONSIBLE FOR ANY MISUSE OF THIS TOOL.
+### Connect API with Cognito
+
+1. Go to your Cognito user Pool → Triggers → Set the function for Post Confirmation hook. 
+
+![Untitled 8](https://user-images.githubusercontent.com/42990423/196822850-ab1e8894-18a8-4679-ba63-0ef8974d77d7.png)
+
+1. Click on “Save”
+
+## Deploying UI - React Client
+
+1. Create an S3 Bucket with the Website property in the AWS Console
+2. If you already have a domain name for this, remember to name the Bucket with the domain address, for example for the name: finances.flavioaandres.com. These are the steps to create: 
+
+![Untitled 9](https://user-images.githubusercontent.com/42990423/196822852-05645ca9-82b7-4478-b4f7-01e7e9ea0b6f.png)
+![Untitled 10](https://user-images.githubusercontent.com/42990423/196822854-9db85007-a05d-4aa4-88a3-5964613fb1b3.png)
+
+1. After creating the S3 bucket, go to the bucket and Click on **Properties** 
+2. Enable the Static Web Hosting feature and add the following settings: 
+    1. Index page: index.html 
+    2. Error Page: index.html
+
+
+![Untitled 11](https://user-images.githubusercontent.com/42990423/196822855-652f958c-223c-48be-977d-ad443867c636.png)
+
+1. Go to `./client/package.json` and update the following scripts to point to your S3 bucket name instead of flavioaandres.com 🙂
+    1. deploy:test
+    2. deploy:prod
+    3. example: `"npm run build:test && aws s3 sync build/ s3:**//my-finances-bucket-flavio** --acl public-read",`
+2. Check your `.env.{environment}` is created, if you’re going to deploy test stage, check `.env.test` is set up with the right .env vars: 
+
+```jsx
+REACT_APP_FINANCES_API_URL="https://api.env.flavioaandres.com"
+```
+
+1. Now, run to deploy: `cd client/ && npm run deploy:test`
+
+## FINALLY EVERYTHING IS DEPLOYED;
+
+### If everything is properly set, you must be able to create the new account in your S3 Bucket.
+
+![Untitled 12](https://user-images.githubusercontent.com/42990423/196822856-092ab97a-55ec-4660-ae9c-621fe57e6162.png)
+
+## MAIL CHIMP
+
+1. Create the Mail-chimp account and then click on Transactional Email and Launch App
+
+![Untitled 13](https://user-images.githubusercontent.com/42990423/196822858-c430ee5e-114d-40c9-90e4-1b0ddc6100bd.png)
+
+1. Add your own domain and follow the instructions of mailchimp setup 
+
+![Untitled 14](https://user-images.githubusercontent.com/42990423/196822860-3183966f-e4ec-4aa0-a435-13d9e4a1c20e.png)
+
+1. Create the email where you will receive the messages and test it 
+
+![Untitled 15](https://user-images.githubusercontent.com/42990423/196822865-67e9b56c-57ba-4489-b92a-f525c507d3e8.png)
+
+
+### Create the Following Document in your Bank Collection in mongo db. 
+
+```
+{
+    "_id" : ObjectId("5fd625d50e1f299d3a6c9521"),
+    "filters" : [ 
+        {
+            "phrase" : "Bancolombia te informa recepción transferencia",
+            "type" : "INCOME",
+            "parser" : "transferReception"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Compra",
+            "type" : "EXPENSE",
+            "parser" : "shopping"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Retiro",
+            "type" : "EXPENSE",
+            "parser" : "debitWithdrawal"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Transferencia",
+            "type" : "EXPENSE",
+            "parser" : "transfer"
+        }, 
+        {
+            "phrase" : "Bancolombia le informa Pago",
+            "type" : "EXPENSE",
+            "parser" : "payments"
+        }
+    ],
+    "name" : "BANCOLOMBIA",
+    "subjects" : [ 
+        "Servicio de Alertas y Notificaciones Bancolombia", 
+        "Servicio de Alertas.", 
+        "Servicio de Alertas y Notificaciones", 
+        "Alertas y Notificaciones"
+    ],
+    "folder" : "INBOX",
+    "createdAt" : ISODate("2020-11-26T19:32:15.925Z"),
+    "updatedAt" : ISODate("2020-11-26T19:32:15.925Z"),
+    "__v" : 0.0,
+    "ignore_phrase" : "Bancolombia le informa que su factura inscrita",
+    "index_value" : NumberLong(0)
+}
+
+
 ```
