@@ -28,7 +28,7 @@
     "mongoose-autopopulate": "^0.14.0",
     "puppeteer-core": "^5.5.0",
     "telegraf": "^4.3.0",
-    "twilio": "^3.39.1"
+    "twilio": "^3.84.1"
   },
   "devDependencies": {
     "aws-sdk": "^2.910.0",
