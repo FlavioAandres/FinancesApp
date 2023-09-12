@@ -26,14 +26,14 @@ const parseEmailInfo = (headers) => {
 }
 
 const parseHtmlWithRegex = (html)=>{
-  return html.replaceAll(/\n/ig, '')
+  return html.replace(/\n/ig, '')
   .replace(/<style[^>]*>[\s\S]*?<\/style[^>]*>/ig, '')
   .replace(/<head[^>]*>[\s\S]*?<\/head[^>]*>/ig, '')
   .replace(/<script[^>]*>[\s\S]*?<\/script[^>]*>/ig, '')
   .replace(/<\/\s*(?:p|div)>/ig, '\n')
   .replace(/<br[^>]*\/?>/ig, '\n')
   .replace(/<[^>]*>/ig, '')
-  .replaceAll('&nbsp;', ' ')
+  .replace('&nbsp;', ' ')
   .replace(/[^\S\r\n][^\S\r\n]+/ig, ' ')
 }
 

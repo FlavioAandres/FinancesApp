@@ -26,7 +26,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs14.x
   stage: test
   memorySize: 520 # optional, in MB, default is 1024
   timeout: 15 # optional, in seconds, default is 6
@@ -363,32 +363,31 @@ functions:
             claims:
               - sub
 
-  #Telegram Bot
-  TelegramBotSetWebhook:
-    handler: AutomationServices/TelegramBot/handler.setWebhook
-    name: TelegramBotSetWebhook-POST-${opt:stage}
-    events:
-      - http:
-          path: /telegram/setWebhook
-          method: POST
-          cors: true
-    environment:
-      BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
+  # #Telegram Bot
+  # BOTS DEPRECATED
+  # TelegramBotSetWebhook:
+  #   handler: AutomationServices/TelegramBot/handler.setWebhook
+  #   name: TelegramBotSetWebhook-POST-${opt:stage}
+  #   events:
+  #     - http:
+  #         path: /telegram/setWebhook
+  #         method: POST
+  #         cors: true
+  #   environment:
+  #     BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
 
-  TelegramBotWebHook:
-    handler: AutomationServices/TelegramBot/handler.webhook
-    name: TelegramBotWebHook-POST-${opt:stage}
-    events:
-      - http:
-          path: /telegram/webhook
-          method: POST
-          cors: true
-    environment:
-      BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
+  # TelegramBotWebHook:
+  #   handler: AutomationServices/TelegramBot/handler.webhook
+  #   name: TelegramBotWebHook-POST-${opt:stage}
+  #   events:
+  #     - http:
+  #         path: /telegram/webhook
+  #         method: POST
+  #         cors: true
+  #   environment:
+  #     BOT_TOKEN: ${file(./config/${opt:stage}.json):TELEGRAM_BOT_KEY}
 
   #AUTOMATIONS
-
-
   ProcessEmailsFromUsers:
     handler: AutomationServices/EmailsForwardingReader/index.process
     name: ProcessEmailsFromUsers-${opt:stage}
@@ -414,41 +413,41 @@ functions:
               - AcceptationEmailQueue
               - Arn
           batchSize: 1
-
-  EmailChecker:
-    handler: AutomationServices/AutoMailChecker/checker.start
-    name: AutomationServices-EmailChecker-${opt:stage}
-    timeout: 120
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - EmailUsersQueue
-              - Arn
-          batchSize: 1
-    environment:
-      EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
-      EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
-
-  PaymentsAnalizer:
-    handler: AutomationServices/AnalizerTask/analizer.start
-    name: AutomationServices-AnalizerTasks-${opt:stage}
-    events:
-      - schedule:
-          description: "Runs every month"
-          rate: cron(0 0 1 * ? *) # First day of the month
-          enabled: true
-          input:
-            ExecutionType: "MONTHLY"
-      - schedule:
-          description: "Runs every sunday"
-          rate: cron(0 0 ? * SUN *)
-          enabled: true
-          input:
-            ExecutionType: "WEEKLY"
-    environment:
-      TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
-      TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
+  # DEPRECATED
+  # EmailChecker:
+  #   handler: AutomationServices/AutoMailChecker/checker.start
+  #   name: AutomationServices-EmailChecker-${opt:stage}
+  #   timeout: 120
+  #   events:
+  #     - sqs:
+  #         arn:
+  #           Fn::GetAtt:
+  #             - EmailUsersQueue
+  #             - Arn
+  #         batchSize: 1
+  #   environment:
+  #     EMAIL_USERNAME: ${file(./config/${opt:stage}.json):EMAIL_USERNAME}
+  #     EMAIL_PASSWORD: ${file(./config/${opt:stage}.json):EMAIL_PASSWORD}
+  # DEPERECATED - Needs to be redefined
+  # PaymentsAnalizer:
+  #   handler: AutomationServices/AnalizerTask/analizer.start
+  #   name: AutomationServices-AnalizerTasks-${opt:stage}
+  #   events:
+  #     - schedule:
+  #         description: "Runs every month"
+  #         rate: cron(0 0 1 * ? *) # First day of the month
+  #         enabled: true
+  #         input:
+  #           ExecutionType: "MONTHLY"
+  #     - schedule:
+  #         description: "Runs every sunday"
+  #         rate: cron(0 0 ? * SUN *)
+  #         enabled: true
+  #         input:
+  #           ExecutionType: "WEEKLY"
+  #   environment:
+  #     TWILIO_ACCESS_TOKEN: ${file(./config/${opt:stage}.json):TWILIO_ACCESS_TOKEN}
+  #     TWILIO_SECTRET_KEY: ${file(./config/${opt:stage}.json):TWILIO_SECTRET_KEY}
 
   HideNoAcceptedPayments:
     handler: AutomationServices/AutoHidePayments/handler.start

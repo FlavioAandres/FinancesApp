@@ -22,7 +22,7 @@ module.exports.process = async (event, context, callback) => {
     const emailData = {
         html: data.text,
     }
-
+    
     // TODO
     // Receive date form email
     await processBankEmails([data.bank], user, emailData, Date.now());
@@ -48,7 +48,9 @@ const processBankEmails = async (bank, user, emailData, timestamp) => {
         bankName
       );
 
-      if (!res) continue;
+      if (!res) {
+        continue;
+      };
 
       const prePaymentObj = {
         bank: bankName,
